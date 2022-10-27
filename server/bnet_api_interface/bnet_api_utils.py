@@ -1,9 +1,16 @@
 import datetime as dt
+from enum import Enum
 import json
 import requests
 from requests.auth import HTTPBasicAuth
 
 
+'''
+This enum enumerates the CLASSIC and RETAIL versions of WoW
+'''
+class GameVersion(Enum):
+    CLASSIC = 1
+    RETAIL = 2
 
 
 '''
@@ -12,6 +19,12 @@ game data
 '''
 
 class BNetAPIUtil:
+
+    '''
+    ===============
+    Class Variables
+    ===============
+    '''
 
     '''
     Battle.net API access keys
@@ -33,11 +46,12 @@ class BNetAPIUtil:
     # TODO: consider non-static namespaces (eg. dynamic, profile)
     # Only use US region
     namespaces = {
-        'classic': 'static-classic-us',
-        'retail': 'static-us'
+        GameVersion.CLASSIC: 'static-classic-us',
+        GameVersion.RETAIL: 'static-us'
     }
     # Only use en_US
     locale = 'en_US'
+
 
     '''
     DESC
@@ -50,6 +64,7 @@ class BNetAPIUtil:
     '''
     def __init__(self):
         self.__access_token__ = None
+    
     
     '''
     ==============
@@ -122,6 +137,28 @@ class BNetAPIUtil:
     https://develop.battle.net/documentation/world-of-warcraft-classic
     '''
     
+    
+    '''
+    ----------------
+    Helper Functions
+    ----------------
+    '''
+    
+    
+    '''
+    DESC
+        Verifies whether the input is of type GameVersion, raise an exception
+        if it is not
+    
+    INPUT
+        Maybe a GameVersion enum
+    
+    RETURN
+    '''
+    def __verify_game_version(self, game_version) -> None:
+        if game_version not in GameVersion:
+            raise TypeError('{} not found in GameVersion'.format(game_version))
+    
     '''
     -----------
     WoW Classic
@@ -135,6 +172,7 @@ class BNetAPIUtil:
         GET requests
     
     INPUT
+        GameVersion enum
     
     RETURN
         Dictionary with the following base params defined
@@ -142,12 +180,13 @@ class BNetAPIUtil:
         - access_token
         - locale
     '''
-    def get_base_payload(self) -> dict:
+    def __get_base_payload(self, game_version) -> dict:
         # check existing token
         if not self.has_valid_access_token():
             self.get_access_token()
+            
         return {
-            'namespace': self.namespaces['classic'],
+            'namespace': self.namespaces[game_version],
             'locale': self.locale,
             'access_token': self.__access_token__
         }
@@ -158,16 +197,18 @@ class BNetAPIUtil:
         Item data endpoint /data/wow/item/{itemId}
         
     INPUT
-        Unique ItemID of the item
+        - Unique ItemID of the item
+        - Version of WoW (Classic / Retail)
         
     RETURN
         JSON response body
     '''
-    def get_item_metadata(self, itemid) -> dict:  
+    def get_item_metadata(self, itemid, game_version) -> dict:  
         # prepare GET metadata
+        self.__verify_game_version(game_version)
         base_url = 'https://us.api.blizzard.com/data/wow/item/{itemid}'
         url = base_url.format(itemid=itemid)
-        payload = self.get_base_payload()
+        payload = self.__get_base_payload(game_version)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -184,16 +225,18 @@ class BNetAPIUtil:
         Item media endpoint /data/wow/media/item/{itemId}
         
     INPUT
-        Unique ItemID of the item
+        - Unique ItemID of the item
+        - Version of WoW (Classic / Retail)
         
     RETURN
         JSON response body
     '''
-    def get_item_media_metadata(self, itemid) -> dict:  
+    def get_item_media_metadata(self, itemid, game_version) -> dict:  
         # prepare GET metadata
+        self.__verify_game_version(game_version)
         base_url = 'https://us.api.blizzard.com/data/wow/media/item/{itemid}'
         url = base_url.format(itemid=itemid)
-        payload = self.get_base_payload()
+        payload = self.__get_base_payload(game_version)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -213,7 +256,7 @@ def main():
     util = BNetAPIUtil()
     if not util.has_valid_access_token():
         util.get_access_token()
-    item_data = util.get_item_media_metadata(19019)
+    item_data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
     print(json.dumps(item_data))
     
 if __name__ == "__main__":

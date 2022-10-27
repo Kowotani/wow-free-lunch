@@ -43,6 +43,7 @@ class BNetAPIUtil:
     '''
     Other API Inputs
     '''
+    base_api_url = 'https://us.api.blizzard.com'
     # TODO: consider non-static namespaces (eg. dynamic, profile)
     # Only use US region
     namespaces = {
@@ -52,6 +53,12 @@ class BNetAPIUtil:
     # Only use en_US
     locale = 'en_US'
 
+
+    '''
+    Profession Map of [Profession -> Index]
+    '''
+    professions = {}
+    
 
     '''
     DESC
@@ -159,10 +166,11 @@ class BNetAPIUtil:
         if game_version not in GameVersion:
             raise TypeError('{} not found in GameVersion'.format(game_version))
     
+    
     '''
-    -----------
-    WoW Classic
-    -----------
+    --------------
+    Item Endpoints
+    --------------
     '''
     
     
@@ -206,7 +214,7 @@ class BNetAPIUtil:
     def get_item_metadata(self, itemid, game_version) -> dict:  
         # prepare GET metadata
         self.__verify_game_version(game_version)
-        base_url = 'https://us.api.blizzard.com/data/wow/item/{itemid}'
+        base_url = self.base_api_url + '/data/wow/item/{itemid}'
         url = base_url.format(itemid=itemid)
         payload = self.__get_base_payload(game_version)
         
@@ -234,7 +242,7 @@ class BNetAPIUtil:
     def get_item_media_metadata(self, itemid, game_version) -> dict:  
         # prepare GET metadata
         self.__verify_game_version(game_version)
-        base_url = 'https://us.api.blizzard.com/data/wow/media/item/{itemid}'
+        base_url = self.base_api_url + '/data/wow/media/item/{itemid}'
         url = base_url.format(itemid=itemid)
         payload = self.__get_base_payload(game_version)
         
@@ -248,6 +256,37 @@ class BNetAPIUtil:
         return None
 
 
+    '''
+    --------------------
+    Profession Endpoints
+    --------------------
+    '''
+    
+
+    '''
+    DESC
+        Profession index endpoint /data/wow/profession/index
+        
+    INPUT
+        
+    RETURN
+        JSON response body
+    '''
+    def get_profession_index(self) -> dict:  
+        # prepare GET metadata
+        url = self.base_api_url + '/data/wow/profession/index'
+        # this endpoint is only supported on RETAIL
+        payload = self.__get_base_payload(GameVersion.RETAIL)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            r.raise_for_status()
+            
+        return None    
+
 '''
 Main code
 '''
@@ -256,8 +295,10 @@ def main():
     util = BNetAPIUtil()
     if not util.has_valid_access_token():
         util.get_access_token()
-    item_data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
-    print(json.dumps(item_data))
+    # item_data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
+    # print(json.dumps(item_data))
+    profession_data = util.get_profession_index()
+    print(json.dumps(profession_data))
     
 if __name__ == "__main__":
     main()

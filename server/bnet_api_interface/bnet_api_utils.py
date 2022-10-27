@@ -86,6 +86,34 @@ class BNetAPIUtil:
     
     
     '''
+    ================
+    Helper Functions
+    ================
+    '''
+    
+    '''
+    DESC
+        Handles a response from a Requests call - if the status is good (200) 
+        this will return the response body, otherwise it will raise an exception
+        
+    INPUT
+        Response from a Requests GET or POST call
+        
+    RETURN
+        Response body as JSON if the status is good (200)
+    '''
+    @staticmethod
+    def handle_request_response(response) -> dict:
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raise_for_status()
+            
+        return None
+    
+    
+    '''
     ==============
     Auth Functions
     ==============
@@ -140,14 +168,11 @@ class BNetAPIUtil:
         
         # POST request
         r = requests.post(url, auth=auth, data=data)
-        if r.status_code == 200:
-            r_body = r.json()
-            self.__access_token__ = r_body['access_token']
-            self.access_token_expiration = dt.datetime.now() + \
-                dt.timedelta(seconds=r_body['expires_in'])
-        else:
-            r.raise_for_status()
-
+        body = BNetAPIUtil.handle_request_response(r)
+        self.__access_token__ = body['access_token']
+        self.access_token_expiration = dt.datetime.now() + \
+            dt.timedelta(seconds=body['expires_in'])
+            
 
     '''
     =============
@@ -238,12 +263,7 @@ class BNetAPIUtil:
         
         # GET request
         r = requests.get(url, params=payload)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            r.raise_for_status()
-            
-        return None
+        return BNetAPIUtil.handle_request_response(r)
         
 
     '''
@@ -267,12 +287,7 @@ class BNetAPIUtil:
         
         # GET request
         r = requests.get(url, params=payload)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            r.raise_for_status()
-            
-        return None
+        return BNetAPIUtil.handle_request_response(r)
 
 
     '''
@@ -316,12 +331,7 @@ class BNetAPIUtil:
         
         # GET request
         r = requests.get(url, params=payload)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            r.raise_for_status()
-            
-        return None    
+        return BNetAPIUtil.handle_request_response(r)  
 
 
     '''
@@ -344,12 +354,7 @@ class BNetAPIUtil:
         
         # GET request
         r = requests.get(url, params=payload)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            r.raise_for_status()
-            
-        return None  
+        return BNetAPIUtil.handle_request_response(r)
 
 
     '''
@@ -377,12 +382,7 @@ class BNetAPIUtil:
         
         # GET request
         r = requests.get(url, params=payload)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            r.raise_for_status()
-            
-        return None  
+        return BNetAPIUtil.handle_request_response(r)
 
 
     '''
@@ -405,12 +405,7 @@ class BNetAPIUtil:
         
         # GET request
         r = requests.get(url, params=payload)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            r.raise_for_status()
-            
-        return None  
+        return BNetAPIUtil.handle_request_response(r)
         
         
     '''
@@ -433,12 +428,7 @@ class BNetAPIUtil:
         
         # GET request
         r = requests.get(url, params=payload)
-        if r.status_code == 200:
-            return r.json()
-        else:
-            r.raise_for_status()
-            
-        return None          
+        return BNetAPIUtil.handle_request_response(r)         
 
 
 '''

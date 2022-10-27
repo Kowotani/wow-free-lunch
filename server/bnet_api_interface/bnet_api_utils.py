@@ -27,6 +27,12 @@ class BNetAPIUtil:
     '''
 
     '''
+    --------------------------
+    Generic Endpoint Variables
+    --------------------------
+    '''
+
+    '''
     Battle.net API access keys
     '''
     __CLIENT_ID__ = '4e41cbadc23f466ea64c61e382c08bd1'
@@ -53,6 +59,12 @@ class BNetAPIUtil:
     # Only use en_US
     locale = 'en_US'
 
+
+    '''
+    -----------------------------
+    Profession Endpoint Variables
+    -----------------------------
+    '''
 
     '''
     Profession Map of [Profession -> ID]
@@ -91,6 +103,7 @@ class BNetAPIUtil:
         HTTPBasicAuth object       
     '''
     def __get_auth_object(self) -> HTTPBasicAuth:
+        
         return HTTPBasicAuth(self.__CLIENT_ID__, self.__CLIENT_SECRET__)
 
     '''
@@ -103,6 +116,7 @@ class BNetAPIUtil:
         TRUE if the access token is still valid, FALSE otherwise
     '''
     def has_valid_access_token(self) -> bool:
+        
         return self.__access_token__ is not None and \
             dt.datetime.now() < self.access_token_expiration
 
@@ -118,6 +132,7 @@ class BNetAPIUtil:
     RETURN
     '''
     def get_access_token(self) -> None:
+        
         # prepare POST metadata
         url = 'https://oauth.battle.net/token'
         auth = self.__get_auth_object()
@@ -163,6 +178,7 @@ class BNetAPIUtil:
     RETURN
     '''
     def __verify_game_version(self, game_version) -> None:
+        
         if game_version not in GameVersion:
             raise TypeError('{} not found in GameVersion'.format(game_version))
     
@@ -189,6 +205,7 @@ class BNetAPIUtil:
         - locale
     '''
     def __get_base_payload(self, game_version) -> dict:
+        
         # check existing token
         if not self.has_valid_access_token():
             self.get_access_token()
@@ -211,11 +228,12 @@ class BNetAPIUtil:
     RETURN
         JSON response body
     '''
-    def get_item_metadata(self, itemid, game_version) -> dict:  
+    def get_item_metadata(self, item_id, game_version) -> dict: 
+        
         # prepare GET metadata
         self.__verify_game_version(game_version)
-        base_url = self.base_api_url + '/item/{itemid}'
-        url = base_url.format(itemid=itemid)
+        base_url = self.base_api_url + '/item/{item_id}'
+        url = base_url.format(item_id=item_id)
         payload = self.__get_base_payload(game_version)
         
         # GET request
@@ -239,11 +257,12 @@ class BNetAPIUtil:
     RETURN
         JSON response body
     '''
-    def get_item_media_metadata(self, itemid, game_version) -> dict:  
+    def get_item_media_metadata(self, item_id, game_version) -> dict:  
+        
         # prepare GET metadata
         self.__verify_game_version(game_version)
-        base_url = self.base_api_url + '/media/item/{itemid}'
-        url = base_url.format(itemid=itemid)
+        base_url = self.base_api_url + '/media/item/{item_id}'
+        url = base_url.format(item_id=item_id)
         payload = self.__get_base_payload(game_version)
         
         # GET request
@@ -272,6 +291,7 @@ class BNetAPIUtil:
     RETURN
     '''
     def create_profession_map(self) -> None:
+        
         professions = {}
         profession_json = self.get_profession_index()
         for profession in profession_json['professions']:
@@ -280,7 +300,7 @@ class BNetAPIUtil:
 
     '''
     DESC
-        Profession index endpoint /profession/index
+        Profession index endpoint /profession/index. Only supported on RETAIL
         
     INPUT
         
@@ -288,6 +308,7 @@ class BNetAPIUtil:
         JSON response body
     '''
     def get_profession_index(self) -> dict:  
+        
         # prepare GET metadata
         url = self.base_api_url + '/profession/index'
         # this endpoint is only supported on RETAIL
@@ -302,6 +323,124 @@ class BNetAPIUtil:
             
         return None    
 
+
+    '''
+    DESC
+        Profession endpoint /profession/{professionId}
+        
+    INPUT
+        Unique ProfessionID of the Profession
+        
+    RETURN
+        JSON response body
+    '''
+    def get_profession_metadata(self, profession_id) -> dict: 
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + '/profession/{profession_id}'
+        url = base_url.format(profession_id=profession_id)
+        # this endpoint is only supported on RETAIL
+        payload = self.__get_base_payload(GameVersion.RETAIL)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            r.raise_for_status()
+            
+        return None  
+
+
+    '''
+    DESC
+        Profession skill tier endpoint 
+        /profession/{professionId}/skill-tier/{skillTierId}
+        
+    INPUT
+        - Unique ProfessionID of the Profession
+        - Unique SkilltierID of the Profession's Skill Tier
+        
+    RETURN
+        JSON response body
+    '''
+    def get_profession_skill_tier_metadata(self, profession_id, 
+        skill_tier_id) -> dict:  
+            
+        # prepare GET metadata
+        base_url = self.base_api_url + \
+            '/profession/{profession_id}/skill-tier/{skill_tier_id}'
+        url = base_url.format(profession_id=profession_id, 
+            skill_tier_id=skill_tier_id)
+        # this endpoint is only supported on RETAIL
+        payload = self.__get_base_payload(GameVersion.RETAIL)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            r.raise_for_status()
+            
+        return None  
+
+
+    '''
+    DESC
+        Recipe endpoint /profession/{recipeID}
+        
+    INPUT
+        Unique RecipeID of the Recipe
+        
+    RETURN
+        JSON response body
+    '''
+    def get_recipe_metadata(self, recipe_id) -> dict:  
+            
+        # prepare GET metadata
+        base_url = self.base_api_url + '/recipe/{recipe_id}'
+        url = base_url.format(recipe_id=recipe_id)
+        # this endpoint is only supported on RETAIL
+        payload = self.__get_base_payload(GameVersion.RETAIL)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            r.raise_for_status()
+            
+        return None  
+        
+        
+    '''
+    DESC
+        Recipe Media endpoint /media/recipe/{recipeID}
+        
+    INPUT
+        Unique RecipeID of the Recipe
+        
+    RETURN
+        JSON response body
+    '''
+    def get_recipe_media_metadata(self, recipe_id) -> dict:  
+            
+        # prepare GET metadata
+        base_url = self.base_api_url + '/media/recipe/{recipe_id}'
+        url = base_url.format(recipe_id=recipe_id)
+        # this endpoint is only supported on RETAIL
+        payload = self.__get_base_payload(GameVersion.RETAIL)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            r.raise_for_status()
+            
+        return None          
+
+
 '''
 Main code
 '''
@@ -310,11 +449,12 @@ def main():
     util = BNetAPIUtil()
     if not util.has_valid_access_token():
         util.get_access_token()
-    # item_data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
-    # print(json.dumps(item_data))
-    # profession_data = util.get_profession_index()
-    util.create_profession_map()
-    print(util.professions)
+    # data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
+    # data = util.get_profession_skill_tier_metadata(197, 2540)
+    data = util.get_recipe_media_metadata(2360)
+    print(json.dumps(data))
+    # util.create_profession_map()
+    # print(util.professions)
     
 if __name__ == "__main__":
     main()

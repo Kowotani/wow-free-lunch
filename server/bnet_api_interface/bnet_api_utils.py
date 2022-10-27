@@ -43,7 +43,7 @@ class BNetAPIUtil:
     '''
     Other API Inputs
     '''
-    base_api_url = 'https://us.api.blizzard.com'
+    base_api_url = 'https://us.api.blizzard.com/data/wow'
     # TODO: consider non-static namespaces (eg. dynamic, profile)
     # Only use US region
     namespaces = {
@@ -55,7 +55,7 @@ class BNetAPIUtil:
 
 
     '''
-    Profession Map of [Profession -> Index]
+    Profession Map of [Profession -> ID]
     '''
     professions = {}
     
@@ -202,7 +202,7 @@ class BNetAPIUtil:
     
     '''
     DESC
-        Item data endpoint /data/wow/item/{itemId}
+        Item data endpoint /item/{itemId}
         
     INPUT
         - Unique ItemID of the item
@@ -214,7 +214,7 @@ class BNetAPIUtil:
     def get_item_metadata(self, itemid, game_version) -> dict:  
         # prepare GET metadata
         self.__verify_game_version(game_version)
-        base_url = self.base_api_url + '/data/wow/item/{itemid}'
+        base_url = self.base_api_url + '/item/{itemid}'
         url = base_url.format(itemid=itemid)
         payload = self.__get_base_payload(game_version)
         
@@ -230,7 +230,7 @@ class BNetAPIUtil:
 
     '''
     DESC
-        Item media endpoint /data/wow/media/item/{itemId}
+        Item media endpoint /media/item/{itemId}
         
     INPUT
         - Unique ItemID of the item
@@ -242,7 +242,7 @@ class BNetAPIUtil:
     def get_item_media_metadata(self, itemid, game_version) -> dict:  
         # prepare GET metadata
         self.__verify_game_version(game_version)
-        base_url = self.base_api_url + '/data/wow/media/item/{itemid}'
+        base_url = self.base_api_url + '/media/item/{itemid}'
         url = base_url.format(itemid=itemid)
         payload = self.__get_base_payload(game_version)
         
@@ -262,10 +262,25 @@ class BNetAPIUtil:
     --------------------
     '''
     
+    
+    '''
+    DESC
+        Creates the Profession Map that maps Professions -> ID
+        
+    INPUT
+        
+    RETURN
+    '''
+    def create_profession_map(self) -> None:
+        professions = {}
+        profession_json = self.get_profession_index()
+        for profession in profession_json['professions']:
+            professions[profession['name']] = profession['id']
+        self.professions = professions
 
     '''
     DESC
-        Profession index endpoint /data/wow/profession/index
+        Profession index endpoint /profession/index
         
     INPUT
         
@@ -274,7 +289,7 @@ class BNetAPIUtil:
     '''
     def get_profession_index(self) -> dict:  
         # prepare GET metadata
-        url = self.base_api_url + '/data/wow/profession/index'
+        url = self.base_api_url + '/profession/index'
         # this endpoint is only supported on RETAIL
         payload = self.__get_base_payload(GameVersion.RETAIL)
         
@@ -297,8 +312,9 @@ def main():
         util.get_access_token()
     # item_data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
     # print(json.dumps(item_data))
-    profession_data = util.get_profession_index()
-    print(json.dumps(profession_data))
+    # profession_data = util.get_profession_index()
+    util.create_profession_map()
+    print(util.professions)
     
 if __name__ == "__main__":
     main()

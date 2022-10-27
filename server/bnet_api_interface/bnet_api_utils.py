@@ -179,6 +179,32 @@ class BNetAPIUtil:
         return None
         
 
+    '''
+    DESC
+        Item media endpoint /data/wow/media/item/{itemId}
+        
+    INPUT
+        Unique ItemID of the item
+        
+    RETURN
+        JSON response body
+    '''
+    def get_item_media_metadata(self, itemid) -> dict:  
+        # prepare GET metadata
+        base_url = 'https://us.api.blizzard.com/data/wow/media/item/{itemid}'
+        url = base_url.format(itemid=itemid)
+        payload = self.get_base_payload()
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        if r.status_code == 200:
+            return r.json()
+        else:
+            r.raise_for_status()
+            
+        return None
+
+
 '''
 Main code
 '''
@@ -187,7 +213,7 @@ def main():
     util = BNetAPIUtil()
     if not util.has_valid_access_token():
         util.get_access_token()
-    item_data = util.get_item_metadata(19019)
+    item_data = util.get_item_media_metadata(19019)
     print(json.dumps(item_data))
     
 if __name__ == "__main__":

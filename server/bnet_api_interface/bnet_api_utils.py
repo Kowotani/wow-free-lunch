@@ -60,16 +60,16 @@ class BNetAPIUtil:
     locale = 'en_US'
 
 
-    '''
-    -----------------------------
-    Profession Endpoint Variables
-    -----------------------------
-    '''
+    # '''
+    # -----------------------------
+    # Profession Endpoint Variables
+    # -----------------------------
+    # '''
 
-    '''
-    Profession Map of [Profession -> ID]
-    '''
-    professions = {}
+    # '''
+    # Profession Map of [Profession -> ID]
+    # '''
+    # professions = {}
     
 
     '''
@@ -297,21 +297,21 @@ class BNetAPIUtil:
     '''
     
     
-    '''
-    DESC
-        Creates the Profession Map that maps Professions -> ID
+    # '''
+    # DESC
+    #     Creates the Profession Map that maps Professions -> ID
         
-    INPUT
+    # INPUT
         
-    RETURN
-    '''
-    def create_profession_map(self) -> None:
+    # RETURN
+    # '''
+    # def create_profession_map(self) -> None:
         
-        professions = {}
-        profession_json = self.get_profession_index()
-        for profession in profession_json['professions']:
-            professions[profession['name']] = profession['id']
-        self.professions = professions
+    #     professions = {}
+    #     profession_json = self.get_profession_index()
+    #     for profession in profession_json['professions']:
+    #         professions[profession['name']] = profession['id']
+    #     self.professions = professions
 
     '''
     DESC

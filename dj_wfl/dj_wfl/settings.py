@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-d-25_$4sz7mi$ye_(sdtmel21ea-=ll13p@5fhxr+@^h&1ou&$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'dj_wfl.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wow_free_lunch',
+        'USER': 'admin',
+        'PASSWORD': 'wowfreelunch2022',
+        'HOST': 'wow-free-lunch.cb1mnxt26xwt.us-west-1.rds.amazonaws.com',
+        'PORT': 3306,
     }
 }
 

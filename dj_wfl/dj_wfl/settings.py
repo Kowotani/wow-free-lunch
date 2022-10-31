@@ -81,6 +81,9 @@ DATABASES = {
         'PASSWORD': 'wowfreelunch2022',
         'HOST': 'wow-free-lunch.cb1mnxt26xwt.us-west-1.rds.amazonaws.com',
         'PORT': 3306,
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            }
     }
 }
 

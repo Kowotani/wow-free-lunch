@@ -43,12 +43,12 @@ DESC
     Mostly maps to /profession/index endpoint
 '''
 
-class Professions(CommonData, MediaData):
+class Profession(CommonData, MediaData):
     profession_id = models.SmallIntegerField('profession ID', primary_key=True)
     is_primary = models.BooleanField('TRUE if the profession is a primary profession', default=False)
     
     class Meta:
-        db_table = 'professions'
+        db_table = 'profession'
 
 
 '''
@@ -58,14 +58,14 @@ DESC
     Mostly maps to /profession/{professionID} endpoint
 '''
 
-class ProfessionSkillTiers(CommonData):
+class ProfessionSkillTier(CommonData):
     skill_tier_id = models.SmallIntegerField('skill tier ID', primary_key=True) 
-    profession_id = models.ForeignKey(Professions, on_delete=models.CASCADE, db_column='profession_id')
+    profession_id = models.ForeignKey(Profession, on_delete=models.CASCADE, db_column='profession_id')
     min_skill_level = models.SmallIntegerField('minimum skill level (eg. 301 for Burning Crusade)')
     max_skill_level = models.SmallIntegerField('maximum skill level (eg. 375 for Burning Crusade)')
     
     class Meta:
-        db_table = 'profession_skill_tiers'
+        db_table = 'profession_skill_tier'
 
 '''
 ===========

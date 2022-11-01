@@ -35,14 +35,14 @@ class BNetAPIUtil:
     '''
     Battle.net API access keys
     '''
-    __CLIENT_ID__ = '4e41cbadc23f466ea64c61e382c08bd1'
-    __CLIENT_SECRET__ = '1f768iHJc3bPjS6D8j4zXO1nLvYFXE5l'
+    _CLIENT_ID = '4e41cbadc23f466ea64c61e382c08bd1'
+    _CLIENT_SECRET = '1f768iHJc3bPjS6D8j4zXO1nLvYFXE5l'
     
     
     '''
     Access token metadata
     '''
-    __access_token__ = None
+    _access_token = None
     access_token_expiration = None
 
 
@@ -82,7 +82,7 @@ class BNetAPIUtil:
         Empty state object
     '''
     def __init__(self):
-        self.__access_token__ = None
+        self._access_token = None
     
     
     '''
@@ -130,9 +130,9 @@ class BNetAPIUtil:
     RETURN
         HTTPBasicAuth object       
     '''
-    def __get_auth_object(self) -> HTTPBasicAuth:
+    def _get_auth_object(self) -> HTTPBasicAuth:
         
-        return HTTPBasicAuth(self.__CLIENT_ID__, self.__CLIENT_SECRET__)
+        return HTTPBasicAuth(self._CLIENT_ID, self._CLIENT_SECRET)
 
     '''
     DESC
@@ -145,7 +145,7 @@ class BNetAPIUtil:
     '''
     def has_valid_access_token(self) -> bool:
         
-        return self.__access_token__ is not None and \
+        return self._access_token is not None and \
             dt.datetime.now() < self.access_token_expiration
 
 
@@ -163,13 +163,13 @@ class BNetAPIUtil:
         
         # prepare POST metadata
         url = 'https://oauth.battle.net/token'
-        auth = self.__get_auth_object()
+        auth = self._get_auth_object()
         data = {'grant_type' : 'client_credentials'}
         
         # POST request
         r = requests.post(url, auth=auth, data=data)
         body = BNetAPIUtil.handle_request_response(r)
-        self.__access_token__ = body['access_token']
+        self._access_token = body['access_token']
         self.access_token_expiration = dt.datetime.now() + \
             dt.timedelta(seconds=body['expires_in'])
             
@@ -202,7 +202,7 @@ class BNetAPIUtil:
     
     RETURN
     '''
-    def __verify_game_version(self, game_version) -> None:
+    def _verify_game_version(self, game_version) -> None:
         
         if game_version not in GameVersion:
             raise TypeError('{} not found in GameVersion'.format(game_version))
@@ -229,7 +229,7 @@ class BNetAPIUtil:
         - access_token
         - locale
     '''
-    def __get_base_payload(self, game_version) -> dict:
+    def _get_base_payload(self, game_version) -> dict:
         
         # check existing token
         if not self.has_valid_access_token():
@@ -238,7 +238,7 @@ class BNetAPIUtil:
         return {
             'namespace': self.namespaces[game_version],
             'locale': self.locale,
-            'access_token': self.__access_token__
+            'access_token': self._access_token
         }
     
     
@@ -256,10 +256,10 @@ class BNetAPIUtil:
     def get_item_metadata(self, item_id, game_version) -> dict: 
         
         # prepare GET metadata
-        self.__verify_game_version(game_version)
+        self._verify_game_version(game_version)
         base_url = self.base_api_url + '/item/{item_id}'
         url = base_url.format(item_id=item_id)
-        payload = self.__get_base_payload(game_version)
+        payload = self._get_base_payload(game_version)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -280,10 +280,10 @@ class BNetAPIUtil:
     def get_item_media_metadata(self, item_id, game_version) -> dict:  
         
         # prepare GET metadata
-        self.__verify_game_version(game_version)
+        self._verify_game_version(game_version)
         base_url = self.base_api_url + '/media/item/{item_id}'
         url = base_url.format(item_id=item_id)
-        payload = self.__get_base_payload(game_version)
+        payload = self._get_base_payload(game_version)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -296,22 +296,6 @@ class BNetAPIUtil:
     --------------------
     '''
     
-    
-    # '''
-    # DESC
-    #     Creates the Profession Map that maps Professions -> ID
-        
-    # INPUT
-        
-    # RETURN
-    # '''
-    # def create_profession_map(self) -> None:
-        
-    #     professions = {}
-    #     profession_json = self.get_profession_index()
-    #     for profession in profession_json['professions']:
-    #         professions[profession['name']] = profession['id']
-    #     self.professions = professions
 
     '''
     DESC
@@ -327,7 +311,7 @@ class BNetAPIUtil:
         # prepare GET metadata
         url = self.base_api_url + '/profession/index'
         # this endpoint is only supported on RETAIL
-        payload = self.__get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -350,7 +334,30 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/profession/{profession_id}'
         url = base_url.format(profession_id=profession_id)
         # this endpoint is only supported on RETAIL
-        payload = self.__get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(GameVersion.RETAIL)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)
+
+
+    '''
+    DESC
+        Profession endpoint /media/profession/{professionId}
+        
+    INPUT
+        Unique ProfessionID of the Profession
+        
+    RETURN
+        JSON response body
+    '''
+    def get_profession_media(self, profession_id) -> dict: 
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + '/media/profession/{profession_id}'
+        url = base_url.format(profession_id=profession_id)
+        # this endpoint is only supported on RETAIL
+        payload = self._get_base_payload(GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -378,7 +385,7 @@ class BNetAPIUtil:
         url = base_url.format(profession_id=profession_id, 
             skill_tier_id=skill_tier_id)
         # this endpoint is only supported on RETAIL
-        payload = self.__get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -401,7 +408,7 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/recipe/{recipe_id}'
         url = base_url.format(recipe_id=recipe_id)
         # this endpoint is only supported on RETAIL
-        payload = self.__get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -424,7 +431,7 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/media/recipe/{recipe_id}'
         url = base_url.format(recipe_id=recipe_id)
         # this endpoint is only supported on RETAIL
-        payload = self.__get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -437,14 +444,12 @@ Main code
 
 def main():
     util = BNetAPIUtil()
-    if not util.has_valid_access_token():
-        util.get_access_token()
+    # data = util.get_profession_index()
+    data = util.get_profession_media(164)
     # data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
     # data = util.get_profession_skill_tier_metadata(197, 2540)
-    data = util.get_recipe_media_metadata(2360)
+    # data = util.get_recipe_media_metadata(2360)
     print(json.dumps(data))
-    # util.create_profession_map()
-    # print(util.professions)
     
 if __name__ == "__main__":
     main()

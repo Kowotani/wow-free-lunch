@@ -17,7 +17,7 @@ DESC
 class ProfessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profession
-        fields = ['__all__']
+        fields = '__all__'
             
 
 '''
@@ -28,4 +28,4 @@ DESC
 class ProfessionSkillTierSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfessionSkillTier
-        fields = ['__all__']
+        fields = '__all__'

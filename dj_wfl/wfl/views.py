@@ -17,15 +17,26 @@ Profession Views
 
 
 '''
-Creates a list of Professions
+Creates a Profession
+Supported methods: POST
 '''
-class ProfessionList(generics.ListCreateAPIView):
+class ProfessionCreate(generics.CreateAPIView):
+    queryset = Profession.objects.all()
+    serializer_class = ProfessionSerializer
+    
+
+'''
+Retrieve list of Professions
+Supported methods: GET
+'''
+class ProfessionList(generics.ListAPIView):
     queryset = Profession.objects.all()
     serializer_class = ProfessionSerializer
     
     
 '''
-Manages CRUD operations for a Profession
+Manages read / update / delete operations for a Profession
+Supported methods: GET, PUT, PATCH, DELETE
 '''
 class ProfessionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Profession.objects.all()

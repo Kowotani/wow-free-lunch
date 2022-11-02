@@ -58,18 +58,6 @@ class BNetAPIUtil:
     }
     # Only use en_US
     locale = 'en_US'
-
-
-    # '''
-    # -----------------------------
-    # Profession Endpoint Variables
-    # -----------------------------
-    # '''
-
-    # '''
-    # Profession Map of [Profession -> ID]
-    # '''
-    # professions = {}
     
 
     '''

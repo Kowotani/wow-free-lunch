@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from django.apps import apps
 import datetime as dt
 from enum import Enum
+# add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
 from wfl.models import Profession, ProfessionSkillTier
 
 
@@ -44,7 +45,7 @@ class BulkObjectLoader:
         
     RETURN
     '''
-    def __init__(self, chunk_size=100) -> None:
+    def __init__(self, chunk_size=1000) -> None:
         self.chunk_size = chunk_size
         
     
@@ -139,7 +140,7 @@ class ProfessionDataLoader:
         min_level: int     # Eg. 350 for Northrend
         max_level: int     # Eg. 450 for Northrend
         level_range: int   # Eg. 100 for Northrend
-        legacy_tier: bool   # TRUE if the tier required leveling previous tiers
+        is_legacy_tier: bool   # TRUE if the tier required previous tiers to unlock
     
     
     '''
@@ -155,7 +156,7 @@ class ProfessionDataLoader:
         'Legion': ProfessionSkillTierLevels(700, 800, 100, True),
         'Zandalari': ProfessionSkillTierLevels(0, 0, 175, False),
         'Shadowlands': ProfessionSkillTierLevels(0, 0, 175, False),
-        # 'Dragon Isles': ProfessionSkillTierLevels(0, 0, 175, False),
+        'Dragon Isles': ProfessionSkillTierLevels(0, 0, 175, False),
         }
     
     
@@ -187,6 +188,26 @@ class ProfessionDataLoader:
     
     '''
     DESC
+        Determines which skill tier levels match the given skill tier name. The
+        names requires some matching since they look like 'Legion Blacksmithing'
+        and 'Kul Tiran Tailoring / Zandalari Tailoring'
+        
+    INPUT
+        Skill tier name (eg. 'Classic Leatherworking')
+        
+    RETURN
+        ProfessionSkillTierLevels dataclass. Return an empty state object if
+        there is no match
+    '''    
+    def _get_skill_tier_levels(self, skill_tier_name):
+        for expansion, skill_tier_levels in self.profession_levels.items():
+            if skill_tier_name.find(expansion) > 0:
+                return skill_tier_levels
+        return self.ProfessionSkillTierLevels(0, 0, 0, False)
+    
+    
+    '''
+    DESC
         Loads the `profession` and `profession_skill_tier` tables
         
     INPUT
@@ -198,44 +219,74 @@ class ProfessionDataLoader:
         # call the /profession/index endpoint
         index_r = self._bnet_api_util.get_profession_index()
         
-        if index_r is not None:
-            
-            for profession in index_r['professions']:
-                profession_id = profession['id']
-                name = profession['name']
-                
-                # get profession media
-                media_r = self._bnet_api_util.get_profession_media(profession_id)
-                
-                if media_r is not None:
-                    media_url = media_r['assets']['value']
-                    media_file_data_id = media_r['assets']['file_data_id']
-                    
-                else:
-                    raise Exception('Error: get_profession_metadata() in bnet_data_loader.load_profession()')
-                
-                # get skill tier data
-                id_r = self._bnet_api_util.get_profession_metadata(profession_id)
-                
-                if id_r is not None:
-                    is_primary = id_r['type']['type'] == 'PRIMARY'
-                    
-                    
-                else:
-                    raise Exception('Error: get_profession_metadata() in bnet_data_loader.load_profession()')
-                    
-                # enqueue object for loading
-                obj = Profession(
-                    profession__id=profession_id, 
-                    name=name,
-                    media_url=media_url,
-                    media_file_data_id=media_file_data_id,
-                    is_primary=is_primary
-                    )
-                self._obj_loader.add(obj)
-                
-        else:
+        if index_r is None:
             raise Exception('Error: get_profession_index() in bnet_data_loader.load_profession()')
+            
+        # iterate through professions
+        for profession in index_r['professions']:
+            
+            # get profession media
+            media_r = self._bnet_api_util.get_profession_media(profession['id'])
+            
+            if media_r is None:
+                raise Exception('Error: get_profession_metadata() in bnet_data_loader.load_profession()')
+            
+            # get profession metadata
+            pid_r = self._bnet_api_util.get_profession_metadata(profession['id'])
+            
+            if pid_r is None:
+                raise Exception('Error: get_profession_metadata() in bnet_data_loader.load_profession()')
+                
+            # enqueue Profession object for loading
+            profession_obj = Profession(
+                profession_id=profession['id'], 
+                name=profession['name'],
+                media_url=media_r['assets'][0]['value'],
+                media_file_data_id=media_r['assets'][0]['file_data_id'],
+                is_primary=(pid_r['type']['type'] == 'PRIMARY')
+                )
+            self._obj_loader.add(profession_obj)
+            
+            # check if profession has skill tiers
+            if 'skill_tiers' not in pid_r:
+                continue 
+            
+            # iterate through skill tiers
+            for skill_tier in pid_r['skill_tiers']:
+                
+                skill_tier_levels = self._get_skill_tier_levels(skill_tier['name'])
+                
+                # get skill tier metadata
+                sid_r = self._bnet_api_util.get_profession_skill_tier_metadata(
+                    profession['id'], skill_tier['id'])
+                    
+                if sid_r is None:
+                    raise Exception('Error: get_profession_skill_tier_metadata() in bnet_data_loader.load_profession()')
+                
+                # enqueue ProfessionSkillTier object for loading
+                skill_tier_obj = ProfessionSkillTier(
+                    skill_tier_id=skill_tier['id'],
+                    profession=profession_obj, 
+                    name=skill_tier['name'],
+                    min_skill_level=sid_r['minimum_skill_level'],
+                    max_skill_level=sid_r['maximum_skill_level'],
+                    min_total_skill_level=skill_tier_levels.min_level,
+                    max_total_skill_level=skill_tier_levels.max_level,
+                    is_legacy_tier=skill_tier_levels.is_legacy_tier,
+                    )
+                self._obj_loader.add(skill_tier_obj)
             
         # load any remaining objects
         self._obj_loader.commit_remaining()
+       
+        
+'''
+Main code
+'''
+
+def main():
+    util = ProfessionDataLoader()
+    util.load_profession_and_profession_skill_tier()
+    
+if __name__ == "__main__":
+    main()

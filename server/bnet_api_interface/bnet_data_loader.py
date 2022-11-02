@@ -208,13 +208,13 @@ class ProfessionDataLoader:
     
     '''
     DESC
-        Loads the `profession` and `profession_skill_tier` tables
+        Loads the `profession` table
         
     INPUT
         
     RETURN
     '''    
-    def load_profession_and_profession_skill_tier(self) -> None:
+    def load_profession(self) -> None:
         
         # call the /profession/index endpoint
         index_r = self._bnet_api_util.get_profession_index()
@@ -279,6 +279,33 @@ class ProfessionDataLoader:
         # load any remaining objects
         self._obj_loader.commit_remaining()
        
+
+    '''
+    DESC
+        Loads the `profession_skill_tier` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_profession_skill_tier(self) -> None:
+        
+        # query profession table
+        
+        # get Profession object
+        
+        # call the /profession/{professionId} endpoint
+        
+        # check if profession has skill tiers
+        
+        # iterate through skill tiers
+        
+        # call the /profession/{professionID}/skill-tier/{skillTierID} endpoint
+        
+        # enqueue ProfessionSkillTier object for loading
+        
+        # load any remaining objects
+        pass
         
 '''
 Main code
@@ -286,7 +313,8 @@ Main code
 
 def main():
     util = ProfessionDataLoader()
-    util.load_profession_and_profession_skill_tier()
+    util.load_profession()
+    util.load_profession_skill_tier()
     
 if __name__ == "__main__":
     main()

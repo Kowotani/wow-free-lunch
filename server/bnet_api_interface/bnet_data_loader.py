@@ -201,7 +201,7 @@ class ProfessionDataLoader:
     '''    
     def _get_skill_tier_levels(self, skill_tier_name):
         for expansion, skill_tier_levels in self.profession_levels.items():
-            if skill_tier_name.find(expansion) > 0:
+            if skill_tier_name.find(expansion) >= 0:
                 return skill_tier_levels
         return self.ProfessionSkillTierLevels(0, 0, 0, False)
     

@@ -60,7 +60,7 @@ DESC
 
 class ProfessionSkillTier(CommonData):
     skill_tier_id = models.SmallIntegerField('skill tier ID', primary_key=True) 
-    profession_id = models.ForeignKey(Profession, on_delete=models.CASCADE, db_column='profession_id')
+    profession = models.ForeignKey(Profession, on_delete=models.CASCADE)
     min_skill_level = models.SmallIntegerField('minimum skill level for this tier (eg. 1 for Burning Crusade)', default=0)
     max_skill_level = models.SmallIntegerField('maximum skill level for this tier (eg. 75 for Burning Crusade)', default=0)
     min_total_skill_level = models.SmallIntegerField('minimum total skill level (eg. 301 for Burning Crusade)', default=0)

@@ -339,7 +339,7 @@ class BNetAPIUtil:
     RETURN
         JSON response body
     '''
-    def get_profession_media(self, profession_id) -> dict: 
+    def get_profession_media_metadata(self, profession_id) -> dict: 
         
         # prepare GET metadata
         base_url = self.base_api_url + '/media/profession/{profession_id}'

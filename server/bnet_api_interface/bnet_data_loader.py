@@ -226,7 +226,7 @@ class ProfessionDataLoader:
         for profession in index_r['professions']:
             
             # get profession media
-            media_r = self._bnet_api_util.get_profession_media(profession['id'])
+            media_r = self._bnet_api_util.get_profession_media_metadata(profession['id'])
             
             if media_r is None:
                 raise Exception('Error: get_profession_metadata() in bnet_data_loader.load_profession()')

@@ -65,6 +65,7 @@ class ProfessionSkillTier(CommonData):
     max_skill_level = models.SmallIntegerField('maximum skill level for this tier (eg. 75 for Burning Crusade)', default=0)
     min_total_skill_level = models.SmallIntegerField('minimum total skill level (eg. 301 for Burning Crusade)', default=0)
     max_total_skill_level = models.SmallIntegerField('maximum total skill level (eg. 375 for Burning Crusade)', default=0)
+    is_legacy_tier = models.BooleanField('TRUE if the tier requires previous tiers to unlock', default=False)
     
     class Meta:
         db_table = 'profession_skill_tier'

@@ -160,7 +160,8 @@ class ProfessionDataManager:
     
     
     '''
-    This list contains all professions that craft items
+    This list contains all professions that craft items. Note that Enchanting
+    is not a crafting profession since it produces spells and not items
     '''
     crafting_professions = ['Alchemy', 'Blacksmithing', 'Cooking', 
         'Engineering', 'Jewelcrafting', 'Inscription', 'Leatherworking',
@@ -202,6 +203,21 @@ class ProfessionDataManager:
     
     '''
     DESC
+        Determines if the profession is a crafting profession (ie. it creates
+        items)
+        
+    INPUT
+        Profession name
+        
+    RETURN
+        TRUE if the profession creates items, FALSE otherwise
+    '''    
+    def _is_crafting_profession(self, profession_name):
+        return profession_name in self.crafting_professions
+    
+    
+    '''
+    DESC
         Loads the `profession` table
         
     INPUT
@@ -237,7 +253,8 @@ class ProfessionDataManager:
                 name=profession['name'],
                 media_url=media_r['assets'][0]['value'],
                 media_file_data_id=media_r['assets'][0]['file_data_id'],
-                is_primary=(pid_r['type']['type'] == 'PRIMARY')
+                is_primary=(pid_r['type']['type'] == 'PRIMARY'),
+                is_crafting=self._is_crafting_profession(profession['name'])
                 )
             self._obj_loader.add(profession_obj)
             
@@ -336,3 +353,4 @@ class ProfessionDataManager:
             # enqueue StgRecipeItem object for loading
             
             # load any remaining objects
+            pass

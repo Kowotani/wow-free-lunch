@@ -3,7 +3,9 @@ from wfl.views import (
     ProfessionCreate, ProfessionList, ProfessionDetail,
     
     ProfessionSkillTierCreate, ProfessionSkillTierList, 
-    ProfessionSkillTierDetail
+    ProfessionSkillTierDetail,
+    
+    StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail
     )
 
 urlpatterns = [
@@ -19,4 +21,8 @@ urlpatterns = [
     path('profession/skill_tier/create', ProfessionSkillTierCreate.as_view()),
     path('profession/skill_tier/all', ProfessionSkillTierList.as_view()),
     path('profession/skill_tier/<pk>', ProfessionSkillTierDetail.as_view()),
+    
+    path('profession/stg_recipe_item/create', StgRecipeItemCreate.as_view()),
+    path('profession/stg_recipe_item/all', StgRecipeItemList.as_view()),
+    path('profession/stg_recipe_item/<pk>', StgRecipeItemDetail.as_view()),
 ]

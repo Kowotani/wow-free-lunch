@@ -281,6 +281,9 @@ class ProfessionDataManager:
             # call the /profession/{professionId} endpoint
             pid_r = self._bnet_api_util.get_profession_metadata(
                 profession.profession_id)
+                
+            if pid_r is None:
+                raise Exception('Error: get_profession_metadata() in bnet_data_loader.load_profession_skill_tier()')
             
             # check if profession has skill tiers
             if 'skill_tiers' not in pid_r:
@@ -294,6 +297,9 @@ class ProfessionDataManager:
                 # call the /profession/{professionID}/skill-tier/{skillTierID} endpoint
                 sid_r = self._bnet_api_util.get_profession_skill_tier_metadata(
                     profession.profession_id, skill_tier['id'])
+                    
+                if sid_r is None:   
+                    raise Exception('Error: get_profession_skill_tier_metadata() in bnet_data_loader.load_profession_skill_tier()')                    
                 
                 # enqueue ProfessionSkillTier object for loading
                 obj = ProfessionSkillTier(
@@ -310,19 +316,6 @@ class ProfessionDataManager:
         
         # load any remaining objects
         self._obj_loader.commit_remaining()
-        
-    
-    '''
-    DESC
-        Loads the all data to their respective tables
-        
-    INPUT
-        
-    RETURN
-    '''    
-    def load_all(self) -> None:
-        self.load_profession()
-        self.load_profession_skill_tier()
 
 
     '''
@@ -336,21 +329,85 @@ class ProfessionDataManager:
     def load_stg_recipe_item(self) -> None:
         
         # query profession_skill_tier table
-        profession_skill_tiers = ProfessionSkillTier.objects.all()
+        profession_skill_tiers = ProfessionSkillTier.objects.filter(
+            profession__is_crafting=True, is_legacy_tier=True)
         
         # get ProfessionSkillTier object
         for profession_skill_tier in profession_skill_tiers:
-        
-            # check if skill tier has recipes
+                
+            # call the /profession/{professionID}/skill-tier/{skillTierID} endpoint
+            sid_r = self._bnet_api_util.get_profession_skill_tier_metadata(
+                profession_skill_tier.profession_id, 
+                profession_skill_tier.skill_tier_id)
+
+            if sid_r is None:   
+                raise Exception('Error: get_profession_skill_tier_metadata() in bnet_data_loader.load_stg_recipe_item()') 
             
-            
-            # iterate through each item category
-            
-            # call the /recipe/{recipeID} endpoint
-            
-            # iterate through the reagents
-            
-            # enqueue StgRecipeItem object for loading
+            # iterate through the recipe categories
+            for category in sid_r['categories']:
+                
+                # iterate through the recipes
+                for recipe in category['recipes']:
+                    
+                    # check if recipe reagents have already been loaded
+                    if StgRecipeItem.objects.filter(recipe_id=recipe['id']).exists():
+                        continue
+                    
+                    # call the /recipe/{recipeID} endpoint
+                    rid_r = self._bnet_api_util.get_recipe_metadata(recipe['id'])
+                    
+                    if rid_r is None:
+                        raise Exception('Error: get_recipe_metadata() in bnet_data_loader.load_stg_recipe_item()')
+                    
+                    print(rid_r['id'])
+                    
+                    # check if recipe has reagents
+                    if 'reagents' not in rid_r:
+                        continue
+                    
+                    # get list of crafted item item_ids (for Alliance vs Horde items)
+                    if ('alliance_crafted_item' in rid_r 
+                        and 'horde_crafted_item' in rid_r):
+                        crafted_item_ids = [rid_r['alliance_crafted_item']['id'], 
+                            rid_r['horde_crafted_item']['id']]    
+                            
+                    elif 'crafted_item' in rid_r:
+                        crafted_item_ids = [rid_r['crafted_item']['id']]
+                        
+                    else:
+                        # this appears to be the case for armor enhancements (eg. recipe_id=26880)
+                        continue
+                    
+                    # get list of reagent item_ids
+                    reagent_item_ids = [x['reagent']['id'] for x in rid_r['reagents']]
+                    
+                    # enqueue StgRecipeItem objects for loading
+                    for crafted_item_id in crafted_item_ids:
+                        
+                        for item_id in reagent_item_ids:
+                        
+                            obj = StgRecipeItem(
+                                stg_recipe_item_id='_'.join([str(x) for x in
+                                    [recipe['id'], item_id, crafted_item_id]]),
+                                recipe_id=recipe['id'],
+                                item_id=item_id,
+                                crafted_item_id=crafted_item_id,
+                                name='{} Reagent'.format(rid_r['name']),
+                                )
+                            self._obj_loader.add(obj)                
             
             # load any remaining objects
-            pass
+            self._obj_loader.commit_remaining()
+            
+            
+    '''
+    DESC
+        Loads the all data to their respective tables
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_all(self) -> None:
+        self.load_profession()
+        self.load_profession_skill_tier()

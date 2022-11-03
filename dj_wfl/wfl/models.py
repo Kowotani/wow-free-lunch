@@ -54,6 +54,7 @@ DESC
 class Profession(CommonData, MediaData):
     profession_id = models.SmallIntegerField('profession ID', primary_key=True)
     is_primary = models.BooleanField('TRUE if the profession is a primary profession', default=False)
+    is_crafting = models.BooleanField('TRUE if the profession crafts items', default=False)
 
 
     class Meta:

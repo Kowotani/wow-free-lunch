@@ -160,6 +160,13 @@ class ProfessionDataManager:
     
     
     '''
+    This list contains all professions that craft items
+    '''
+    crafting_professions = ['Alchemy', 'Blacksmithing', 'Cooking', 
+        'Engineering', 'Jewelcrafting', 'Inscription', 'Leatherworking',
+        'Tailoring']
+    
+    '''
     DESC
         Constructor class
         
@@ -312,18 +319,20 @@ class ProfessionDataManager:
     def load_stg_recipe_item(self) -> None:
         
         # query profession_skill_tier table
-        profession_skill_tier = ProfessionSkillTier.objects.all()
+        profession_skill_tiers = ProfessionSkillTier.objects.all()
         
         # get ProfessionSkillTier object
+        for profession_skill_tier in profession_skill_tiers:
         
-        # check if skill tier has recipes
-        
-        # iterate through each item category
-        
-        # call the /recipe/{recipeID} endpoint
-        
-        # iterate through the reagents
-        
-        # enqueue StgRecipeItem object for loading
-        
-        # load any remaining objects
+            # check if skill tier has recipes
+            
+            
+            # iterate through each item category
+            
+            # call the /recipe/{recipeID} endpoint
+            
+            # iterate through the reagents
+            
+            # enqueue StgRecipeItem object for loading
+            
+            # load any remaining objects

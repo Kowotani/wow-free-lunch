@@ -55,7 +55,7 @@ class Profession(CommonData, MediaData):
     profession_id = models.SmallIntegerField('profession ID', primary_key=True)
     is_primary = models.BooleanField('TRUE if the profession is a primary profession', default=False)
 
-    
+
     class Meta:
         db_table = 'profession'
 
@@ -83,6 +83,27 @@ class ProfessionSkillTier(CommonData):
     
     class Meta:
         db_table = 'profession_skill_tier'
+        
+    
+    def __str__(self):
+        return CommonData.__str__(self)
+
+
+'''
+DESC
+    Staging table for collecting all of the item_ids to pull based on the recipe reagent and crafted item
+    This will be used to determine which item_ids to load into the item table
+'''
+
+class StgRecipeItem(CommonData):
+    stg_recipe_item_id = models.IntegerField('concatenation of IDs for recipe / item / crafted_item', primary_key=True) 
+    recipe_id = models.IntegerField('recipe ID', default=0)
+    item_id = models.IntegerField('reagent item ID', default=0)
+    crafted_item_id = models.IntegerField('crafted item ID', default=0)
+
+    
+    class Meta:
+        db_table = 'stg_recipe_item'
         
     
     def __str__(self):

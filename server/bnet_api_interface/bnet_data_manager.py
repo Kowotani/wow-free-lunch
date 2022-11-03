@@ -5,7 +5,7 @@ from django.apps import apps
 import datetime as dt
 from enum import Enum
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import Profession, ProfessionSkillTier
+from wfl.models import Profession, ProfessionSkillTier, StgRecipeItem
 
 
 '''
@@ -299,3 +299,31 @@ class ProfessionDataManager:
     def load_all(self) -> None:
         self.load_profession()
         self.load_profession_skill_tier()
+
+
+    '''
+    DESC
+        Loads the `stg_recipe_item` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_stg_recipe_item(self) -> None:
+        
+        # query profession_skill_tier table
+        profession_skill_tier = ProfessionSkillTier.objects.all()
+        
+        # get ProfessionSkillTier object
+        
+        # check if skill tier has recipes
+        
+        # iterate through each item category
+        
+        # call the /recipe/{recipeID} endpoint
+        
+        # iterate through the reagents
+        
+        # enqueue StgRecipeItem object for loading
+        
+        # load any remaining objects

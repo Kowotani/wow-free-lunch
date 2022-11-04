@@ -147,7 +147,7 @@ DESC
 '''
 
 class ItemClassHierarchy(CommonData):
-    item_class_hierarchy_id = models.SmallIntegerField('unique identifier for item_class and item_subclass IDs', primary_key=True)
+    item_class_hierarchy_id = models.CharField('unique identifier for item_class and item_subclass IDs', max_length=256, primary_key=True)
     item_subclass_id = models.SmallIntegerField('item subclass ID', default=0)
     item_class = models.ForeignKey(ItemClass, on_delete=models.CASCADE)
     class_name = models.CharField('item class name', max_length=256, default=None)

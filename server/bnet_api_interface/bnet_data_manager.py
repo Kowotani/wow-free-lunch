@@ -505,3 +505,54 @@ class ItemDataManager:
         # load any remaining objects
         self._obj_loader.commit_remaining()
         
+        
+        
+    '''
+    DESC
+        Loads the `item_class_hierarchy` table
+        
+        There is no way to get a list of all item_subclasses via the Battle.net 
+        API, but since the cardinality is low we can naively obtain them by 
+        incrementing the ID until the API returns an error
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_item_class_hierarchy(self) -> None:
+        
+        # query the item_class table
+        item_classes = ItemClass.objects.all()
+        
+        # get ItemClass object
+        for item_class in item_classes:
+            
+            print(item_class)
+        
+            # naively iterate up to 100 item_subclass_ids until the API returns an error
+            for i in range(0, 100):
+                
+                print('>>> Checking i={}'.format(i))
+        
+                # call the /item-class/{itemClassId}/item-subclass/{itemSubclassId} endpoint
+                try:
+                    isid_r = self._bnet_api_util.get_item_subclass_metadata(
+                        item_class.pk, i)
+                    
+                    print(isid_r)
+                    
+                    # enqueue ItemSubclass objects for loading 
+                    obj = ItemSubclass(
+                        item_subclass_id=isid_r['subclass_id'],
+                        item_class=item_class,
+                        name=isid_r['display_name']
+                    )
+                    self._obj_loader.add(obj) 
+                    
+                except:
+                    # skip to the next item_class
+                    print('>>> breaking for item_class_id={} and i={}'.format(item_class.pk, i))
+                    break               
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()

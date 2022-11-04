@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from wfl.models import Profession, ProfessionSkillTier, StgRecipeItem
+from wfl.models import (ItemClass, Profession, ProfessionSkillTier,
+    StgRecipeItem)
 
 
 '''
@@ -40,3 +41,22 @@ class StgRecipeItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = StgRecipeItem
         fields = '__all__'
+        
+        
+'''
+================
+Item Serializers
+================
+'''
+
+
+'''
+DESC
+    Item Class serializer
+'''
+
+class ItemClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemClass
+        fields = '__all__'
+            

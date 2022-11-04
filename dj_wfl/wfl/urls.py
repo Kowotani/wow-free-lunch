@@ -1,11 +1,13 @@
 from django.urls import path
 from wfl.views import (
+    ItemClassCreate, ItemClassList, ItemClassDetail,
+    
     ProfessionCreate, ProfessionList, ProfessionDetail,
     
     ProfessionSkillTierCreate, ProfessionSkillTierList, 
     ProfessionSkillTierDetail,
     
-    StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail
+    StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail,
     )
 
 urlpatterns = [
@@ -25,4 +27,13 @@ urlpatterns = [
     path('profession/stg_recipe_item/create', StgRecipeItemCreate.as_view()),
     path('profession/stg_recipe_item/all', StgRecipeItemList.as_view()),
     path('profession/stg_recipe_item/<pk>', StgRecipeItemDetail.as_view()),
+    
+    
+    # =====
+    # Items
+    # =====
+    
+    path('item/item_class/create', ItemClassCreate.as_view()),
+    path('item/item_class/all', ItemClassList.as_view()),
+    path('item/item_class/<pk>', ItemClassDetail.as_view()),
 ]

@@ -5,15 +5,24 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from wfl.models import Profession, ProfessionSkillTier, StgRecipeItem
-from wfl.serializers import (ProfessionSerializer, 
+from wfl.models import (ItemClass, Profession, ProfessionSkillTier, 
+    StgRecipeItem)
+from wfl.serializers import (ItemClassSerializer, ProfessionSerializer, 
     ProfessionSkillTierSerializer, StgRecipeItemSerializer)
+    
 
 
 '''
 ================
 Profession Views
 ================
+'''
+
+
+'''
+----------
+Profession
+----------
 '''
 
 
@@ -44,6 +53,12 @@ class ProfessionDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfessionSerializer
     
 
+'''
+---------------------
+Profession Skill Tier
+---------------------
+'''
+
 
 '''
 Creates a Profession Skill Tier
@@ -71,6 +86,13 @@ class ProfessionSkillTierDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ProfessionSkillTier.objects.all()
     serializer_class = ProfessionSkillTierSerializer
     
+
+'''
+---------------
+Stg Recipe Item
+---------------
+'''
+
     
 '''
 Creates a StgRecipeItem
@@ -97,3 +119,44 @@ Supported methods: GET / PUT / PATCH / DELETE
 class StgRecipeItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = StgRecipeItem.objects.all()
     serializer_class = StgRecipeItemSerializer
+    
+    
+'''
+==========
+Item Views
+==========
+'''
+
+
+'''
+----------
+Item Class
+----------
+'''
+
+
+'''
+Creates an Item Class
+Supported methods: POST
+'''
+class ItemClassCreate(generics.CreateAPIView):
+    queryset = ItemClass.objects.all()
+    serializer_class = ItemClassSerializer
+    
+
+'''
+Retrieve list of Item Classes
+Supported methods: GET
+'''
+class ItemClassList(generics.ListAPIView):
+    queryset = ItemClass.objects.all()
+    serializer_class = ItemClassSerializer
+    
+    
+'''
+Manages read / update / delete operations for an Item Class
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class ItemClassDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ItemClass.objects.all()
+    serializer_class = ItemClassSerializer

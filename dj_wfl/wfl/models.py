@@ -45,6 +45,7 @@ Profession Models
 =================
 '''
 
+
 '''
 DESC
     Dim table for Professions
@@ -116,3 +117,20 @@ class StgRecipeItem(CommonData):
 Item Models
 ===========
 '''
+
+'''
+DESC
+    Dim table for Professions
+    Mostly maps to /profession/index endpoint
+'''
+
+class ItemClass(CommonData):
+    item_class_id = models.SmallIntegerField('item class ID', primary_key=True)
+
+
+    class Meta:
+        db_table = 'item_class'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)

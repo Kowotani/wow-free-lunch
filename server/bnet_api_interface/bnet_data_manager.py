@@ -5,7 +5,7 @@ from django.apps import apps
 import datetime as dt
 from enum import Enum
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (ItemClass, ItemSubclass, Profession, ProfessionSkillTier, 
+from wfl.models import (ItemClass, ItemClassHierarchy, Profession, ProfessionSkillTier, 
     StgRecipeItem)
 
 
@@ -526,32 +526,30 @@ class ItemDataManager:
         
         # get ItemClass object
         for item_class in item_classes:
-            
-            print(item_class)
         
-            # naively iterate up to 100 item_subclass_ids until the API returns an error
-            for i in range(0, 100):
-                
-                print('>>> Checking i={}'.format(i))
+            # naively iterate up to 50 item_subclass_ids until the API returns an error
+            for i in range(0, 50):
         
                 # call the /item-class/{itemClassId}/item-subclass/{itemSubclassId} endpoint
                 try:
                     isid_r = self._bnet_api_util.get_item_subclass_metadata(
                         item_class.pk, i)
                     
-                    print(isid_r)
-                    
                     # enqueue ItemSubclass objects for loading 
-                    obj = ItemSubclass(
+                    obj = ItemClassHierarchy(
+                        item_class_hierarchy_id='{}_{}'.format(item_class.pk,
+                            isid_r['subclass_id']),
                         item_subclass_id=isid_r['subclass_id'],
+                        class_name=getattr(item_class, 'name'),
+                        subclass_name=isid_r['display_name'],
                         item_class=item_class,
-                        name=isid_r['display_name']
+                        name='{} - {}'.format(getattr(item_class, 'name'), 
+                            isid_r['display_name'])
                     )
                     self._obj_loader.add(obj) 
                     
                 except:
                     # skip to the next item_class
-                    print('>>> breaking for item_class_id={} and i={}'.format(item_class.pk, i))
                     break               
 
         # load any remaining objects

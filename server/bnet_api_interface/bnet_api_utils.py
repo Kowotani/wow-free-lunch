@@ -302,6 +302,33 @@ class BNetAPIUtil:
 
 
     '''
+    DESC
+        Item subclass endpoint 
+        /item-class/{itemCLassId}/item-subclass/{itemSubclassId}. This endpoint 
+        is supported on both CLASSIC and RETAIL but this method will only be
+        used on RETAIL.
+        
+    INPUT
+        
+    RETURN
+        JSON response body
+    '''
+    def get_item_subclass(self, item_class_id, item_subclass_id) -> dict: 
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + \
+            '/item-class/{item_class_id}/item-subclass/{item_subclass_id}'
+        url = base_url.format(item_class_id=item_class_id, 
+            item_subclass_id=item_subclass_id)
+        # this method will only be called on RETAIL
+        payload = self._get_base_payload(GameVersion.RETAIL)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)
+
+
+    '''
     --------------------
     Profession Endpoints
     --------------------

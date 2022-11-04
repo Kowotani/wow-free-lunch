@@ -5,7 +5,8 @@ from django.apps import apps
 import datetime as dt
 from enum import Enum
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import Profession, ProfessionSkillTier, StgRecipeItem
+from wfl.models import (ItemClass, Profession, ProfessionSkillTier, 
+    StgRecipeItem)
 
 
 '''
@@ -114,7 +115,12 @@ Profession Data
 
 
 '''
-This class manages data for the `profession` and `profession_skill_tier` tables
+This class manages data for the following models
+- Profession
+- ProfessionSkillTier
+- StgRecipeItem
+- Recipe
+- Reagent
 '''
 
 class ProfessionDataManager:
@@ -166,6 +172,14 @@ class ProfessionDataManager:
     crafting_professions = ['Alchemy', 'Blacksmithing', 'Cooking', 
         'Engineering', 'Jewelcrafting', 'Inscription', 'Leatherworking',
         'Tailoring']
+
+
+    '''
+    =============
+    Class Methods
+    =============
+    '''
+    
     
     '''
     DESC
@@ -411,3 +425,83 @@ class ProfessionDataManager:
     def load_all(self) -> None:
         self.load_profession()
         self.load_profession_skill_tier()
+        
+
+'''
+=========
+Item Data 
+=========
+'''
+
+
+'''
+This class manages data for the following models
+- ItemClass
+- ItemSubclass
+- Item
+'''
+
+
+class ItemDataManager:
+    
+    
+    '''
+    ===============
+    Class Variables
+    ===============
+    '''
+    
+    _bnet_api_util = None
+    _obj_loader = None
+    
+    
+    '''
+    =============
+    Class Methods
+    =============
+    '''
+    
+    
+    '''
+    DESC
+        Constructor class
+        
+    INPUT
+        
+    RETURN
+        Empty state object
+    '''    
+    def __init__(self):
+        self._bnet_api_util = BNetAPIUtil()
+        self._obj_loader = BulkObjectLoader()
+        
+    
+    '''
+    DESC
+        Loads the `item_class` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_item_class(self) -> None:
+        
+        # call the /item-class/index endpoint
+        index_r = self._bnet_api_util.get_item_class_index()
+        
+        if index_r is None:   
+            raise Exception('Error: get_item_class_index() in bnet_data_loader.load_item_class()') 
+        
+        # iterate through the item classes
+        for item_class in index_r['item_classes']:
+        
+            # enqueue StgRecipeItem objects for loading
+            obj = ItemClass(
+                item_class_id=item_class['id'],
+                name=item_class['name']
+            )
+            self._obj_loader.add(obj)                
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()
+        

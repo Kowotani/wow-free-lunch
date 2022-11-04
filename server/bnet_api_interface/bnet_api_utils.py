@@ -197,13 +197,6 @@ class BNetAPIUtil:
     
     
     '''
-    --------------
-    Item Endpoints
-    --------------
-    '''
-    
-    
-    '''
     DESC
         Creates a dictionary initialized with the base params for Battle.net API
         GET requests
@@ -228,6 +221,13 @@ class BNetAPIUtil:
             'locale': self.locale,
             'access_token': self._access_token
         }
+    
+        
+    '''
+    --------------
+    Item Endpoints
+    --------------
+    '''
     
     
     '''
@@ -272,6 +272,29 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/media/item/{item_id}'
         url = base_url.format(item_id=item_id)
         payload = self._get_base_payload(game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)
+
+
+    '''
+    DESC
+        Item class index endpoint /item-class/index. This endpoint is 
+        supported on both CLASSIC and RETAIL but this method will only be
+        used on RETAIL.
+        
+    INPUT
+        
+    RETURN
+        JSON response body
+    '''
+    def get_item_class_index(self) -> dict: 
+        
+        # prepare GET metadata
+        url = self.base_api_url + '/item-class/index'
+        # this method will only be called on RETAIL
+        payload = self._get_base_payload(GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -382,7 +405,7 @@ class BNetAPIUtil:
 
     '''
     DESC
-        Recipe endpoint /profession/{recipeID}
+        Recipe endpoint /recipe/{recipeID}
         
     INPUT
         Unique RecipeID of the Recipe

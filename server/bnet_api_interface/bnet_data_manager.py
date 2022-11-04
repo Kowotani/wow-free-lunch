@@ -5,7 +5,7 @@ from django.apps import apps
 import datetime as dt
 from enum import Enum
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (ItemClass, Profession, ProfessionSkillTier, 
+from wfl.models import (ItemClass, ItemSubclass, Profession, ProfessionSkillTier, 
     StgRecipeItem)
 
 

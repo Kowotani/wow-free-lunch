@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from wfl.models import (ItemClass, ItemSubclass, Profession, 
+from wfl.models import (ItemClass, ItemClassHierarchy, Profession, 
     ProfessionSkillTier, StgRecipeItem)
 
 
@@ -63,11 +63,11 @@ class ItemClassSerializer(serializers.ModelSerializer):
         
 '''
 DESC
-    Item Sublass serializer
+    Item Class Hierarchy serializer
 '''
 
-class ItemSubclassSerializer(serializers.ModelSerializer):
+class ItemClassHierarchySerializer(serializers.ModelSerializer):
     class Meta:
-        model = ItemSubclass
+        model = ItemClassHierarchy
         fields = '__all__'
             

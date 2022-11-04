@@ -5,9 +5,9 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from wfl.models import (ItemClass, ItemSubclass, Profession, ProfessionSkillTier, 
+from wfl.models import (ItemClass, ItemClassHierarchy, Profession, ProfessionSkillTier, 
     StgRecipeItem)
-from wfl.serializers import (ItemClassSerializer, ItemSubclassSerializer, 
+from wfl.serializers import (ItemClassSerializer, ItemClassHierarchySerializer, 
     ProfessionSerializer, ProfessionSkillTierSerializer, StgRecipeItemSerializer)
     
 
@@ -163,34 +163,34 @@ class ItemClassDetail(generics.RetrieveUpdateDestroyAPIView):
     
 
 '''
-----------
-Item Subclass
-----------
+--------------------
+Item Class Hierarchy
+--------------------
 '''
 
 
 '''
-Creates an Item Subclass
+Creates an Item Class Hierarchy
 Supported methods: POST
 '''
-class ItemSubclassCreate(generics.CreateAPIView):
-    queryset = ItemSubclass.objects.all()
-    serializer_class = ItemSubclassSerializer
+class ItemClassHierarchyCreate(generics.CreateAPIView):
+    queryset = ItemClassHierarchy.objects.all()
+    serializer_class = ItemClassHierarchySerializer
     
 
 '''
 Retrieve list of Item Subclasses
 Supported methods: GET
 '''
-class ItemSubclassList(generics.ListAPIView):
-    queryset = ItemSubclass.objects.all()
-    serializer_class = ItemSubclassSerializer
+class ItemClassHierarchyList(generics.ListAPIView):
+    queryset = ItemClassHierarchy.objects.all()
+    serializer_class = ItemClassHierarchySerializer
     
     
 '''
 Manages read / update / delete operations for an Item Subclass
 Supported methods: GET / PUT / PATCH / DELETE
 '''
-class ItemSubclassDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ItemSubclass.objects.all()
-    serializer_class = ItemSubclassSerializer
+class ItemClassHierarchyDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ItemClassHierarchy.objects.all()
+    serializer_class = ItemClassHierarchySerializer

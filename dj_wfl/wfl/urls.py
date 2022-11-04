@@ -2,7 +2,7 @@ from django.urls import path
 from wfl.views import (
     ItemClassCreate, ItemClassList, ItemClassDetail,
     
-    ItemSubclassCreate, ItemSubclassList, ItemSubclassDetail,
+    ItemClassHierarchyCreate, ItemClassHierarchyList, ItemClassHierarchyDetail,
     
     ProfessionCreate, ProfessionList, ProfessionDetail,
     
@@ -39,7 +39,7 @@ urlpatterns = [
     path('item/item_class/all', ItemClassList.as_view()),
     path('item/item_class/<pk>', ItemClassDetail.as_view()),
 
-    path('item/item_subclass/create', ItemSubclassCreate.as_view()),
-    path('item/item_subclass/all', ItemSubclassList.as_view()),
-    path('item/item_subclass/<pk>', ItemSubclassDetail.as_view()),
+    path('item/item_class_hierarchy/create', ItemClassHierarchyCreate.as_view()),
+    path('item/item_class_hierarchy/all', ItemClassHierarchyList.as_view()),
+    path('item/item_class_hierarchy/<pk>', ItemClassHierarchyDetail.as_view()),
 ]

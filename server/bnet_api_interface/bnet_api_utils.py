@@ -313,7 +313,7 @@ class BNetAPIUtil:
     RETURN
         JSON response body
     '''
-    def get_item_subclass(self, item_class_id, item_subclass_id) -> dict: 
+    def get_item_subclass_metadata(self, item_class_id, item_subclass_id) -> dict: 
         
         # prepare GET metadata
         base_url = self.base_api_url + \

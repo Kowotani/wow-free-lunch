@@ -141,18 +141,21 @@ class ItemClass(CommonData):
         
 '''
 DESC
-    Dim table for Item Subclassess
+    Dim table for Item Class Hierarchy
     Mostly maps to /item_class/{itemClassId}/item_subclass/{itemSubclassId}
     endpoint
 '''
 
-class ItemSubclass(CommonData):
-    item_subclass_id = models.SmallIntegerField('item subclass ID', primary_key=True)
+class ItemClassHierarchy(CommonData):
+    item_class_hierarchy_id = models.SmallIntegerField('unique identifier for item_class and item_subclass IDs', primary_key=True)
+    item_subclass_id = models.SmallIntegerField('item subclass ID', default=0)
     item_class = models.ForeignKey(ItemClass, on_delete=models.CASCADE)
+    class_name = models.CharField('item class name', max_length=256, default=None)
+    subclass_name = models.CharField('item subclass name', max_length=256, default=None)
 
 
     class Meta:
-        db_table = 'item_subclass'
+        db_table = 'item_class_hierarchy'
 
         
     def __str__(self):

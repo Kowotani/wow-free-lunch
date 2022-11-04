@@ -5,10 +5,10 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from wfl.models import (ItemClass, Profession, ProfessionSkillTier, 
+from wfl.models import (ItemClass, ItemSubclass, Profession, ProfessionSkillTier, 
     StgRecipeItem)
-from wfl.serializers import (ItemClassSerializer, ProfessionSerializer, 
-    ProfessionSkillTierSerializer, StgRecipeItemSerializer)
+from wfl.serializers import (ItemClassSerializer, ItemSubclassSerializer, 
+    ProfessionSerializer, ProfessionSkillTierSerializer, StgRecipeItemSerializer)
     
 
 
@@ -160,3 +160,37 @@ Supported methods: GET / PUT / PATCH / DELETE
 class ItemClassDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ItemClass.objects.all()
     serializer_class = ItemClassSerializer
+    
+
+'''
+----------
+Item Subclass
+----------
+'''
+
+
+'''
+Creates an Item Subclass
+Supported methods: POST
+'''
+class ItemSubclassCreate(generics.CreateAPIView):
+    queryset = ItemSubclass.objects.all()
+    serializer_class = ItemSubclassSerializer
+    
+
+'''
+Retrieve list of Item Subclasses
+Supported methods: GET
+'''
+class ItemSubclassList(generics.ListAPIView):
+    queryset = ItemSubclass.objects.all()
+    serializer_class = ItemSubclassSerializer
+    
+    
+'''
+Manages read / update / delete operations for an Item Subclass
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class ItemSubclassDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ItemSubclass.objects.all()
+    serializer_class = ItemSubclassSerializer

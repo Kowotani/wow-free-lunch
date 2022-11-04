@@ -1,10 +1,12 @@
 from django.db import models
 
+
 '''
 ==========
 ABC Models
 ==========
 '''
+
 
 '''
 DESC
@@ -118,10 +120,11 @@ Item Models
 ===========
 '''
 
+
 '''
 DESC
-    Dim table for Professions
-    Mostly maps to /profession/index endpoint
+    Dim table for Item Classes
+    Mostly maps to /item_class/index endpoint
 '''
 
 class ItemClass(CommonData):
@@ -130,6 +133,26 @@ class ItemClass(CommonData):
 
     class Meta:
         db_table = 'item_class'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+        
+        
+'''
+DESC
+    Dim table for Item Subclassess
+    Mostly maps to /item_class/{itemClassId}/item_subclass/{itemSubclassId}
+    endpoint
+'''
+
+class ItemSubclass(CommonData):
+    item_subclass_id = models.SmallIntegerField('item subclass ID', primary_key=True)
+    item_class = models.ForeignKey(ItemClass, on_delete=models.CASCADE)
+
+
+    class Meta:
+        db_table = 'item_subclass'
 
         
     def __str__(self):

@@ -344,7 +344,7 @@ class ProfessionDataManager:
         
         # query profession_skill_tier table
         profession_skill_tiers = ProfessionSkillTier.objects.filter(
-            profession__is_crafting=True, is_legacy_tier=True)
+            profession__is_crafting=True, is_legacy_tier=False)
         
         # get ProfessionSkillTier object
         for profession_skill_tier in profession_skill_tiers:

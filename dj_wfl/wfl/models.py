@@ -160,3 +160,48 @@ class ItemClassHierarchy(CommonData):
         
     def __str__(self):
         return CommonData.__str__(self)
+        
+        
+'''
+DESC
+    Dim table for Item
+    Mostly maps to /item/{itemId} endpoint
+    Note that there will be CLASSIC and RETAIL versions of items
+'''
+
+class Item(CommonData):
+    
+    # game version 
+    GAME_VERSION = (
+        ('CLASSIC', 'CLASSIC'),
+        ('RETAIL', 'RETAIL'),
+    )
+    
+    # quality 
+    QUALITY = (
+        ('POOR', 'POOR'),
+        ('COMMON', 'COMMON'),
+        ('UNCOMMON', 'UNCOMMON'),
+        ('RARE', 'RARE'),
+        ('EPIC', 'EPIC'),
+        ('LEGENDARY', 'LEGENDARY'),
+        ('HEIRLOOM', 'HEIRLOOM'),
+    )
+        
+    
+    item_id = models.IntegerField('item ID', primary_key=True) 
+    item_class_hierarchy = models.ForeignKey(ItemClassHierarchy, on_delete=models.CASCADE)
+    purchase_price = models.IntegerField('item vendor purchase price', default=0)
+    sell_price = models.IntegerField('item vendor sell price', default=0)
+    game_version = models.CharField('game version of the item', max_length=256, choices=GAME_VERSION, default='RETAIL')
+    level = models.SmallIntegerField('item level', default=0)
+    required_level = models.SmallIntegerField('required player level', default=0)
+    quality = models.CharField('quality level', max_length=256, choices=QUALITY, default='COMMON')
+
+    class Meta:
+        db_table = 'item'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+        

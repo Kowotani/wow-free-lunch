@@ -483,11 +483,11 @@ Main code
 def main():
     util = BNetAPIUtil()
     # data = util.get_profession_index()
-    data = util.get_profession_media(164)
+    # data = util.get_profession_media_metadata(164)
     # data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
     # data = util.get_profession_skill_tier_metadata(197, 2540)
     # data = util.get_recipe_media_metadata(2360)
-    print(json.dumps(data))
+    # print(json.dumps(data))
     
 if __name__ == "__main__":
     main()

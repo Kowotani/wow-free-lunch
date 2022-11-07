@@ -1,5 +1,7 @@
 from django.urls import path
 from wfl.views import (
+    ItemCreate, ItemList, ItemDetail,
+    
     ItemClassCreate, ItemClassList, ItemClassDetail,
     
     ItemClassHierarchyCreate, ItemClassHierarchyList, ItemClassHierarchyDetail,
@@ -34,6 +36,10 @@ urlpatterns = [
     # =====
     # Items
     # =====
+    
+    path('item/create', ItemCreate.as_view()),
+    path('item/all', ItemList.as_view()),
+    path('item/<pk>', ItemDetail.as_view()),
     
     path('item/item_class/create', ItemClassCreate.as_view()),
     path('item/item_class/all', ItemClassList.as_view()),

@@ -34,7 +34,7 @@ DESC
 '''
 
 class MediaData(models.Model):
-    media_url = models.CharField('URL of the media asset', max_length=512, unique=True, null=True)
+    media_url = models.CharField('URL of the media asset', max_length=512, null=True)
     media_file_data_id = models.IntegerField('ID provided by Battle.net endpoints', null=True)
 
     

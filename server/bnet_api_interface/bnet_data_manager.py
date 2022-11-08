@@ -5,9 +5,8 @@ from django.apps import apps
 import datetime as dt
 from enum import Enum
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (Item, ItemClass, ItemClassHierarchy, Profession, 
-    ProfessionSkillTier, StgRecipeItem)
-from wfl.models import QUALITY
+from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
+    Profession, ProfessionSkillTier, StgRecipeItem)
 
 '''
 =================
@@ -439,6 +438,7 @@ This class manages data for the following models
 - ItemClass
 - ItemSubclass
 - Item
+- ItemData
 '''
 
 
@@ -558,7 +558,7 @@ class ItemDataManager:
         
     '''
     DESC
-        Loads the `item` table
+        Loads the `item_data` table
         
         This table will only contain data for the RETAIL version of the game, 
         beacuse the Django ORM model doesn't support multi-column PKs and the
@@ -570,7 +570,7 @@ class ItemDataManager:
         
     RETURN
     '''    
-    def load_item(self) -> None:
+    def load_item_data(self) -> None:
         
         # ------------------
         # load reagent items
@@ -582,42 +582,53 @@ class ItemDataManager:
         # iterate through each item_id
         for item_id in [x['item_id'] for x in item_id_objs]:
     
-            # call the /item/{itemId} endpoint
-            iid_r = self._bnet_api_util.get_item_metadata(item_id, 
-                GameVersion.RETAIL)
+            # load both CLASSIC and RETAIL versions
+            for game_version in [ItemData.GAME_VERSION.RETAIL, 
+                ItemData.GAME_VERSION.CLASSIC]:
+    
+                # call the /item/{itemId} endpoint
+                iid_r = self._bnet_api_util.get_item_metadata(item_id, 
+                    game_version)
+                        
+                # TODO: imrpove logic by checking if the item_id exists in this
+                # table for RETAIL
+                if iid_r is None and game_version == ItemData.GAME_VERSION.CLASSIC:
+                    continue
+                
+                elif iid_r is None:
+                    raise Exception('Error: get_item_metadata() in bnet_data_loader.load_item()') 
                     
-            if iid_r is None:   
-                raise Exception('Error: get_item_metadata() in bnet_data_loader.load_item()') 
+                # get item media
+                media_r = self._bnet_api_util.get_item_media_metadata(item_id, 
+                    game_version)
                 
-            # get item media
-            media_r = self._bnet_api_util.get_item_media_metadata(item_id, 
-                GameVersion.RETAIL)
-            
-            if media_r is None:
-                raise Exception('Error: get_item_metadata() in bnet_data_loader.load_item()')
+                if media_r is None:
+                    raise Exception('Error: get_item_metadata() in bnet_data_loader.load_item()')
+                    
+                # # ge ItemClassHierarchy object
+                # item_class_hierarchy = ItemClassHierarchy.objects.all()[0]
+                    
+                # enqueue Item object for loading 
+                obj = ItemData(
+                    item_data_id='{}_{}'.format(game_version, item_id),
+                    name=iid_r['name'],
+                    game_version=game_version,
+                    # item_class_hierarchy=item_class_hierarchy,
+                    media_url=media_r['assets'][0]['value'],
+                    media_file_data_id=media_r['assets'][0]['file_data_id'],
+                    purchase_price=iid_r['purchase_price'],
+                    sell_price=iid_r['sell_price'],
+                    level=iid_r['level'],
+                    required_level=iid_r['required_level'],
+                    quality=iid_r['quality']['type'],
+                )
+                self._obj_loader.add(obj) 
                 
-            # ge ItemClassHierarchy object
-            item_class_hierarchy = ItemClassHierarchy.objects.all()[0]
-                
-            # enqueue Item object for loading 
-            obj = Item(
-                item_id=item_id,
-                name=iid_r['name'],
-                item_class_hierarchy=item_class_hierarchy,
-                media_url=media_r['assets'][0]['value'],
-                media_file_data_id=media_r['assets'][0]['file_data_id'],
-                purchase_price=iid_r['purchase_price'],
-                sell_price=iid_r['sell_price'],
-                level=iid_r['level'],
-                required_level=iid_r['required_level'],
-                quality=iid_r['quality']['type'],
-            )
-            self._obj_loader.add(obj) 
+            # load any remaining objects
+            self._obj_loader.commit_remaining()
             
                 
         # -----------------
-        # load crated items
+        # load created items
         # -----------------
 
-        # load any remaining objects
-        self._obj_loader.commit_remaining()

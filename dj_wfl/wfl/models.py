@@ -1,4 +1,5 @@
 from django.db import models
+from wfl.utils import GameVersion, ItemQuality
 
 
 '''
@@ -170,33 +171,14 @@ DESC
     CLASSIC and RETAIL versions of the game
 '''
 
-class ItemData(CommonData, MediaData):
-    
-    # game version 
-    GAME_VERSION = (
-        ('CLASSIC', 'CLASSIC'),
-        ('RETAIL', 'RETAIL'),
-    )
-    
-    # quality 
-    QUALITY = (
-        ('POOR', 'POOR'),
-        ('COMMON', 'COMMON'),
-        ('UNCOMMON', 'UNCOMMON'),
-        ('RARE', 'RARE'),
-        ('EPIC', 'EPIC'),
-        ('LEGENDARY', 'LEGENDARY'),
-        ('HEIRLOOM', 'HEIRLOOM'),
-    )
-        
-    
+class ItemData(CommonData, MediaData):    
     item_data_id = models.CharField('unique identifier for item_id and game_version', max_length=256, primary_key=True) 
     purchase_price = models.IntegerField('item vendor purchase price', default=0)
     sell_price = models.IntegerField('item vendor sell price', default=0)
-    game_version = models.CharField('game version of the item', max_length=256, choices=GAME_VERSION, default='RETAIL')
+    game_version = models.CharField('game version of the item', max_length=256, choices=GameVersion.choices(), default=GameVersion.RETAIL)
     level = models.SmallIntegerField('item level', default=0)
     required_level = models.SmallIntegerField('required player level', default=0)
-    quality = models.CharField('quality level', max_length=256, choices=QUALITY, default='COMMON')
+    quality = models.CharField('quality level', max_length=256, choices=ItemQuality.choices(), default=ItemQuality.COMMON)
 
 
     class Meta:

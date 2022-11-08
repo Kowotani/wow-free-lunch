@@ -3,14 +3,7 @@ from enum import Enum
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-
-
-'''
-This enum enumerates the CLASSIC and RETAIL versions of WoW
-'''
-class GameVersion(Enum):
-    CLASSIC = 1
-    RETAIL = 2
+from wfl.utils import GameVersion
 
 
 '''

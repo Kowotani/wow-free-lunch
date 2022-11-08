@@ -1,13 +1,13 @@
-from bnet_api_utils import BNetAPIUtil
+from bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 from dataclasses import dataclass
 from django.apps import apps
 import datetime as dt
 from enum import Enum
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (ItemClass, ItemClassHierarchy, Profession, ProfessionSkillTier, 
-    StgRecipeItem)
-
+from wfl.models import (Item, ItemClass, ItemClassHierarchy, Profession, 
+    ProfessionSkillTier, StgRecipeItem)
+from wfl.models import QUALITY
 
 '''
 =================
@@ -535,7 +535,7 @@ class ItemDataManager:
                     isid_r = self._bnet_api_util.get_item_subclass_metadata(
                         item_class.pk, i)
                     
-                    # enqueue ItemSubclass objects for loading 
+                    # enqueue ItemSubclass object for loading 
                     obj = ItemClassHierarchy(
                         item_class_hierarchy_id='{}_{}'.format(item_class.pk,
                             isid_r['subclass_id']),
@@ -551,6 +551,73 @@ class ItemDataManager:
                 except:
                     # skip to the next item_class
                     break               
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()
+        
+        
+    '''
+    DESC
+        Loads the `item` table
+        
+        This table will only contain data for the RETAIL version of the game, 
+        beacuse the Django ORM model doesn't support multi-column PKs and the
+        data model gets ugly if we make a dummy PK
+        
+        The universe of items to load is found in the `stg_recipe_item` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_item(self) -> None:
+        
+        # ------------------
+        # load reagent items
+        # ------------------
+        
+        # query the stg_recipe_item table for distinct item_id objects
+        item_id_objs = StgRecipeItem.objects.values('item_id').distinct()
+        
+        # iterate through each item_id
+        for item_id in [x['item_id'] for x in item_id_objs]:
+    
+            # call the /item/{itemId} endpoint
+            iid_r = self._bnet_api_util.get_item_metadata(item_id, 
+                GameVersion.RETAIL)
+                    
+            if iid_r is None:   
+                raise Exception('Error: get_item_metadata() in bnet_data_loader.load_item()') 
+                
+            # get item media
+            media_r = self._bnet_api_util.get_item_media_metadata(item_id, 
+                GameVersion.RETAIL)
+            
+            if media_r is None:
+                raise Exception('Error: get_item_metadata() in bnet_data_loader.load_item()')
+                
+            # ge ItemClassHierarchy object
+            item_class_hierarchy = ItemClassHierarchy.objects.all()[0]
+                
+            # enqueue Item object for loading 
+            obj = Item(
+                item_id=item_id,
+                name=iid_r['name'],
+                item_class_hierarchy=item_class_hierarchy,
+                media_url=media_r['assets'][0]['value'],
+                media_file_data_id=media_r['assets'][0]['file_data_id'],
+                purchase_price=iid_r['purchase_price'],
+                sell_price=iid_r['sell_price'],
+                level=iid_r['level'],
+                required_level=iid_r['required_level'],
+                quality=iid_r['quality']['type'],
+            )
+            self._obj_loader.add(obj) 
+            
+                
+        # -----------------
+        # load crated items
+        # -----------------
 
         # load any remaining objects
         self._obj_loader.commit_remaining()

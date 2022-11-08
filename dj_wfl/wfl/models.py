@@ -33,7 +33,7 @@ DESC
 '''
 
 class MediaData(models.Model):
-    media_url = models.CharField('URL of the media asset', max_lengthd=512, unique=True, null=True)
+    media_url = models.CharField('URL of the media asset', max_length=512, unique=True, null=True)
     media_file_data_id = models.IntegerField('ID provided by Battle.net endpoints', null=True)
 
     
@@ -159,17 +159,18 @@ class ItemClassHierarchy(CommonData):
 
         
     def __str__(self):
-        return CommonData.__str__(self)
-        
-        
+        return CommonData.__str__(self)   
+      
+      
 '''
 DESC
-    Dim table for Item
+    Dim table for ItemData - to be used in conjuction with Item
     Mostly maps to /item/{itemId} endpoint
-    Note that there will be CLASSIC and RETAIL versions of items
+    This model will store the actual data associated with the Item for both
+    CLASSIC and RETAIL versions of the game
 '''
 
-class Item(CommonData, MediaData):
+class ItemData(CommonData, MediaData):
     
     # game version 
     GAME_VERSION = (
@@ -189,14 +190,36 @@ class Item(CommonData, MediaData):
     )
         
     
-    item_id = models.IntegerField('item ID', primary_key=True) 
-    item_class_hierarchy = models.ForeignKey(ItemClassHierarchy, on_delete=models.CASCADE)
+    item_data_id = models.CharField('unique identifier for item_id and game_version', max_length=256, primary_key=True) 
     purchase_price = models.IntegerField('item vendor purchase price', default=0)
     sell_price = models.IntegerField('item vendor sell price', default=0)
     game_version = models.CharField('game version of the item', max_length=256, choices=GAME_VERSION, default='RETAIL')
     level = models.SmallIntegerField('item level', default=0)
     required_level = models.SmallIntegerField('required player level', default=0)
     quality = models.CharField('quality level', max_length=256, choices=QUALITY, default='COMMON')
+
+
+    class Meta:
+        db_table = 'item_data'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)      
+      
+        
+'''
+DESC
+    Dim table for Item - to be used in conjuction with ItemData
+    Mostly maps to /item/{itemId} endpoint
+    This model mostly exists to support Django's singular column PK requirement
+'''
+
+class Item(CommonData):
+    item_id = models.IntegerField('item ID', primary_key=True) 
+    item_class_hierarchy = models.ForeignKey(ItemClassHierarchy, on_delete=models.CASCADE)
+    classic_item_data = models.ForeignKey(ItemData, on_delete=models.CASCADE, related_name='classic_item_data', null=True)
+    retail_item_data = models.ForeignKey(ItemData, on_delete=models.CASCADE, related_name='retail_item_data', null=True)
+    
 
     class Meta:
         db_table = 'item'
@@ -205,3 +228,4 @@ class Item(CommonData, MediaData):
     def __str__(self):
         return CommonData.__str__(self)
         
+

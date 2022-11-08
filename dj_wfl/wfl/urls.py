@@ -6,6 +6,8 @@ from wfl.views import (
     
     ItemClassHierarchyCreate, ItemClassHierarchyList, ItemClassHierarchyDetail,
     
+    ItemDataCreate, ItemDataList, ItemDataDetail,
+    
     ProfessionCreate, ProfessionList, ProfessionDetail,
     
     ProfessionSkillTierCreate, ProfessionSkillTierList, 
@@ -40,6 +42,10 @@ urlpatterns = [
     path('item/create', ItemCreate.as_view()),
     path('item/all', ItemList.as_view()),
     path('item/<pk>', ItemDetail.as_view()),
+    
+    path('item/item_data/create', ItemDataCreate.as_view()),
+    path('item/item_data/all', ItemDataList.as_view()),
+    path('item/item_data/<pk>', ItemDataDetail.as_view()),
     
     path('item/item_class/create', ItemClassCreate.as_view()),
     path('item/item_class/all', ItemClassList.as_view()),

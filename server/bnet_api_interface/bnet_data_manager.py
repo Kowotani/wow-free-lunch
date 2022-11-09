@@ -455,6 +455,7 @@ class ItemDataManager:
     
     _bnet_api_util = None
     _obj_loader = None
+    chunk_size = 100
     
     
     '''
@@ -475,7 +476,7 @@ class ItemDataManager:
     '''    
     def __init__(self):
         self._bnet_api_util = BNetAPIUtil()
-        self._obj_loader = BulkObjectLoader()
+        self._obj_loader = BulkObjectLoader(self.chunk_size)
 
 
     '''
@@ -593,6 +594,10 @@ class ItemDataManager:
         # query the stg_recipe_item table for distinct item_id (reagent) objects
         item_id_objs = StgRecipeItem.objects.values('item_id').distinct()
         
+        # implement custom chunk_sizing since ItemData need to be loaded
+        # before Item
+        counter = 0
+        
         # iterate through each reagent item_id
         for item_id in [x['item_id'] for x in item_id_objs]:
         
@@ -698,8 +703,18 @@ class ItemDataManager:
             )
             self._obj_loader.add(item_obj)
             
+            # implement custom chunk_size loading because ItemData need to
+            # be loaded before Item
+            counter += 1
+            
+            if counter >= self.chunk_size:
+                self._obj_loader._commit(ItemData)
+                self._obj_loader._commit(Item)
+                counter = 0
+            
         # load any remaining objects
-        self._obj_loader.commit_remaining()
+        self._obj_loader._commit(ItemData)
+        self._obj_loader._commit(Item)
                 
         # ------------------
         # load crafted items

@@ -124,27 +124,6 @@ class ProfessionSkillTier(CommonData):
 
 
 '''
-DESC
-    Staging table for collecting all of the item_ids to pull based on the recipe reagent and crafted item
-    This will be used to determine which item_ids to load into the item table
-'''
-
-class StgRecipeItem(CommonData):
-    stg_recipe_item_id = models.CharField('concat (recipe / reagent item / crafted item IDs) as dummy PK', max_length=256, primary_key=True) 
-    recipe_id = models.IntegerField('recipe ID', default=0)
-    item_id = models.IntegerField('reagent item ID', default=0)
-    crafted_item_id = models.IntegerField('crafted item ID', default=0)
-
-    
-    class Meta:
-        db_table = 'stg_recipe_item'
-        
-    
-    def __str__(self):
-        return CommonData.__str__(self)
-
-
-'''
 ===========
 Item Models
 ===========
@@ -240,3 +219,52 @@ class Item(CommonData):
         return CommonData.__str__(self)
         
 
+'''
+=============
+Recipe Models
+=============
+'''
+
+
+'''
+DESC
+    Staging table for collecting all of the item_ids to pull based on the recipe reagent and crafted item
+    This will be used to determine which item_ids to load into the item table
+'''
+
+class StgRecipeItem(CommonData):
+    stg_recipe_item_id = models.CharField('concat (recipe / reagent item / crafted item IDs) as dummy PK', max_length=256, primary_key=True) 
+    recipe_id = models.IntegerField('recipe ID', default=0)
+    item_id = models.IntegerField('reagent item ID', default=0)
+    crafted_item_id = models.IntegerField('crafted item ID', default=0)
+
+    
+    class Meta:
+        db_table = 'stg_recipe_item'
+        
+    
+    def __str__(self):
+        return CommonData.__str__(self)
+
+
+'''
+DESC
+    Dim table for Recipes
+    This 
+    Mostly maps to /recipe/{recipeId}
+'''
+
+class Recipe(CommonData, MediaData):
+    recipe_id = models.IntegerField('recipe ID', primary_key=True) 
+    skill_tier = models.ForeignKey(ProfessionSkillTier, on_delete=models.CASCADE)
+    crafted_item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    min_quantity = models.SmallIntegerField('min quantity produced', default=1)
+    max_quantity = models.SmallIntegerField('max quantity produced', default=1)
+
+    
+    class Meta:
+        db_table = 'recipe'
+        
+    
+    def __str__(self):
+        return CommonData.__str__(self)

@@ -15,6 +15,8 @@ from wfl.views import (
     ProfessionSkillTierCreate, ProfessionSkillTierList, 
     ProfessionSkillTierDetail,
     
+    RecipeCreate, RecipeList, RecipeDetail,
+
     StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail,
     )
 
@@ -31,10 +33,6 @@ urlpatterns = [
     path('profession/skill_tier/create', ProfessionSkillTierCreate.as_view()),
     path('profession/skill_tier/all', ProfessionSkillTierList.as_view()),
     path('profession/skill_tier/<pk>', ProfessionSkillTierDetail.as_view()),
-    
-    path('profession/stg_recipe_item/create', StgRecipeItemCreate.as_view()),
-    path('profession/stg_recipe_item/all', StgRecipeItemList.as_view()),
-    path('profession/stg_recipe_item/<pk>', StgRecipeItemDetail.as_view()),
     
     
     # =====
@@ -56,6 +54,19 @@ urlpatterns = [
     path('item/item_class_hierarchy/create', ItemClassHierarchyCreate.as_view()),
     path('item/item_class_hierarchy/all', ItemClassHierarchyList.as_view()),
     path('item/item_class_hierarchy/<pk>', ItemClassHierarchyDetail.as_view()),
+    
+   
+    # =======
+    # Recipes
+    # =======
+    
+    path('recipe/stg_recipe_item/create', StgRecipeItemCreate.as_view()),
+    path('recipe/stg_recipe_item/all', StgRecipeItemList.as_view()),
+    path('recipe/stg_recipe_item/<pk>', StgRecipeItemDetail.as_view()),   
+    
+    path('recipe/create', RecipeCreate.as_view()),
+    path('recipe/all', RecipeList.as_view()),
+    path('recipe/<pk>', RecipeDetail.as_view()), 
     
     
     # ==========

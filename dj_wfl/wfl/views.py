@@ -6,11 +6,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, Recipe, StgRecipeItem)
     
 from wfl.serializers import (ItemSerializer, ItemClassSerializer, 
     ItemClassHierarchySerializer, ItemDataSerializer, ProfessionSerializer, 
-    ExpansionSerializer, ProfessionSkillTierSerializer, StgRecipeItemSerializer)
+    ExpansionSerializer, ProfessionSkillTierSerializer, RecipeSerializer, 
+    StgRecipeItemSerializer)
     
 
 
@@ -87,40 +88,6 @@ Supported methods: GET / PUT / PATCH / DELETE
 class ProfessionSkillTierDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ProfessionSkillTier.objects.all()
     serializer_class = ProfessionSkillTierSerializer
-    
-
-'''
----------------
-Stg Recipe Item
----------------
-'''
-
-    
-'''
-Creates a StgRecipeItem
-Supported methods: POST
-'''
-class StgRecipeItemCreate(generics.CreateAPIView):
-    queryset = StgRecipeItem.objects.all()
-    serializer_class = StgRecipeItemSerializer
-    
-
-'''
-Retrieve list of Stg Recipe Items
-Supported methods: GET
-'''
-class StgRecipeItemList(generics.ListAPIView):
-    queryset = StgRecipeItem.objects.all()
-    serializer_class = StgRecipeItemSerializer
-    
-    
-'''
-Manages read / update / delete operations for a Stg Recipe Item
-Supported methods: GET / PUT / PATCH / DELETE
-'''
-class StgRecipeItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = StgRecipeItem.objects.all()
-    serializer_class = StgRecipeItemSerializer
     
     
 '''
@@ -264,6 +231,81 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     
+    
+'''
+============
+Recipe Views
+============
+'''
+    
+    
+'''
+---------------
+Stg Recipe Item
+---------------
+'''
+
+    
+'''
+Creates a StgRecipeItem
+Supported methods: POST
+'''
+class StgRecipeItemCreate(generics.CreateAPIView):
+    queryset = StgRecipeItem.objects.all()
+    serializer_class = StgRecipeItemSerializer
+    
+
+'''
+Retrieve list of Stg Recipe Items
+Supported methods: GET
+'''
+class StgRecipeItemList(generics.ListAPIView):
+    queryset = StgRecipeItem.objects.all()
+    serializer_class = StgRecipeItemSerializer
+    
+    
+'''
+Manages read / update / delete operations for a Stg Recipe Item
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class StgRecipeItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = StgRecipeItem.objects.all()
+    serializer_class = StgRecipeItemSerializer
+    
+ 
+'''
+------
+Recipe
+------
+'''
+
+    
+'''
+Creates a Recipe
+Supported methods: POST
+'''
+class RecipeCreate(generics.CreateAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    
+
+'''
+Retrieve list of Recipes
+Supported methods: GET
+'''
+class RecipeList(generics.ListAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    
+    
+'''
+Manages read / update / delete operations for a Recipe
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer 
+ 
     
 '''
 ===============

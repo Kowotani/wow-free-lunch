@@ -480,6 +480,13 @@ class ItemDataManager:
 
 
     '''
+    --------------
+    Helper Methods
+    --------------
+    '''
+
+
+    '''
     DESC
          Get the ItemClassHierarchy for the given inputs
         
@@ -490,9 +497,80 @@ class ItemDataManager:
     RETURN
         ItemClassHierarchy for the given inputs
     '''    
-    def _get_item_class_hierarchy(self, item_class_name, item_subclass_name):
+    def _get_item_class_hierarchy(self, item_class_name, item_subclass_name) -> ItemClassHierarchy:
         return ItemClassHierarchy.objects.filter(class_name=item_class_name, 
             subclass_name=item_subclass_name)[0] 
+
+
+    '''
+    DESC
+         Create the ItemData object for the given inputs. Returns None if the
+         object isn't created
+        
+    INPUT
+        - item_id of the item
+        - GameVersion of the item to create
+        
+    RETURN
+        - ItemData object, or None if it can't be created
+        - item_name, or None if it can't be parsed
+        - item_class_hierarchy, or None of it can't be parsed
+    '''    
+    def _get_item_data_object(self, item_id, game_version) -> (ItemData, str, ItemClassHierarchy):
+        
+        # TODO: figure out a better way to handle 404 errors for non-existent
+        # item_ids (eg. 107976)
+        try:
+
+            # call the /item/{itemId} endpoint
+            iid_r = self._bnet_api_util.get_item_metadata(item_id, game_version)
+            if iid_r is None:
+                raise Exception(
+                    'Error: [{}] get_item_metadata() in bnet_data_loader._get_item_data_object()'.format(game_version.value)) 
+                
+            # get item media
+            media_r = self._bnet_api_util.get_item_media_metadata(item_id, game_version)
+            if media_r is None:
+                raise Exception(
+                    'Error: [{}] get_item_media_metadata() in bnet_data_loader._get_item_data_object()'.format(game_version.value))
+
+                
+            # enqueue ItemData object for loading 
+            obj = ItemData(
+                item_data_id='{}_{}'.format(game_version.value, item_id),
+                name='{} Data'.format(iid_r['name']),
+                game_version=game_version.value,
+                media_url=media_r['assets'][0]['value'],
+                media_file_data_id=media_r['assets'][0]['file_data_id'],
+                purchase_price=iid_r['purchase_price'],
+                sell_price=iid_r['sell_price'],
+                level=iid_r['level'],
+                required_level=iid_r['required_level'],
+                quality=iid_r['quality']['type'],
+            )
+            
+            # get ItemClassHierarchy
+            item_class_hierarchy=self._get_item_class_hierarchy(
+                iid_r['item_class']['name'], iid_r['item_subclass']['name'])
+            
+            # get item_name
+            item_name = iid_r['name']
+            
+            # return tuple
+            return obj, item_name, item_class_hierarchy
+            
+        # TODO: figure out a better way to handle 404 errors for non-existent
+        # item_ids (eg. 107976)    
+        except:
+            print('[{}] Exception for item_id={}'.format(game_version.value, item_id))
+            return None, None, None
+
+
+    '''
+    --------------
+    Laoder Methods
+    --------------
+    '''
 
     
     '''
@@ -587,317 +665,76 @@ class ItemDataManager:
     '''    
     def load_item_and_item_data(self) -> None:
         
-        # ------------------
-        # load reagent items
-        # ------------------
-        
-        # query the stg_recipe_item table for distinct item_id (reagent) objects
-        item_id_objs = StgRecipeItem.objects.values('item_id').distinct()
-        
-        # implement custom chunk_sizing since ItemData need to be loaded
-        # before Item
-        counter = 0
-        
-        # iterate through each reagent item_id
-        for item_id in [x['item_id'] for x in item_id_objs]:
-        
-            print('item_id={}'.format(item_id))
-        
-            # required item metadata
-            item_class_hierarchy = None
-            item_name = None
-        
-            # ------
-            # RETAIL
-            # ------
-
-            # TODO: figure out a better way to handle 404 errors for non-existent
-            # item_ids (eg. 107976)
-            try:
-
-                # call the /item/{itemId} endpoint
-                iid_r = self._bnet_api_util.get_item_metadata(item_id, 
-                    GameVersion.RETAIL)
+        # iterate through each item_key (reagent item and crafted item)
+        # for item_key in ['item_id', 'crafted_item_id']:
+        for item_key in ['crafted_item_id']:
+            
+            # query the stg_recipe_item table for distinct item_key objects
+            # item_id_objs = StgRecipeItem.objects.values(item_key).distinct()
+            item_id_objs = StgRecipeItem.objects.filter(crafted_item_id__gte=10000, crafted_item_id__lte=10010).values(item_key).distinct()
+            
+            # implement custom chunk_sizing since ItemData need to be loaded
+            # before Item
+            counter = 0
+            
+            # iterate through each item_key
+            for item_id in [x[item_key] for x in item_id_objs]:
+            
+                # -------
+                # CLASSIC
+                # -------
                 
-                if iid_r is None:
-                    raise Exception('Error: [RETAIL] get_item_metadata() in bnet_data_loader.load_item()') 
-                    
-                # get item media
-                media_r = self._bnet_api_util.get_item_media_metadata(item_id, 
-                    GameVersion.RETAIL)
-                
-                if media_r is None:
-                    raise Exception('Error: [RETAIL] get_item_media_metadata() in bnet_data_loader.load_item()')
+                # TODO: explicitly identify items in CLASSIC
+                classic_obj, c_item_name, c_item_class_hierarchy = self._get_item_data_object(
+                    item_id, GameVersion.CLASSIC)
+            
+                # ------
+                # RETAIL
+                # ------
     
-                    
-                # enqueue ItemData object for loading 
-                retail_obj = ItemData(
-                    item_data_id='{}_{}'.format(GameVersion.RETAIL.value, item_id),
-                    name='{} Data'.format(iid_r['name']),
-                    game_version=GameVersion.RETAIL.value,
-                    media_url=media_r['assets'][0]['value'],
-                    media_file_data_id=media_r['assets'][0]['file_data_id'],
-                    purchase_price=iid_r['purchase_price'],
-                    sell_price=iid_r['sell_price'],
-                    level=iid_r['level'],
-                    required_level=iid_r['required_level'],
-                    quality=iid_r['quality']['type'],
+                retail_obj, r_item_name, r_item_class_hierarchy = self._get_item_data_object(
+                    item_id, GameVersion.RETAIL)
+                
+                # ----    
+                # ITEM
+                # ----
+                
+                # determine item_name and item_class_hierarchy, this uses
+                # "falsey" logic (0, None, False, "")
+                item_name = r_item_name or c_item_name
+                item_class_hierarchy = r_item_class_hierarchy or c_item_class_hierarchy
+                
+                # skip if required item metadata doesn't exist (ie. errors)
+                if (None in [item_class_hierarchy, item_id, item_name] 
+                    and retail_obj is None and classic_obj is None):
+                    continue
+                
+                # create Item object
+                item_obj = Item(
+                    item_id=item_id,
+                    name=item_name,
+                    item_class_hierarchy=item_class_hierarchy,
+                    classic_item_data=classic_obj,
+                    retail_item_data=retail_obj,
                 )
-                self._obj_loader.add(retail_obj) 
                 
-                # get ItemClassHierarchy
-                item_class_hierarchy=self._get_item_class_hierarchy(
-                    iid_r['item_class']['name'], iid_r['item_subclass']['name'])
+                # add all valid objects
+                if retail_obj is not None:
+                    self._obj_loader.add(retail_obj) 
+                if classic_obj is not None:
+                    self._obj_loader.add(classic_obj)
+                self._obj_loader.add(item_obj)
                 
-                # get item_name
-                item_name = iid_r['name']
+                # implement custom chunk_size loading because ItemData need to
+                # be loaded before Item, use chunk_size - 1 to trigger this upload
+                # instead of the one in BulkObjectLoader to guarantee order
+                counter += 1
                 
-            # TODO: figure out a better way to handle 404 errors for non-existent
-            # item_ids (eg. 107976)    
-            except:
-                print('[RETAIL] Exception for item_id={}'.format(item_id))
-                retail_obj = None
-            
-            
-            # -------
-            # CLASSIC
-            # -------
-            
-            # TODO: explicitly identify items in CLASSIC
-            try:
+                if counter >= self.chunk_size - 1:
+                    self._obj_loader._commit(ItemData)
+                    self._obj_loader._commit(Item)
+                    counter = 0
                 
-                # call the /item/{itemId} endpoint
-                iid_r = self._bnet_api_util.get_item_metadata(item_id, 
-                    GameVersion.CLASSIC)
-                
-                if iid_r is None:
-                    raise Exception('Error: [CLASSIC] get_item_metadata() in bnet_data_loader.load_item()') 
-                    
-                # get item media
-                media_r = self._bnet_api_util.get_item_media_metadata(item_id, 
-                    GameVersion.CLASSIC)
-                
-                if media_r is None:
-                    raise Exception('Error: [CLASSIC] get_item_media_metadata() in bnet_data_loader.load_item()')
-        
-                    
-                # enqueue ItemData object for loading 
-                classic_obj = ItemData(
-                    item_data_id='{}_{}'.format(GameVersion.CLASSIC.value, item_id),
-                    name='{} Data'.format(iid_r['name']),
-                    game_version=GameVersion.CLASSIC.value,
-                    media_url=media_r['assets'][0]['value'],
-                    media_file_data_id=media_r['assets'][0]['file_data_id'],
-                    purchase_price=iid_r['purchase_price'],
-                    sell_price=iid_r['sell_price'],
-                    level=iid_r['level'],
-                    required_level=iid_r['required_level'],
-                    quality=iid_r['quality']['type'],
-                )
-                self._obj_loader.add(classic_obj)
-            
-                # get ItemClassHierarchy
-                if item_class_hierarchy is None:
-                    item_class_hierarchy=self._get_item_class_hierarchy(
-                        iid_r['item_class']['name'], iid_r['item_subclass']['name'])
-                
-                # get item_name
-                if item_name is None:
-                    item_name = iid_r['name']
-            
-            # TODO: explicitly identify items in CLASSIC    
-            except:
-                print('[CLASSIC] Exception for item_id={}'.format(item_id))
-                classic_obj = None
-            
-            
-            # ----    
-            # ITEM
-            # ----
-            
-            # skip if required item metadata doesn't exist (ie. errors)
-            if (None in [item_class_hierarchy, item_id, item_name] 
-                and retail_obj is None and classic_obj is None):
-                continue
-            
-            # enqueue ItemData object for loading 
-            item_obj = Item(
-                item_id=item_id,
-                name=item_name,
-                item_class_hierarchy=item_class_hierarchy,
-                classic_item_data=classic_obj,
-                retail_item_data=retail_obj,
-            )
-            self._obj_loader.add(item_obj)
-            
-            # implement custom chunk_size loading because ItemData need to
-            # be loaded before Item, use chunk_size -1 to trigger this upload
-            # instead of the one in BulkObjectLoader
-            counter += 1
-            
-            if counter >= self.chunk_size - 1:
-                self._obj_loader._commit(ItemData)
-                self._obj_loader._commit(Item)
-                counter = 0
-            
-        # load any remaining objects
-        self._obj_loader._commit(ItemData)
-        self._obj_loader._commit(Item)
-        
-                
-        # ------------------
-        # load crafted items
-        # ------------------
-        
-        # query the stg_recipe_item table for distinct item_id (reagent) objects
-        item_id_objs = StgRecipeItem.objects.values('crafted_item_id').distinct()
-        
-        # implement custom chunk_sizing since ItemData need to be loaded
-        # before Item
-        counter = 0
-        
-        # iterate through each reagent item_id
-        for item_id in [x['crafted_item_id'] for x in item_id_objs]:
-        
-            print('item_id={}'.format(item_id))
-        
-            # required item metadata
-            item_class_hierarchy = None
-            item_name = None
-        
-            # ------
-            # RETAIL
-            # ------
-
-            # TODO: figure out a better way to handle 404 errors for non-existent
-            # item_ids (eg. 107976)
-            try:
-
-                # call the /item/{itemId} endpoint
-                iid_r = self._bnet_api_util.get_item_metadata(item_id, 
-                    GameVersion.RETAIL)
-                
-                if iid_r is None:
-                    raise Exception('Error: [RETAIL] get_item_metadata() in bnet_data_loader.load_item()') 
-                    
-                # get item media
-                media_r = self._bnet_api_util.get_item_media_metadata(item_id, 
-                    GameVersion.RETAIL)
-                
-                if media_r is None:
-                    raise Exception('Error: [RETAIL] get_item_media_metadata() in bnet_data_loader.load_item()')
-    
-                    
-                # enqueue ItemData object for loading 
-                retail_obj = ItemData(
-                    item_data_id='{}_{}'.format(GameVersion.RETAIL.value, item_id),
-                    name='{} Data'.format(iid_r['name']),
-                    game_version=GameVersion.RETAIL.value,
-                    media_url=media_r['assets'][0]['value'],
-                    media_file_data_id=media_r['assets'][0]['file_data_id'],
-                    purchase_price=iid_r['purchase_price'],
-                    sell_price=iid_r['sell_price'],
-                    level=iid_r['level'],
-                    required_level=iid_r['required_level'],
-                    quality=iid_r['quality']['type'],
-                )
-                self._obj_loader.add(retail_obj) 
-                
-                # get ItemClassHierarchy
-                item_class_hierarchy=self._get_item_class_hierarchy(
-                    iid_r['item_class']['name'], iid_r['item_subclass']['name'])
-                
-                # get item_name
-                item_name = iid_r['name']
-                
-            # TODO: figure out a better way to handle 404 errors for non-existent
-            # item_ids (eg. 107976)    
-            except:
-                print('[RETAIL] Exception for item_id={}'.format(item_id))
-                retail_obj = None
-            
-            
-            # -------
-            # CLASSIC
-            # -------
-            
-            # TODO: explicitly identify items in CLASSIC
-            try:
-                
-                # call the /item/{itemId} endpoint
-                iid_r = self._bnet_api_util.get_item_metadata(item_id, 
-                    GameVersion.CLASSIC)
-                
-                if iid_r is None:
-                    raise Exception('Error: [CLASSIC] get_item_metadata() in bnet_data_loader.load_item()') 
-                    
-                # get item media
-                media_r = self._bnet_api_util.get_item_media_metadata(item_id, 
-                    GameVersion.CLASSIC)
-                
-                if media_r is None:
-                    raise Exception('Error: [CLASSIC] get_item_media_metadata() in bnet_data_loader.load_item()')
-        
-                    
-                # enqueue ItemData object for loading 
-                classic_obj = ItemData(
-                    item_data_id='{}_{}'.format(GameVersion.CLASSIC.value, item_id),
-                    name='{} Data'.format(iid_r['name']),
-                    game_version=GameVersion.CLASSIC.value,
-                    media_url=media_r['assets'][0]['value'],
-                    media_file_data_id=media_r['assets'][0]['file_data_id'],
-                    purchase_price=iid_r['purchase_price'],
-                    sell_price=iid_r['sell_price'],
-                    level=iid_r['level'],
-                    required_level=iid_r['required_level'],
-                    quality=iid_r['quality']['type'],
-                )
-                self._obj_loader.add(classic_obj)
-            
-                # get ItemClassHierarchy
-                if item_class_hierarchy is None:
-                    item_class_hierarchy=self._get_item_class_hierarchy(
-                        iid_r['item_class']['name'], iid_r['item_subclass']['name'])
-                
-                # get item_name
-                if item_name is None:
-                    item_name = iid_r['name']
-            
-            # TODO: explicitly identify items in CLASSIC    
-            except:
-                print('[CLASSIC] Exception for item_id={}'.format(item_id))
-                classic_obj = None
-            
-            
-            # ----    
-            # ITEM
-            # ----
-            
-            # skip if required item metadata doesn't exist (ie. errors)
-            if (None in [item_class_hierarchy, item_id, item_name] 
-                and retail_obj is None and classic_obj is None):
-                continue
-            
-            # enqueue ItemData object for loading 
-            item_obj = Item(
-                item_id=item_id,
-                name=item_name,
-                item_class_hierarchy=item_class_hierarchy,
-                classic_item_data=classic_obj,
-                retail_item_data=retail_obj,
-            )
-            self._obj_loader.add(item_obj)
-            
-            # implement custom chunk_size loading because ItemData need to
-            # be loaded before Item, use chunk_size -1 to trigger this upload
-            # instead of the one in BulkObjectLoader
-            counter += 1
-            
-            if counter >= self.chunk_size - 1:
-                self._obj_loader._commit(ItemData)
-                self._obj_loader._commit(Item)
-                counter = 0
-            
-        # load any remaining objects
-        self._obj_loader._commit(ItemData)
-        self._obj_loader._commit(Item)        
+            # load any remaining objects
+            self._obj_loader._commit(ItemData)
+            self._obj_loader._commit(Item)

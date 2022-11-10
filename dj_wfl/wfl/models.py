@@ -43,6 +43,34 @@ class MediaData(models.Model):
 
 
 '''
+================
+Expansion Models
+================
+'''
+
+
+'''
+DESC
+    Dim table for Expansion
+    This table will be populated manually since there is no endpoint
+'''
+
+class Expansion(CommonData):
+    expansion_id = models.SmallIntegerField('expansion ID', primary_key=True)
+    skill_tier_prefix = models.CharField('prefix to identy the expansion skill tiers', max_length=256, default='')
+    max_level = models.SmallIntegerField('max character level', default=0)
+    is_classic = models.BooleanField('TRUE if this expansion is part of Classic', default=False)
+    
+
+    class Meta:
+        db_table = 'expansion'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
+
+'''
 =================
 Profession Models
 =================
@@ -84,6 +112,7 @@ class ProfessionSkillTier(CommonData):
     min_total_skill_level = models.SmallIntegerField('minimum total skill level (eg. 301 for Burning Crusade)', default=0)
     max_total_skill_level = models.SmallIntegerField('maximum total skill level (eg. 375 for Burning Crusade)', default=0)
     is_legacy_tier = models.BooleanField('TRUE if the tier requires previous tiers to unlock', default=False)
+    expansion = models.ForeignKey(Expansion, on_delete=models.CASCADE, default=0)
 
     
     class Meta:
@@ -211,29 +240,3 @@ class Item(CommonData):
         return CommonData.__str__(self)
         
 
-'''
-================
-Expansion Models
-================
-'''
-
-
-'''
-DESC
-    Dim table for Expansion
-    This table will be populated manually since there is no endpoint
-'''
-
-class Expansion(CommonData):
-    expansion_id = models.SmallIntegerField('expansion ID', primary_key=True)
-    skill_tier_prefix = models.CharField('prefix to identy the expansion skill tiers', max_length=256, default='')
-    max_level = models.SmallIntegerField('max character level', default=0)
-    is_classic = models.BooleanField('TRUE if this expansion is part of Classic', default=False)
-    
-
-    class Meta:
-        db_table = 'expansion'
-
-        
-    def __str__(self):
-        return CommonData.__str__(self)

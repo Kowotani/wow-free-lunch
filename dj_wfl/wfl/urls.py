@@ -8,6 +8,8 @@ from wfl.views import (
     
     ItemDataCreate, ItemDataList, ItemDataDetail,
     
+    ExpansionCreate, ExpansionList, ExpansionDetail,
+    
     ProfessionCreate, ProfessionList, ProfessionDetail,
     
     ProfessionSkillTierCreate, ProfessionSkillTierList, 
@@ -54,4 +56,13 @@ urlpatterns = [
     path('item/item_class_hierarchy/create', ItemClassHierarchyCreate.as_view()),
     path('item/item_class_hierarchy/all', ItemClassHierarchyList.as_view()),
     path('item/item_class_hierarchy/<pk>', ItemClassHierarchyDetail.as_view()),
+    
+    
+    # ==========
+    # Expansions
+    # ==========
+    
+    path('expansion/create', ExpansionCreate.as_view()),
+    path('expansion/all', ExpansionList.as_view()),
+    path('expansion/<pk>', ExpansionDetail.as_view()),
 ]

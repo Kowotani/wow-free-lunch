@@ -6,11 +6,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Profession, ProfessionSkillTier,  StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, StgRecipeItem)
     
 from wfl.serializers import (ItemSerializer, ItemClassSerializer, 
     ItemClassHierarchySerializer, ItemDataSerializer, ProfessionSerializer, 
-    ProfessionSkillTierSerializer, StgRecipeItemSerializer)
+    ExpansionSerializer, ProfessionSkillTierSerializer, StgRecipeItemSerializer)
     
 
 
@@ -263,3 +263,44 @@ Supported methods: GET / PUT / PATCH / DELETE
 class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    
+    
+'''
+===============
+Expansion Views
+===============
+'''
+
+
+'''
+---------
+Expansion
+---------
+'''
+
+
+'''
+Creates an Expansion
+Supported methods: POST
+'''
+class ExpansionCreate(generics.CreateAPIView):
+    queryset = Expansion.objects.all()
+    serializer_class = ExpansionSerializer
+    
+
+'''
+Retrieve list of Expansions
+Supported methods: GET
+'''
+class ExpansionList(generics.ListAPIView):
+    queryset = Expansion.objects.all()
+    serializer_class = ExpansionSerializer
+    
+    
+'''
+Manages read / update / delete operations for an Expansion
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class ExpansionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Expansion.objects.all()
+    serializer_class = ExpansionSerializer

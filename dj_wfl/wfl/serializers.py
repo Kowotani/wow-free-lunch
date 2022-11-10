@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Profession, ProfessionSkillTier, StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, StgRecipeItem)
 
 
 '''
@@ -91,4 +91,22 @@ DESC
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
+        fields = '__all__'
+        
+        
+'''
+=====================
+Expansion Serializers
+=====================
+'''
+
+
+'''
+DESC
+    Expansion serializer
+'''
+
+class ExpansionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Expansion
         fields = '__all__'

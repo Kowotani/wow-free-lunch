@@ -195,6 +195,13 @@ class ProfessionDataManager:
     def __init__(self):
         self._bnet_api_util = BNetAPIUtil()
         self._obj_loader = BulkObjectLoader()
+
+    
+    '''
+    --------------
+    Helper Methods
+    --------------
+    '''
     
     
     '''
@@ -230,6 +237,29 @@ class ProfessionDataManager:
     '''    
     def _is_crafting_profession(self, profession_name):
         return profession_name in self.crafting_professions
+    
+
+    '''
+    DESC
+        Determines to which Expansion the given Skill Tier belongs
+        
+    INPUT
+        Skill Tier name
+        
+    RETURN
+        Expansion object
+    '''    
+    def _get_expansion_from_skill_tier(self, skill_tier_name):
+        for expansion in Expansion.objects.all():
+            if skill_tier_name.find(expansion.skill_tier_prefix) >= 0:
+                return expansion
+        return None
+    
+    '''
+    --------------
+    Loader Methods
+    --------------
+    '''
     
     
     '''
@@ -317,6 +347,9 @@ class ProfessionDataManager:
                 if sid_r is None:   
                     raise Exception('Error: get_profession_skill_tier_metadata() in bnet_data_loader.load_profession_skill_tier()')                    
                 
+                # get expansion for skill tier
+                expansion = self._get_expansion_from_skill_tier(skill_tier['name'])
+                
                 # enqueue ProfessionSkillTier object for loading
                 obj = ProfessionSkillTier(
                     skill_tier_id=skill_tier['id'],
@@ -327,6 +360,7 @@ class ProfessionDataManager:
                     min_total_skill_level=skill_tier_levels.min_level,
                     max_total_skill_level=skill_tier_levels.max_level,
                     is_legacy_tier=skill_tier_levels.is_legacy_tier,
+                    expansion=expansion,
                     )
                 self._obj_loader.add(obj)
         
@@ -569,7 +603,7 @@ class ItemDataManager:
 
     '''
     --------------
-    Laoder Methods
+    Loader Methods
     --------------
     '''
 
@@ -667,12 +701,10 @@ class ItemDataManager:
     def load_item_and_item_data(self) -> None:
         
         # iterate through each item_key (reagent item and crafted item)
-        # for item_key in ['item_id', 'crafted_item_id']:
-        for item_key in ['crafted_item_id']:
+        for item_key in ['item_id', 'crafted_item_id']:
             
             # query the stg_recipe_item table for distinct item_key objects
-            # item_id_objs = StgRecipeItem.objects.values(item_key).distinct()
-            item_id_objs = StgRecipeItem.objects.filter(crafted_item_id__gte=10000, crafted_item_id__lte=10010).values(item_key).distinct()
+            item_id_objs = StgRecipeItem.objects.values(item_key).distinct()
             
             # implement custom chunk_sizing since ItemData need to be loaded
             # before Item
@@ -681,20 +713,26 @@ class ItemDataManager:
             # iterate through each item_key
             for item_id in [x[item_key] for x in item_id_objs]:
             
-                # -------
-                # CLASSIC
-                # -------
-                
-                # TODO: explicitly identify items in CLASSIC
-                classic_obj, c_item_name, c_item_class_hierarchy = self._get_item_data_object(
-                    item_id, GameVersion.CLASSIC)
-            
                 # ------
                 # RETAIL
                 # ------
     
                 retail_obj, r_item_name, r_item_class_hierarchy = self._get_item_data_object(
                     item_id, GameVersion.RETAIL)
+  
+                # -------
+                # CLASSIC
+                # -------
+                
+                # TODO: explicitly identify items in CLASSIC
+                # approximate with item_level <= 20 for RETAIL data
+                if retail_obj is None or getattr(retail_obj, 'level') <= 20:
+                    classic_obj, c_item_name, c_item_class_hierarchy = self._get_item_data_object(
+                        item_id, GameVersion.CLASSIC)
+                else:
+                    classic_obj = None
+                    c_item_name = None
+                    c_item_class_hierarchy = None
                 
                 # ----    
                 # ITEM
@@ -787,7 +825,7 @@ class ExpansionDataManager:
         4: ExpansionData('Mists of Pandaria', 'Pandaria', 90, False),
         5: ExpansionData('Warlords of Draenor', 'Draenor', 100, False),
         6: ExpansionData('Legion', 'Legion', 110, False),
-        7: ExpansionData('Battle for Azeroth', 'Kul Tiran', 120, False),
+        7: ExpansionData('Battle for Azeroth', 'Zandalari', 120, False),
         8: ExpansionData('Shadowlands', 'Shadowlands', 60, False),
         9: ExpansionData('Dragonflight', 'Dragon Isles', 70, False),
         }

@@ -725,8 +725,8 @@ class ItemDataManager:
                 # -------
                 
                 # TODO: explicitly identify items in CLASSIC
-                # approximate with item_level <= 20 for RETAIL data
-                if retail_obj is None or getattr(retail_obj, 'level') <= 20:
+                # approximate with item_level <= 40 for RETAIL data
+                if retail_obj is None or getattr(retail_obj, 'level') <= 40:
                     classic_obj, c_item_name, c_item_class_hierarchy = self._get_item_data_object(
                         item_id, GameVersion.CLASSIC)
                 else:
@@ -778,7 +778,82 @@ class ItemDataManager:
             self._obj_loader._commit(ItemData)
             self._obj_loader._commit(Item)
             
-            
+
+'''
+===========
+Recipe Data 
+===========
+'''
+
+
+'''
+This class manages data for the following models
+- StgRecipeItem
+- Recipe
+- Reagent
+'''
+
+class RecipeDataManager:
+
+
+    '''
+    ===============
+    Class Variables
+    ===============
+    '''
+    
+    _bnet_api_util = None
+    _obj_loader = None            
+
+
+    '''
+    =============
+    Class Methods
+    =============
+    '''
+    
+    
+    '''
+    DESC
+        Class constructor
+        
+    INPUT
+        
+    RETURN
+        Empty state object
+    '''    
+    def __init__(self):
+        self._bnet_api_util = BNetAPIUtil()
+        self._obj_loader = BulkObjectLoader()
+    
+        
+    '''
+    --------------
+    Helper Methods
+    --------------
+    '''
+
+
+    '''
+    --------------
+    Loader Methods
+    --------------
+    '''
+
+
+    '''
+    DESC
+        Loads the `recipe` table
+        Mostly maps to /recipe/{recipeId} endpoint
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_recipe(self):
+        pass
+
+
 '''
 ==============
 Expansion Data 
@@ -829,6 +904,7 @@ class ExpansionDataManager:
         8: ExpansionData('Shadowlands', 'Shadowlands', 60, False),
         9: ExpansionData('Dragonflight', 'Dragon Isles', 70, False),
         }
+    
     
     '''
     =============

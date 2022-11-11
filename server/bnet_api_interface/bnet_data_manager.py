@@ -930,6 +930,12 @@ class RecipeDataManager:
                 stg_recipe_items = stg_recipe_items.filter(
                     crafted_item_id=crafted_item_id)
             crafted_item_id = stg_recipe_items.first().crafted_item_id
+            
+            # get crafted Item 
+            crafted_item = self._get_item(crafted_item_id)
+            
+            if crafted_item is None:
+                continue
     
             # call the /recipe/{recipeId} endpoint
             rid_r = self._bnet_api_util.get_recipe_metadata(recipe_id_dict['recipe_id'])
@@ -947,12 +953,14 @@ class RecipeDataManager:
             else:
                 raise Exception('Cannot find item quantity for recipe_id={}'.format(rid_r['id']))
         
+            
+        
             # enqueue the Recipe object for loading
             recipe_obj = Recipe(
                 recipe_id=rid_r['id'],
                 name=rid_r['name'],
                 skill_tier_id=stg_recipe_items.first().skill_tier_id,
-                crafted_item=self._get_item(crafted_item_id),
+                crafted_item=crafted_item,
                 min_quantity=min_quantity,
                 max_quantity=max_quantity
             )

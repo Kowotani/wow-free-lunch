@@ -963,6 +963,9 @@ class RecipeDataManager:
             
                 # get Item object
                 item = self._get_item(stg_recipe_item.item_id)
+                
+                if item is None:
+                    continue
             
                 # enqueue the Reagent object for loading
                 reagent_obj = Reagent(

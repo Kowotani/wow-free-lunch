@@ -237,6 +237,8 @@ class StgRecipeItem(CommonData):
     recipe_id = models.IntegerField('recipe ID', default=0)
     item_id = models.IntegerField('reagent item ID', default=0)
     crafted_item_id = models.IntegerField('crafted item ID', default=0)
+    skill_tier_id = models.IntegerField('skill tier ID', default=0)
+    item_quantity = models.SmallIntegerField('reagent item quantity', default=0)
 
     
     class Meta:

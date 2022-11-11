@@ -2,11 +2,12 @@ from bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 from dataclasses import dataclass
 from django.apps import apps
+from django.db.models import Q
 import datetime as dt
 from enum import Enum
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, StgRecipeItem)
 # enums
 from wfl.utils import GameVersion, ItemQuality
 
@@ -74,11 +75,12 @@ class BulkObjectLoader:
         Add the passed object to its queue if it doesn't already exist
         
     INPUT
-        Model object to queue up for bulk creation
+        - Model object to queue up for bulk creation
+        - [OPTIONAL] Auto-commit objects if chunk_size threshold is met
         
     RETURN
     '''
-    def add(self, obj) -> None:
+    def add(self, obj, auto_commit=True) -> None:
         
         model_class = type(obj)
         model_key = model_class._meta.label
@@ -90,8 +92,9 @@ class BulkObjectLoader:
             self._create_queues[model_key].append(obj)
             print('{} queue - added pk={}'.format(model_key, obj.pk))
         
-            # bulk create if threshold has been met
-            if len(self._create_queues[model_key]) >= self.chunk_size:
+            # bulk create if threshold has been met and auto_commit enabled
+            if (len(self._create_queues[model_key]) >= self.chunk_size
+                and auto_commit):
                 self._commit(model_class)
                 
                 
@@ -100,13 +103,22 @@ class BulkObjectLoader:
         Bulk create any remaining model objects
         
     INPUT
+        [OPTIONAL] List of model classes to commit in specified order
         
     RETURN
     '''
-    def commit_remaining(self) -> None:  
-        for model_name, objs in self._create_queues.items():
-            if len(objs) > 0:
-                self._commit(apps.get_model(model_name))
+    def commit_remaining(self, ordered_model_classes=[]) -> None:  
+        
+        # commit objects in specified order
+        if len(ordered_model_classes) > 0:
+            for model_class in ordered_model_classes:
+                self._commit(model_class)
+            
+        # commit objects in any order
+        else:
+            for model_name, objs in self._create_queues.items():
+                if len(objs) > 0:
+                    self._commit(apps.get_model(model_name))
 
 
 '''
@@ -366,88 +378,6 @@ class ProfessionDataManager:
         
         # load any remaining objects
         self._obj_loader.commit_remaining()
-
-
-    '''
-    DESC
-        Loads the `stg_recipe_item` table
-        
-    INPUT
-        
-    RETURN
-    '''    
-    def load_stg_recipe_item(self) -> None:
-        
-        # query profession_skill_tier table
-        profession_skill_tiers = ProfessionSkillTier.objects.filter(
-            profession__is_crafting=True, is_legacy_tier=False)
-        
-        # get ProfessionSkillTier object
-        for profession_skill_tier in profession_skill_tiers:
-                
-            # call the /profession/{professionID}/skill-tier/{skillTierID} endpoint
-            sid_r = self._bnet_api_util.get_profession_skill_tier_metadata(
-                profession_skill_tier.profession_id, 
-                profession_skill_tier.skill_tier_id)
-
-            if sid_r is None:   
-                raise Exception('Error: get_profession_skill_tier_metadata() in bnet_data_loader.load_stg_recipe_item()') 
-            
-            # iterate through the recipe categories
-            for category in sid_r['categories']:
-                
-                # iterate through the recipes
-                for recipe in category['recipes']:
-                    
-                    # check if recipe reagents have already been loaded
-                    if StgRecipeItem.objects.filter(recipe_id=recipe['id']).exists():
-                        continue
-                    
-                    # call the /recipe/{recipeID} endpoint
-                    rid_r = self._bnet_api_util.get_recipe_metadata(recipe['id'])
-                    
-                    if rid_r is None:
-                        raise Exception('Error: get_recipe_metadata() in bnet_data_loader.load_stg_recipe_item()')
-                    
-                    print(rid_r['id'])
-                    
-                    # check if recipe has reagents
-                    if 'reagents' not in rid_r:
-                        continue
-                    
-                    # get list of crafted item item_ids (for Alliance vs Horde items)
-                    if ('alliance_crafted_item' in rid_r 
-                        and 'horde_crafted_item' in rid_r):
-                        crafted_item_ids = [rid_r['alliance_crafted_item']['id'], 
-                            rid_r['horde_crafted_item']['id']]    
-                            
-                    elif 'crafted_item' in rid_r:
-                        crafted_item_ids = [rid_r['crafted_item']['id']]
-                        
-                    else:
-                        # this appears to be the case for armor enhancements (eg. recipe_id=26880)
-                        continue
-                    
-                    # get list of reagent item_ids
-                    reagent_item_ids = [x['reagent']['id'] for x in rid_r['reagents']]
-                    
-                    # enqueue StgRecipeItem objects for loading
-                    for crafted_item_id in crafted_item_ids:
-                        
-                        for item_id in reagent_item_ids:
-                        
-                            obj = StgRecipeItem(
-                                stg_recipe_item_id='_'.join([str(x) for x in
-                                    [recipe['id'], item_id, crafted_item_id]]),
-                                recipe_id=recipe['id'],
-                                item_id=item_id,
-                                crafted_item_id=crafted_item_id,
-                                name='{} Reagent'.format(rid_r['name']),
-                                )
-                            self._obj_loader.add(obj)                
-            
-            # load any remaining objects
-            self._obj_loader.commit_remaining()
             
             
     '''
@@ -534,7 +464,7 @@ class ItemDataManager:
     '''    
     def _get_item_class_hierarchy(self, item_class_name, item_subclass_name) -> ItemClassHierarchy:
         return ItemClassHierarchy.objects.filter(class_name=item_class_name, 
-            subclass_name=item_subclass_name)[0] 
+            subclass_name=item_subclass_name).first()
 
 
     '''
@@ -672,10 +602,10 @@ class ItemDataManager:
                         item_class_hierarchy_id='{}_{}'.format(item_class.pk,
                             isid_r['subclass_id']),
                         item_subclass_id=isid_r['subclass_id'],
-                        class_name=getattr(item_class, 'name'),
+                        class_name=item_class.name,
                         subclass_name=isid_r['display_name'],
                         item_class=item_class,
-                        name='{} - {}'.format(getattr(item_class, 'name'), 
+                        name='{} - {}'.format(item_class.name, 
                             isid_r['display_name'])
                     )
                     self._obj_loader.add(obj) 
@@ -726,7 +656,7 @@ class ItemDataManager:
                 
                 # TODO: explicitly identify items in CLASSIC
                 # approximate with item_level <= 40 for RETAIL data
-                if retail_obj is None or getattr(retail_obj, 'level') <= 40:
+                if retail_obj is None or retail_obj.level <= 40:
                     classic_obj, c_item_name, c_item_class_hierarchy = self._get_item_data_object(
                         item_id, GameVersion.CLASSIC)
                 else:
@@ -759,24 +689,21 @@ class ItemDataManager:
                 
                 # add all valid objects
                 if retail_obj is not None:
-                    self._obj_loader.add(retail_obj) 
+                    self._obj_loader.add(retail_obj, False) 
                 if classic_obj is not None:
-                    self._obj_loader.add(classic_obj)
-                self._obj_loader.add(item_obj)
+                    self._obj_loader.add(classic_obj, False)
+                self._obj_loader.add(item_obj, False)
                 
                 # implement custom chunk_size loading because ItemData need to
-                # be loaded before Item, use chunk_size - 1 to trigger this upload
-                # instead of the one in BulkObjectLoader to guarantee order
+                # be loaded before Item
                 counter += 1
                 
-                if counter >= self.chunk_size - 1:
-                    self._obj_loader._commit(ItemData)
-                    self._obj_loader._commit(Item)
+                if counter >= self.chunk_size:
+                    self._obj_loader.commit_remaining([ItemData, Item])
                     counter = 0
                 
             # load any remaining objects
-            self._obj_loader._commit(ItemData)
-            self._obj_loader._commit(Item)
+            self._obj_loader.commit_remaining([ItemData, Item])
             
 
 '''
@@ -803,7 +730,8 @@ class RecipeDataManager:
     '''
     
     _bnet_api_util = None
-    _obj_loader = None            
+    _obj_loader = None
+    chunk_size = 100
 
 
     '''
@@ -824,7 +752,7 @@ class RecipeDataManager:
     '''    
     def __init__(self):
         self._bnet_api_util = BNetAPIUtil()
-        self._obj_loader = BulkObjectLoader()
+        self._obj_loader = BulkObjectLoader(self.chunk_size)
     
         
     '''
@@ -832,6 +760,62 @@ class RecipeDataManager:
     Helper Methods
     --------------
     '''
+
+
+    '''
+    DESC
+         Get the Item object for the given item_id
+        
+    INPUT
+        item_id of the item
+        
+    RETURN
+        Item for the given input
+    '''    
+    def _get_item(self, item_id) -> Item:
+        return Item.objects.filter(pk=item_id).first()
+
+
+    '''
+    DESC
+         Determine the crafted_item_id to return given the recipe_response
+         
+         There are 3 cases to consider:
+         
+         [1] The Recipe produces different items for Alliance and Horde. In this
+         case return the crafted item ID for Alliance, if exists, otherwise for
+         Horde (eg. recipe_id=40709 and item_id in (168682, 168688))
+         
+         [2] The Recipe produces one item for both Alliance and Horde. In this
+         case return the singular crafted item ID
+         
+         [3] The Recipe produces no crafted item, which appears to be the case
+         for armor enhancements (eg. recipe_id=26880)
+        
+    INPUT
+        Response from /recipe/{recipeId} endpoint
+        
+    RETURN
+        Item for the given input
+    '''    
+    def _get_resolved_crafted_item_id(self, recipe_response) -> int:
+        
+        # Case 1
+        if 'alliance_crafted_item' in recipe_response:
+            crafted_item_id = recipe_response['alliance_crafted_item']['id']
+            
+        elif 'horde_crafted_item' in recipe_response:
+            crafted_item_id = recipe_response['horde_crafted_item']['id']
+        
+        # Case 2        
+        elif 'crafted_item' in recipe_response:
+            crafted_item_id = recipe_response['crafted_item']['id']
+        
+        # Case 3    
+        else:
+            crafted_item_id = None
+            
+        return crafted_item_id
 
 
     '''
@@ -843,26 +827,248 @@ class RecipeDataManager:
 
     '''
     DESC
-        Loads the `recipe` table
-        Mostly maps to /recipe/{recipeId} endpoint
+        Loads the `stg_recipe_item` table
         
     INPUT
         
     RETURN
     '''    
-    def load_recipe(self):
+    def load_stg_recipe_item(self) -> None:
         
-        # iterate through each skill tier
+        # query profession_skill_tier table for crafting professions
+        profession_skill_tiers = ProfessionSkillTier.objects.filter(
+            profession__is_crafting=True)
         
-            # call the /profession/{professionId}/skill-tier/{skillTierId} endpoint
-        
-            # iterate through each recipe
-        
-                # call the /recipe/{recipeId} endpoint
-        
-        
-        pass
+        # get ProfessionSkillTier object
+        for profession_skill_tier in profession_skill_tiers:
+                
+            # call the /profession/{professionID}/skill-tier/{skillTierID} endpoint
+            sid_r = self._bnet_api_util.get_profession_skill_tier_metadata(
+                profession_skill_tier.profession_id, 
+                profession_skill_tier.skill_tier_id)
 
+            if sid_r is None:   
+                raise Exception('Error: get_profession_skill_tier_metadata() in bnet_data_loader.load_stg_recipe_item()') 
+            
+            # iterate through the recipe categories
+            for category in sid_r['categories']:
+                
+                # iterate through the recipes
+                for recipe in category['recipes']:
+                    
+                    # check if recipe reagents have already been loaded
+                    if StgRecipeItem.objects.filter(recipe_id=recipe['id']).exists():
+                        continue
+                    
+                    # call the /recipe/{recipeID} endpoint
+                    rid_r = self._bnet_api_util.get_recipe_metadata(recipe['id'])
+                    
+                    if rid_r is None:
+                        raise Exception('Error: get_recipe_metadata() in bnet_data_loader.load_stg_recipe_item()')
+                    
+                    # check if recipe has reagents
+                    if 'reagents' not in rid_r:
+                        continue
+                    
+                    # get crafted_item_id
+                    crafted_item_id = self._get_resolved_crafted_item_id(rid_r)
+                    
+                    if crafted_item_id is None:
+                        continue
+                    
+                    # iterate though reagents
+                    for reagent in rid_r['reagents']:
+                    
+                        # enqueue StgRecipeItem objects for loading
+                        obj = StgRecipeItem(
+                            stg_recipe_item_id='_'.join([str(x) for x in
+                                [recipe['id'], reagent['reagent']['id'], 
+                                crafted_item_id]]),
+                            recipe_id=recipe['id'],
+                            item_id=reagent['reagent']['id'],
+                            crafted_item_id=crafted_item_id,
+                            name='{} Reagent'.format(rid_r['name']),
+                            skill_tier_id=profession_skill_tier.skill_tier_id,
+                            item_quantity=reagent['quantity'],
+                            )
+                        self._obj_loader.add(obj)                
+            
+            # load any remaining objects
+            self._obj_loader.commit_remaining()
+
+
+    '''
+    DESC
+        Loads the `recipe` and `reagent` tables
+        Mostly maps to /recipe/{recipeId} endpoint
+        
+        Recipes must be added before Reagents
+        The source of Recipes to 
+    INPUT
+        
+    RETURN
+    '''    
+    def load_recipe_and_reagent(self):
+        
+        counter = 0
+        
+        recipes = Recipe.objects.all().values('recipe_id')
+        stg_recipe_items_to_load = StgRecipeItem.objects.filter(
+            ~Q(recipe_id__in=[x['recipe_id'] for x in recipes]))
+        
+        # iterate through each unique recipe_id in stg_recipe_item not already loaded
+        for recipe_id_dict in stg_recipe_items_to_load.values('recipe_id').distinct():
+        
+            # get the StgRecipeItems
+            stg_recipe_items = StgRecipeItem.objects.filter(
+                recipe_id=recipe_id_dict['recipe_id'])
+                
+            # if there are multiple crafted_item_ids (eg. Alliance vs Horde items)
+            # then only keep the one with the lower crafted_item_id
+            if len(stg_recipe_items.values('crafted_item_id').distinct()) > 1:
+                crafted_item_id = min([x.crafted_item_id for x in stg_recipe_items])
+                stg_recipe_items = stg_recipe_items.filter(
+                    crafted_item_id=crafted_item_id)
+            crafted_item_id = stg_recipe_items.first().crafted_item_id
+    
+            # call the /recipe/{recipeId} endpoint
+            rid_r = self._bnet_api_util.get_recipe_metadata(recipe_id_dict['recipe_id'])
+            
+            if rid_r is None:
+                raise Exception('Error: get_recipe_metadata() in bnet_data_loader.load_recipe_and_reagent()')        
+            
+            # get the min and max quantity crafted
+            if 'value' in rid_r['crafted_quantity']:
+                min_quantity = rid_r['crafted_quantity']['value']
+                max_quantity = rid_r['crafted_quantity']['value']
+            elif 'minimum' in rid_r['crafted_quantity'] and 'maximum' in rid_r['crafted_quantity']:
+                min_quantity = rid_r['crafted_quantity']['minimum']
+                max_quantity = rid_r['crafted_quantity']['maximum']
+            else:
+                raise Exception('Cannot find item quantity for recipe_id={}'.format(rid_r['id']))
+        
+            # enqueue the Recipe object for loading
+            recipe_obj = Recipe(
+                recipe_id=rid_r['id'],
+                name=rid_r['name'],
+                skill_tier_id=stg_recipe_items.first().skill_tier_id,
+                crafted_item=self._get_item(crafted_item_id),
+                min_quantity=min_quantity,
+                max_quantity=max_quantity
+            )
+            self._obj_loader.add(recipe_obj, False)
+            
+            # iterate through each reagent
+            for stg_recipe_item in stg_recipe_items:
+            
+                # get Item object
+                item = self._get_item(stg_recipe_item.item_id)
+            
+                # enqueue the Reagent object for loading
+                reagent_obj = Reagent(
+                    reagent_id='{}_{}'.format(rid_r['id'], item.item_id),
+                    recipe=recipe_obj,
+                    item=item,
+                    name='{} Reagent - {}'.format(rid_r['name'], item.name),
+                    item_quantity=stg_recipe_item.item_quantity,
+                    )
+            
+                # implement custom chunk_size loading because Recipe need to
+                # be loaded before Reagent
+                # add all valid objects
+                self._obj_loader.add(reagent_obj, False)
+                
+            # implement custom chunk_size loading because Recipe need to
+            # be loaded before Reagent
+            counter += 1
+            
+            if counter >= self.chunk_size:
+                self._obj_loader.commit_remaining([Recipe, Reagent])
+                counter = 0
+    
+        # load any remaining objects
+        self._obj_loader.commit_remaining([Recipe, Reagent])  
+                 
+                    
+    '''
+    ---------------
+    Updater Methods
+    ---------------
+    '''
+
+
+    '''
+    DESC
+        Updates the skill_tier_id in the `stg_recipe_item` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def update_skill_tier_id_for_stg_recipe_item(self):
+
+        # query profession_skill_tier table for crafting professions
+        profession_skill_tiers = ProfessionSkillTier.objects.filter(
+            profession__is_crafting=True)
+        
+        # get ProfessionSkillTier object
+        for profession_skill_tier in profession_skill_tiers:
+                
+            # call the /profession/{professionID}/skill-tier/{skillTierID} endpoint
+            sid_r = self._bnet_api_util.get_profession_skill_tier_metadata(
+                profession_skill_tier.profession_id, 
+                profession_skill_tier.skill_tier_id)
+
+            if sid_r is None:   
+                raise Exception('Error: get_profession_skill_tier_metadata() in bnet_data_loader.load_stg_recipe_item()') 
+            
+            # iterate through the recipe categories
+            for category in sid_r['categories']:
+                
+                # iterate through the recipes
+                for recipe in category['recipes']:
+                    
+                    # get StgRecipeItem objects
+                    stg_recipe_items = StgRecipeItem.objects.filter(recipe_id=recipe['id'])
+                    
+                    # update skill tier id
+                    stg_recipe_items.update(skill_tier_id=profession_skill_tier.skill_tier_id)
+                    print('Updated recipe_id={} with skill_tier_id={}'.format(
+                        recipe['id'], profession_skill_tier.skill_tier_id))
+
+    '''
+    DESC
+        Updates the item_quantity in the `stg_recipe_item` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def update_item_quantity_for_stg_recipe_item(self):
+        
+        # get unique recipe_ids
+        for recipe_id_dict in StgRecipeItem.objects.filter(item_quantity=0).values('recipe_id').distinct():
+
+           # call the /recipe/{recipeID} endpoint
+            rid_r = self._bnet_api_util.get_recipe_metadata(recipe_id_dict['recipe_id'])
+            
+            if rid_r is None:
+                raise Exception('Error: get_recipe_metadata() in bnet_data_loader.load_stg_recipe_item()')
+                
+            if 'reagents' not in rid_r:
+                continue
+            
+            # iterate though reagents
+            for reagent in rid_r['reagents']:
+            
+                stg_recipe_items = StgRecipeItem.objects.filter(
+                    recipe_id=rid_r['id'], item_id=reagent['reagent']['id'])
+            
+                stg_recipe_items.update(item_quantity=reagent['quantity'])
+                print('Updated recipe_id={} and item_id={} with item_quantity={}'.format(
+                    rid_r['id'], reagent['reagent']['id'], reagent['quantity']))
+                    
+                
 
 '''
 ==============

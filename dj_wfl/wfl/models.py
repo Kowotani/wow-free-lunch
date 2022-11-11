@@ -250,7 +250,7 @@ class StgRecipeItem(CommonData):
 '''
 DESC
     Dim table for Recipes
-    This 
+    This model will be used with the Reagent model to capture crafting recipes
     Mostly maps to /recipe/{recipeId}
 '''
 
@@ -264,6 +264,28 @@ class Recipe(CommonData, MediaData):
     
     class Meta:
         db_table = 'recipe'
+        
+    
+    def __str__(self):
+        return CommonData.__str__(self)
+        
+        
+'''
+DESC
+    Dim table for Reagents
+    This model will be used with the Recipe model to capture crafting recipes
+    Mostly maps to /recipe/{recipeId}
+'''
+
+class Reagent(CommonData):
+    reagent_id = models.CharField('concat (recipe / item IDs) as dummy PK', max_length=256, primary_key=True)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    item_quantity = models.SmallIntegerField('quantity required', default=1)
+
+    
+    class Meta:
+        db_table = 'reagent'
         
     
     def __str__(self):

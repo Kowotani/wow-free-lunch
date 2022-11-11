@@ -15,6 +15,8 @@ from wfl.views import (
     ProfessionSkillTierCreate, ProfessionSkillTierList, 
     ProfessionSkillTierDetail,
     
+    ReagentCreate, ReagentList, ReagentDetail,
+    
     RecipeCreate, RecipeList, RecipeDetail,
 
     StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail,
@@ -67,6 +69,10 @@ urlpatterns = [
     path('recipe/create', RecipeCreate.as_view()),
     path('recipe/all', RecipeList.as_view()),
     path('recipe/<pk>', RecipeDetail.as_view()), 
+    
+    path('recipe/reagent/create', ReagentCreate.as_view()),
+    path('recipe/reagent/all', ReagentList.as_view()),
+    path('recipe/reagent/<pk>', ReagentDetail.as_view()), 
     
     
     # ==========

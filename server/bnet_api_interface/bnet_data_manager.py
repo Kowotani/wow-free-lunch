@@ -851,6 +851,16 @@ class RecipeDataManager:
     RETURN
     '''    
     def load_recipe(self):
+        
+        # iterate through each skill tier
+        
+            # call the /profession/{professionId}/skill-tier/{skillTierId} endpoint
+        
+            # iterate through each recipe
+        
+                # call the /recipe/{recipeId} endpoint
+        
+        
         pass
 
 

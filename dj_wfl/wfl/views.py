@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Recipe, StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, StgRecipeItem)
     
 from wfl.serializers import (ItemSerializer, ItemClassSerializer, 
     ItemClassHierarchySerializer, ItemDataSerializer, ProfessionSerializer, 
-    ExpansionSerializer, ProfessionSkillTierSerializer, RecipeSerializer, 
-    StgRecipeItemSerializer)
+    ExpansionSerializer, ProfessionSkillTierSerializer, ReagentSerializer,
+    RecipeSerializer, StgRecipeItemSerializer)
     
 
 
@@ -305,6 +305,40 @@ Supported methods: GET / PUT / PATCH / DELETE
 class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer 
+
+
+'''
+-------
+Reagent
+-------
+'''
+
+    
+'''
+Creates a Reagent
+Supported methods: POST
+'''
+class ReagentCreate(generics.CreateAPIView):
+    queryset = Reagent.objects.all()
+    serializer_class = ReagentSerializer
+    
+
+'''
+Retrieve list of Reagents
+Supported methods: GET
+'''
+class ReagentList(generics.ListAPIView):
+    queryset = Reagent.objects.all()
+    serializer_class = ReagentSerializer
+    
+    
+'''
+Manages read / update / delete operations for a Reagent
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class ReagentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Reagent.objects.all()
+    serializer_class = ReagentSerializer 
  
     
 '''

@@ -919,9 +919,11 @@ class RecipeDataManager:
         # iterate through each unique recipe_id in stg_recipe_item not already loaded
         for recipe_id_dict in stg_recipe_items_to_load.values('recipe_id').distinct():
         
+            # get the recipe_id
+            recipe_id = recipe_id_dict['recipe_id']
+        
             # get the StgRecipeItems
-            stg_recipe_items = StgRecipeItem.objects.filter(
-                recipe_id=recipe_id_dict['recipe_id'])
+            stg_recipe_items = StgRecipeItem.objects.filter(recipe_id=recipe_id)
                 
             # if there are multiple crafted_item_ids (eg. Alliance vs Horde items)
             # then only keep the one with the lower crafted_item_id
@@ -938,7 +940,7 @@ class RecipeDataManager:
                 continue
     
             # call the /recipe/{recipeId} endpoint
-            rid_r = self._bnet_api_util.get_recipe_metadata(recipe_id_dict['recipe_id'])
+            rid_r = self._bnet_api_util.get_recipe_metadata(recipe_id)
             
             if rid_r is None:
                 raise Exception('Error: get_recipe_metadata() in bnet_data_loader.load_recipe_and_reagent()')        
@@ -951,18 +953,24 @@ class RecipeDataManager:
                 min_quantity = rid_r['crafted_quantity']['minimum']
                 max_quantity = rid_r['crafted_quantity']['maximum']
             else:
-                raise Exception('Cannot find item quantity for recipe_id={}'.format(rid_r['id']))
-        
+                raise Exception('Cannot find item quantity for recipe_id={}'.format(recipe_id))
+    
+            # get recipe media
+            media_r = self._bnet_api_util.get_recipe_media_metadata(recipe_id)
             
+            if media_r is None:
+                raise Exception('Error: get_recipe_media_metadata() in bnet_data_loader.load_recipe_and_reagent()')
         
             # enqueue the Recipe object for loading
             recipe_obj = Recipe(
-                recipe_id=rid_r['id'],
+                recipe_id=recipe_id,
                 name=rid_r['name'],
                 skill_tier_id=stg_recipe_items.first().skill_tier_id,
                 crafted_item=crafted_item,
                 min_quantity=min_quantity,
-                max_quantity=max_quantity
+                max_quantity=max_quantity,
+                media_url=media_r['assets'][0]['value'],
+                media_file_data_id=media_r['assets'][0]['file_data_id'],
             )
             self._obj_loader.add(recipe_obj, False)
             
@@ -977,7 +985,7 @@ class RecipeDataManager:
             
                 # enqueue the Reagent object for loading
                 reagent_obj = Reagent(
-                    reagent_id='{}_{}'.format(rid_r['id'], item.item_id),
+                    reagent_id='{}_{}'.format(recipe_id, item.item_id),
                     recipe=recipe_obj,
                     item=item,
                     name='{} Reagent - {}'.format(rid_r['name'], item.name),
@@ -1079,7 +1087,32 @@ class RecipeDataManager:
                 print('Updated recipe_id={} and item_id={} with item_quantity={}'.format(
                     rid_r['id'], reagent['reagent']['id'], reagent['quantity']))
                     
-                
+
+    '''
+    DESC
+        Updates the media metadata in the `recipe` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def update_media_for_recipe(self):
+        
+        # get recipe_id for Recipes without media metadata
+        for recipe in Recipe.objects.filter(media_url__isnull=True):
+
+            # call the /media/recipe/{recipeID} endpoint
+            media_r = self._bnet_api_util.get_recipe_media_metadata(recipe.recipe_id)
+            
+            if media_r is None:
+                raise Exception('Error: get_recipe_media_metadata() in bnet_data_loader.update_media_for_recipe()')
+            
+            Recipe.objects.filter(recipe_id=recipe.recipe_id).update(
+                media_url=media_r['assets'][0]['value'],
+                media_file_data_id=media_r['assets'][0]['file_data_id'])
+            print('Updated recipe_id={} with media_url={} and media_file_data_id={}'.format(
+                recipe.recipe_id, media_r['assets'][0]['value'], media_r['assets'][0]['file_data_id']))
+
 
 '''
 ==============

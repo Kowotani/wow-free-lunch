@@ -448,7 +448,7 @@ class BNetAPIUtil:
         
     '''
     DESC
-        Recipe Media endpoint /media/recipe/{recipeID}
+        Recipe Media endpoint /media/recipe/{recipeId}
         
     INPUT
         Unique RecipeID of the Recipe

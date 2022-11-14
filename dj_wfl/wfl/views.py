@@ -6,12 +6,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, Region, 
+    StgRecipeItem)
     
 from wfl.serializers import (ItemSerializer, ItemClassSerializer, 
     ItemClassHierarchySerializer, ItemDataSerializer, ProfessionSerializer, 
     ExpansionSerializer, ProfessionSkillTierSerializer, ReagentSerializer,
-    RecipeSerializer, StgRecipeItemSerializer)
+    RecipeSerializer, RegionSerializer, StgRecipeItemSerializer)
     
 
 
@@ -342,9 +343,9 @@ class ReagentDetail(generics.RetrieveUpdateDestroyAPIView):
  
     
 '''
-===============
-Expansion Views
-===============
+===================
+Game Metadata Views
+===================
 '''
 
 
@@ -380,3 +381,37 @@ Supported methods: GET / PUT / PATCH / DELETE
 class ExpansionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Expansion.objects.all()
     serializer_class = ExpansionSerializer
+    
+    
+'''
+---------
+Region
+---------
+'''
+
+
+'''
+Creates an Region
+Supported methods: POST
+'''
+class RegionCreate(generics.CreateAPIView):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
+    
+
+'''
+Retrieve list of Regions
+Supported methods: GET
+'''
+class RegionList(generics.ListAPIView):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
+    
+    
+'''
+Manages read / update / delete operations for an Region
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class RegionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer

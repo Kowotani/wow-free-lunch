@@ -43,9 +43,9 @@ class MediaData(models.Model):
 
 
 '''
-================
-Expansion Models
-================
+====================
+Game Metadata Models
+====================
 '''
 
 
@@ -64,6 +64,26 @@ class Expansion(CommonData):
 
     class Meta:
         db_table = 'expansion'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
+
+'''
+DESC
+    Dim table for Region
+    Mostly maps to /region/{regionId} endpoint
+'''
+
+class Region(CommonData):
+    region_id = models.SmallIntegerField('region ID', primary_key=True)
+    tag = models.CharField('region tag', max_length=256, default='')
+    game_version = models.CharField('game version of the region', max_length=256, choices=GameVersion.choices(), default=GameVersion.RETAIL)
+    
+
+    class Meta:
+        db_table = 'region'
 
         
     def __str__(self):

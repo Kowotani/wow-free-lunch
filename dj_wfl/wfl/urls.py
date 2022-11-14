@@ -18,6 +18,8 @@ from wfl.views import (
     ReagentCreate, ReagentList, ReagentDetail,
     
     RecipeCreate, RecipeList, RecipeDetail,
+    
+     RegionCreate, RegionList, RegionDetail,
 
     StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail,
     )
@@ -75,11 +77,15 @@ urlpatterns = [
     path('recipe/reagent/<pk>', ReagentDetail.as_view()), 
     
     
-    # ==========
-    # Expansions
-    # ==========
+    # =============
+    # Game Metadata
+    # =============
     
     path('expansion/create', ExpansionCreate.as_view()),
     path('expansion/all', ExpansionList.as_view()),
     path('expansion/<pk>', ExpansionDetail.as_view()),
+    
+    path('region/create', RegionCreate.as_view()),
+    path('region/all', RegionList.as_view()),
+    path('region/<pk>', RegionDetail.as_view()),
 ]

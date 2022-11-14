@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, Region, 
+    StgRecipeItem)
 
 
 '''
@@ -124,16 +125,9 @@ class ReagentSerializer(serializers.ModelSerializer):
         
         
 '''
-================
-Item Serializers
-================
-'''
-        
-        
-'''
-=====================
-Expansion Serializers
-=====================
+=========================
+Game Metadata Serializers
+=========================
 '''
 
 
@@ -145,4 +139,15 @@ DESC
 class ExpansionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expansion
+        fields = '__all__'
+        
+
+'''
+DESC
+    Region serializer
+'''
+
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
         fields = '__all__'

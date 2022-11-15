@@ -658,3 +658,61 @@ class BNetAPIUtil:
         # GET request
         r = requests.get(url, params=payload)
         return BNetAPIUtil.handle_request_response(r)
+        
+
+    '''
+    -----------------------
+    Auction House Endpoints
+    -----------------------
+    '''
+    
+
+    '''
+    DESC
+        Auction House endpoint
+        
+    INPUT
+        - Version of WoW (Classic / Retail)
+        - Connected Realm ID
+        
+    RETURN
+        JSON response body
+    '''
+    def get_auction_house_index(self, game_version, connected_realm_id) -> dict:  
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + '/connected-realm/{connected_realm_id}/auctions/index'
+        url = base_url.format(connected_realm_id=connected_realm_id)
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)  
+        
+
+    '''
+    DESC
+        Auctions endpoint
+        
+    INPUT
+        - Version of WoW (Classic / Retail)
+        - Connected Realm ID
+        - Auction House ID, which seems to always be the following
+            - Alliance = 2
+            - Horde = 6
+            - Blackwater = 7
+        
+    RETURN
+        JSON response body
+    '''
+    def get_auctions(self, game_version, connected_realm_id, auction_house_id) -> dict:  
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + '/connected-realm/{connected_realm_id}/auctions/{auction_house_id}'
+        url = base_url.format(connected_realm_id=connected_realm_id, 
+            auction_house_id=auction_house_id)
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)

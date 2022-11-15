@@ -2,6 +2,21 @@ from enum import Enum
 
 
 '''
+This enum represents the time left for auctions
+'''
+class AuctionTimeLeft(Enum):
+    SHORT = 'SHORT'
+    MEDIUM = 'MEDIUM'
+    LONG = 'LONG'
+    VERY_LONG = 'VERY_LONG'
+    
+    
+    @classmethod
+    def choices(cls):
+        return [(key.value, key.name) for key in cls]
+
+
+'''
 This enum represents the CLASSIC and RETAIL versions of WoW
 '''
 class GameVersion(Enum):
@@ -65,11 +80,11 @@ class RealmCategory(Enum):
 This enum represents the realm population
 '''
 class RealmPopulation(Enum):
-    FULL = 'FULL'
-    HIGH = 'HIGH'
-    LOCKED = 'LOCKED'
-    MEDIUM = 'MEDIUM'
     NEW = 'NEW'
+    MEDIUM = 'MEDIUM'
+    HIGH = 'HIGH'
+    FULL = 'FULL'
+    LOCKED = 'LOCKED'
     
 
     @classmethod

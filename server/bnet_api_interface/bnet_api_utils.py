@@ -538,7 +538,7 @@ class BNetAPIUtil:
         
     '''
     DESC
-        Region index endpoint /region/{regionId}
+        Region metadata endpoint /region/{regionId}
         
     INPUT
         - Version of WoW (Classic / Retail)
@@ -557,3 +557,54 @@ class BNetAPIUtil:
         # GET request
         r = requests.get(url, params=payload)
         return BNetAPIUtil.handle_request_response(r)  
+        
+        
+    '''
+    ---------------
+    Realm Endpoints
+    ---------------
+    '''
+    
+
+    '''
+    DESC
+        Realm index endpoint /realm/index
+        
+    INPUT
+        Version of WoW (Classic / Retail)
+        
+    RETURN
+        JSON response body
+    '''
+    def get_realm_index(self, game_version) -> dict:  
+        
+        # prepare GET metadata
+        url = self.base_api_url + '/realm/index'
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)  
+        
+        
+    '''
+    DESC
+        Realm metadata endpoint /realmn/{realmId}
+        
+    INPUT
+        - Version of WoW (Classic / Retail)
+        - Realm slug
+        
+    RETURN
+        JSON response body
+    '''
+    def get_realm_metadata(self, game_version, realm_slug) -> dict:  
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + '/realm/{realm_slug}'
+        url = base_url.format(realm_slug=realm_slug)
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)

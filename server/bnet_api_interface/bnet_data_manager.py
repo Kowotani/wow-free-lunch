@@ -8,7 +8,7 @@ from enum import Enum
 from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, Region, 
+    Expansion, Profession, ProfessionSkillTier, Reagent, Realm, Recipe, Region, 
     StgRecipeItem)
 # enums
 from wfl.utils import (GameVersion, ItemQuality, NamespaceType, RealmCategory, 
@@ -465,8 +465,8 @@ class ItemDataManager:
         ItemClassHierarchy for the given inputs
     '''    
     def _get_item_class_hierarchy(self, item_class_name, item_subclass_name) -> ItemClassHierarchy:
-        return ItemClassHierarchy.objects.filter(class_name=item_class_name, 
-            subclass_name=item_subclass_name).first()
+        return ItemClassHierarchy.objects.get(class_name=item_class_name, 
+            subclass_name=item_subclass_name)
 
 
     '''
@@ -775,7 +775,7 @@ class RecipeDataManager:
         Item for the given input
     '''    
     def _get_item(self, item_id) -> Item:
-        return Item.objects.filter(pk=item_id).first()
+        return Item.objects.get(pk=item_id)
 
 
     '''
@@ -1251,32 +1251,7 @@ class RealmDataManager:
     _bnet_api_util = None
     _obj_loader = None
     chunk_size = 100
-    
-    
-    # '''
-    # This dataclass stores data for each expansion
-    # '''
-    # @dataclass
-    # class ExpansionData:
-    #     name: str           # Eg. Wrath of the Lich King
-    #     skill_tier_prefix: str     # Eg. Northrend
-    #     max_level: int      # Eg. 80 for Wrath of the Lich King
-    #     is_classic: bool     # TRUE if the expansion is part of CLASSIC
-    
-    
-    # expansion_data = {
-    #     0: ExpansionData('World of Warcraft', 'Classic', 60, True),
-    #     1: ExpansionData('The Burning Crusade', 'Outland', 70, True),
-    #     2: ExpansionData('Wrath of the Lich King', 'Northrend', 80, True),
-    #     3: ExpansionData('Cataclysm', 'Cataclysm', 85, False),
-    #     4: ExpansionData('Mists of Pandaria', 'Pandaria', 90, False),
-    #     5: ExpansionData('Warlords of Draenor', 'Draenor', 100, False),
-    #     6: ExpansionData('Legion', 'Legion', 110, False),
-    #     7: ExpansionData('Battle for Azeroth', 'Zandalari', 120, False),
-    #     8: ExpansionData('Shadowlands', 'Shadowlands', 60, False),
-    #     9: ExpansionData('Dragonflight', 'Dragon Isles', 70, False),
-    #     }
-    
+
     
     '''
     =============
@@ -1307,6 +1282,57 @@ class RealmDataManager:
     
     
     '''
+    DESC
+         Get the RealmCategory for the given input
+        
+    INPUT
+        Maybe a mappable RealmCategory value
+        
+    RETURN
+        RealmCategory enum
+    '''    
+    def _get_realm_category(self, realm_category) -> RealmCategory:
+        realm_categories = {
+            'Brazil': RealmCategory.BRAZIL,
+            'Classic': RealmCategory.CLASSIC,
+            'Latin America': RealmCategory.LATIN_AMERICA,
+            'Oceanic': RealmCategory.OCEANIC,
+            'United States': RealmCategory.UNITED_STATES,
+            'US East': RealmCategory.US_EAST,
+            'US West': RealmCategory.US_WEST
+            }
+            
+        if realm_category not in realm_categories.keys():
+            raise Exception('Unknown realm_category={}'.format(realm_category))
+            
+        return realm_categories[realm_category].value
+    
+ 
+    '''
+    DESC
+         Get the RealmType for the given input
+        
+    INPUT
+        Maybe a mappable RealmType value
+        
+    RETURN
+        RealmType enum
+    '''    
+    def _get_realm_type(self, realm_type) -> RealmType:
+        realm_types = {
+            'NORMAL': RealmType.NORMAL,
+            'PVP': RealmType.PVP,
+            'PVP_RP': RealmType.PVP_RP,
+            'RP': RealmType.RP
+            }
+
+        if realm_type not in realm_types.keys():
+            raise Exception('Unknown realm_type={}'.format(realm_type))
+            
+        return realm_types[realm_type].value
+ 
+    
+    '''
     --------------
     Loader Methods
     --------------
@@ -1319,7 +1345,7 @@ class RealmDataManager:
         Mostly maps to the /region/{regionId} endpoint
         
     INPUT
-        GameVersion of the Region to create
+        GameVersion of the Region to load
         
     RETURN
     '''    
@@ -1350,6 +1376,50 @@ class RealmDataManager:
                 name=rid_r['name'],
                 tag=rid_r['tag'],
                 game_version=game_version.value
+            )
+            self._obj_loader.add(obj) 
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()
+        
+        
+    '''
+    DESC
+        Loads the `realmn` table
+        Mostly maps to the /realmn/{realm_slug} endpoint
+        
+    INPUT
+        GameVersion of the Realm to load
+        
+    RETURN
+    '''    
+    def load_realm(self, game_version):
+        
+        # call the /realmn/index endpoint
+        index_r = self._bnet_api_util.get_realm_index(game_version)
+        
+        if index_r is None:
+            raise Exception('Error: get_realm_index() in bnet_data_loader.load_realm()')
+        
+        # iterate through each realm
+        for realm in index_r['realms']:
+            
+            # call the /realm/{realm_slug} endpoint
+            rid_r = self._bnet_api_util.get_realm_metadata(game_version, 
+                realm['slug'])
+            
+            if rid_r is None:
+                raise Exception('Error: get_realm_index() in bnet_data_loader.load_realm()')
+            
+            # enqueue Realm object for loading 
+            obj = Realm(
+                realm_id=rid_r['id'],
+                region=Region.objects.get(region_id=rid_r['region']['id']),
+                name=rid_r['name'],
+                slug=rid_r['slug'],
+                realm_type=self._get_realm_type(rid_r['type']['type']),
+                realm_category=self._get_realm_category(rid_r['category']),
+                timezone=rid_r['timezone'],
             )
             self._obj_loader.add(obj) 
 

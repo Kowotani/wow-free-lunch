@@ -48,6 +48,7 @@ This enum represents the realm categories
 '''
 class RealmCategory(Enum):
     BRAZIL = 'BRAZIL'
+    CLASSIC = 'CLASSIC'
     LATIN_AMERICA = 'LATIN_AMERICA'
     OCEANIC = 'OCEANIC'
     UNITED_STATES = 'UNITED_STATES'

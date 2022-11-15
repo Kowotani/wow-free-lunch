@@ -3,7 +3,7 @@ from enum import Enum
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-from wfl.utils import GameVersion
+from wfl.utils import GameVersion, NamespaceType
 
 
 '''
@@ -43,12 +43,6 @@ class BNetAPIUtil:
     Other API Inputs
     '''
     base_api_url = 'https://us.api.blizzard.com/data/wow'
-    # TODO: consider non-static namespaces (eg. dynamic, profile)
-    # Only use US region
-    namespaces = {
-        GameVersion.CLASSIC: 'static-classic-us',
-        GameVersion.RETAIL: 'static-us'
-    }
     # Only use en_US
     locale = 'en_US'
     
@@ -187,7 +181,51 @@ class BNetAPIUtil:
         
         if game_version not in GameVersion:
             raise TypeError('{} not found in GameVersion'.format(game_version))
+
+    '''
+    DESC
+        Verifies whether the input is of type NamespaceType, raise an exception
+        if it is not
     
+    INPUT
+        Maybe a NamespaceType enum
+    
+    RETURN
+    '''
+    def _verify_namespace_type(self, namespace_type) -> None:
+        
+        if namespace_type not in NamespaceType:
+            raise TypeError('{} not found in NamespaceType'.format(namespace_type))
+    
+ 
+    '''
+    DESC
+        Verifies whether the input is of type GameVersion, raise an exception
+        if it is not
+    
+    INPUT
+        - GameVersion enum
+        - NamespaceType enum
+    
+    RETURN
+    '''
+    def _get_namespace(self, namespace_type, game_version) -> str:
+        
+        self._verify_namespace_type(namespace_type)
+        self._verify_game_version(game_version)
+        
+        namespaces = {
+            NamespaceType.DYNAMIC: {
+                    GameVersion.CLASSIC: 'dynamic-classic-us',
+                    GameVersion.RETAIL: 'dyanmic-us'
+                }, 
+            NamespaceType.STATIC: {
+                    GameVersion.CLASSIC: 'static-classic-us',
+                    GameVersion.RETAIL: 'static-us'
+                }
+            }
+        
+        return namespaces[namespace_type][game_version]
     
     '''
     DESC
@@ -195,7 +233,8 @@ class BNetAPIUtil:
         GET requests
     
     INPUT
-        GameVersion enum
+        - NamespaceType enum
+        - GameVersion enum
     
     RETURN
         Dictionary with the following base params defined
@@ -203,14 +242,14 @@ class BNetAPIUtil:
         - access_token
         - locale
     '''
-    def _get_base_payload(self, game_version) -> dict:
+    def _get_base_payload(self, namespace_type, game_version) -> dict:
         
         # check existing token
         if not self.has_valid_access_token():
             self.get_access_token()
             
         return {
-            'namespace': self.namespaces[game_version],
+            'namespace': self._get_namespace(namespace_type, game_version),
             'locale': self.locale,
             'access_token': self._access_token
         }
@@ -240,7 +279,7 @@ class BNetAPIUtil:
         self._verify_game_version(game_version)
         base_url = self.base_api_url + '/item/{item_id}'
         url = base_url.format(item_id=item_id)
-        payload = self._get_base_payload(game_version)
+        payload = self._get_base_payload(NamespaceType.STATIC, game_version)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -264,7 +303,7 @@ class BNetAPIUtil:
         self._verify_game_version(game_version)
         base_url = self.base_api_url + '/media/item/{item_id}'
         url = base_url.format(item_id=item_id)
-        payload = self._get_base_payload(game_version)
+        payload = self._get_base_payload(NamespaceType.STATIC, game_version)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -287,7 +326,7 @@ class BNetAPIUtil:
         # prepare GET metadata
         url = self.base_api_url + '/item-class/index'
         # this method will only be called on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(NamespaceType.STATIC, GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -314,7 +353,7 @@ class BNetAPIUtil:
         url = base_url.format(item_class_id=item_class_id, 
             item_subclass_id=item_subclass_id)
         # this method will only be called on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(NamespaceType.STATIC, GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -342,7 +381,7 @@ class BNetAPIUtil:
         # prepare GET metadata
         url = self.base_api_url + '/profession/index'
         # this endpoint is only supported on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(NamespaceType.STATIC, GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -365,7 +404,7 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/profession/{profession_id}'
         url = base_url.format(profession_id=profession_id)
         # this endpoint is only supported on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payloadNamespaceType.STATIC, (GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -388,7 +427,7 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/media/profession/{profession_id}'
         url = base_url.format(profession_id=profession_id)
         # this endpoint is only supported on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(NamespaceType.STATIC, GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -416,7 +455,7 @@ class BNetAPIUtil:
         url = base_url.format(profession_id=profession_id, 
             skill_tier_id=skill_tier_id)
         # this endpoint is only supported on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(NamespaceType.STATIC, GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -439,7 +478,7 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/recipe/{recipe_id}'
         url = base_url.format(recipe_id=recipe_id)
         # this endpoint is only supported on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(NamespaceType.STATIC, GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
@@ -462,25 +501,37 @@ class BNetAPIUtil:
         base_url = self.base_api_url + '/media/recipe/{recipe_id}'
         url = base_url.format(recipe_id=recipe_id)
         # this endpoint is only supported on RETAIL
-        payload = self._get_base_payload(GameVersion.RETAIL)
+        payload = self._get_base_payload(NamespaceType.STATIC, GameVersion.RETAIL)
         
         # GET request
         r = requests.get(url, params=payload)
         return BNetAPIUtil.handle_request_response(r)         
 
 
-'''
-Main code
-'''
-
-def main():
-    util = BNetAPIUtil()
-    # data = util.get_profession_index()
-    # data = util.get_profession_media_metadata(164)
-    # data = util.get_item_media_metadata(19019, GameVersion.RETAIL)
-    # data = util.get_profession_skill_tier_metadata(197, 2540)
-    # data = util.get_recipe_media_metadata(2360)
-    # print(json.dumps(data))
+    '''
+    ----------------
+    Region Endpoints
+    ----------------
+    '''
     
-if __name__ == "__main__":
-    main()
+
+    '''
+    DESC
+        Region index endpoint /region/index
+        
+    INPUT
+        Version of WoW (Classic / Retail)
+        
+    RETURN
+        JSON response body
+    '''
+    def get_region_index(self, namespace_type, game_version) -> dict:  
+        
+        # prepare GET metadata
+        self._verify_game_version(game_version)
+        url = self.base_api_url + '/region/index'
+        payload = self._get_base_payload(namespace_type, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)  

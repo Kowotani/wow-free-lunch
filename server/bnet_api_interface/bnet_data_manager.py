@@ -9,8 +9,7 @@ from enum import Enum
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
     Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, StgRecipeItem)
 # enums
-from wfl.utils import GameVersion, ItemQuality
-
+from wfl.utils import (GameVersion, ItemQuality, RealmCategory, RealmType)
 
 '''
 =================
@@ -1122,6 +1121,13 @@ Game Metadata
 
 
 '''
+--------------
+Expansion Data
+--------------
+'''
+
+
+'''
 This class manages data for the following models
 - Expansion
 '''
@@ -1213,3 +1219,120 @@ class ExpansionDataManager:
 
         # load any remaining objects
         self._obj_loader.commit_remaining()
+        
+        
+'''
+----------
+Realm Data
+----------
+'''
+
+
+'''
+This class manages data for the following models
+- Region
+- Realm
+- Connected Realm
+'''
+
+
+class RealmDataManager:
+    
+    
+    '''
+    ===============
+    Class Variables
+    ===============
+    '''
+    
+    _bnet_api_util = None
+    _obj_loader = None
+    chunk_size = 100
+    
+    
+    # '''
+    # This dataclass stores data for each expansion
+    # '''
+    # @dataclass
+    # class ExpansionData:
+    #     name: str           # Eg. Wrath of the Lich King
+    #     skill_tier_prefix: str     # Eg. Northrend
+    #     max_level: int      # Eg. 80 for Wrath of the Lich King
+    #     is_classic: bool     # TRUE if the expansion is part of CLASSIC
+    
+    
+    # expansion_data = {
+    #     0: ExpansionData('World of Warcraft', 'Classic', 60, True),
+    #     1: ExpansionData('The Burning Crusade', 'Outland', 70, True),
+    #     2: ExpansionData('Wrath of the Lich King', 'Northrend', 80, True),
+    #     3: ExpansionData('Cataclysm', 'Cataclysm', 85, False),
+    #     4: ExpansionData('Mists of Pandaria', 'Pandaria', 90, False),
+    #     5: ExpansionData('Warlords of Draenor', 'Draenor', 100, False),
+    #     6: ExpansionData('Legion', 'Legion', 110, False),
+    #     7: ExpansionData('Battle for Azeroth', 'Zandalari', 120, False),
+    #     8: ExpansionData('Shadowlands', 'Shadowlands', 60, False),
+    #     9: ExpansionData('Dragonflight', 'Dragon Isles', 70, False),
+    #     }
+    
+    
+    '''
+    =============
+    Class Methods
+    =============
+    '''
+    
+    
+    '''
+    DESC
+        Class constructor
+        
+    INPUT
+        
+    RETURN
+        Empty state object
+    '''    
+    def __init__(self):
+        self._bnet_api_util = BNetAPIUtil()
+        self._obj_loader = BulkObjectLoader(self.chunk_size)
+    
+        
+    '''
+    --------------
+    Helper Methods
+    --------------
+    '''    
+    
+    
+    '''
+    --------------
+    Loader Methods
+    --------------
+    '''
+    
+    
+    '''
+    DESC
+        Loads the `region` table
+        Mostly maps to the /region/{regionId} endpoint
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def load_region(self):
+        pass  
+        # # iterate through expansion data
+        # for expansion_id, expansion_data in self.expansion_data.items():
+            
+        #     # enqueue ItemSubclass object for loading 
+        #     obj = Expansion(
+        #         expansion_id=expansion_id,
+        #         name=expansion_data.name,
+        #         skill_tier_prefix=expansion_data.skill_tier_prefix,
+        #         max_level=expansion_data.max_level,
+        #         is_classic=expansion_data.is_classic,
+        #     )
+        #     self._obj_loader.add(obj) 
+
+        # # load any remaining objects
+        # self._obj_loader.commit_remaining()

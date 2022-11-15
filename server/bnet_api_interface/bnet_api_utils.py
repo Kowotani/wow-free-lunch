@@ -589,7 +589,7 @@ class BNetAPIUtil:
         
     '''
     DESC
-        Realm metadata endpoint /realmn/{realmId}
+        Realm metadata endpoint /realm/{realm_slug}
         
     INPUT
         - Version of WoW (Classic / Retail)
@@ -603,6 +603,56 @@ class BNetAPIUtil:
         # prepare GET metadata
         base_url = self.base_api_url + '/realm/{realm_slug}'
         url = base_url.format(realm_slug=realm_slug)
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)
+        
+        
+    '''
+    -------------------------
+    Connected Realm Endpoints
+    -------------------------
+    '''
+    
+
+    '''
+    DESC
+        Realm index endpoint /connected-realm/index
+        
+    INPUT
+        Version of WoW (Classic / Retail)
+        
+    RETURN
+        JSON response body
+    '''
+    def get_connected_realm_index(self, game_version) -> dict:  
+        
+        # prepare GET metadata
+        url = self.base_api_url + '/connected-realm/index'
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)  
+        
+        
+    '''
+    DESC
+        Realm metadata endpoint /connected-realm/{connectedRealmId}
+        
+    INPUT
+        - Version of WoW (Classic / Retail)
+        - Connected Realm ID
+    RETURN
+        JSON response body
+    '''
+    def get_connected_realm_metadata(self, game_version, connected_realm_id) -> dict:  
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + '/connected-realm/{connected_realm_id}'
+        url = base_url.format(connected_realm_id=connected_realm_id)
         payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
         
         # GET request

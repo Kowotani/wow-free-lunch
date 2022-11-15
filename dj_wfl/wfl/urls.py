@@ -17,9 +17,11 @@ from wfl.views import (
     
     ReagentCreate, ReagentList, ReagentDetail,
     
+    RealmCreate, RealmList, RealmDetail,
+    
     RecipeCreate, RecipeList, RecipeDetail,
     
-     RegionCreate, RegionList, RegionDetail,
+    RegionCreate, RegionList, RegionDetail,
 
     StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail,
     )
@@ -88,4 +90,8 @@ urlpatterns = [
     path('region/create', RegionCreate.as_view()),
     path('region/all', RegionList.as_view()),
     path('region/<pk>', RegionDetail.as_view()),
+    
+    path('realm/create', RealmCreate.as_view()),
+    path('realm/all', RealmList.as_view()),
+    path('realm/<pk>', RealmDetail.as_view()),
 ]

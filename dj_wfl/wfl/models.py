@@ -1,5 +1,5 @@
 from django.db import models
-from wfl.utils import GameVersion, ItemQuality
+from wfl.utils import GameVersion, ItemQuality, RealmCategory, RealmType
 
 
 '''
@@ -84,6 +84,29 @@ class Region(CommonData):
 
     class Meta:
         db_table = 'region'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
+
+'''
+DESC
+    Dim table for Region
+    Mostly maps to /realm/{realmId} endpoint
+'''
+
+class Realm(CommonData):
+    realm_id = models.SmallIntegerField('realm ID', primary_key=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    slug = models.CharField('realm slug', max_length=256, default='')
+    realm_type = models.CharField('NORMAL / PVP / PVP_RP / RP', max_length=256, choices=RealmType.choices(), default=RealmType.NORMAL)
+    realm_category = models.CharField('geographic region', max_length=256, choices=RealmCategory.choices(), default=RealmCategory.UNITED_STATES)
+    timezone = models.CharField('realm timezone / locale', max_length=256, default='')
+    
+
+    class Meta:
+        db_table = 'realm'
 
         
     def __str__(self):

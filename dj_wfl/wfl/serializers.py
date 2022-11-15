@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, Region, 
+    Expansion, Profession, ProfessionSkillTier, Reagent, Realm, Recipe, Region, 
     StgRecipeItem)
 
 
@@ -150,4 +150,15 @@ DESC
 class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
+        fields = '__all__'
+        
+
+'''
+DESC
+    Realm serializer
+'''
+
+class RealmSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Realm
         fields = '__all__'

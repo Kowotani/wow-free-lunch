@@ -6,13 +6,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, Region, 
+    Expansion, Profession, ProfessionSkillTier, Reagent, Realm, Recipe, Region, 
     StgRecipeItem)
     
 from wfl.serializers import (ItemSerializer, ItemClassSerializer, 
     ItemClassHierarchySerializer, ItemDataSerializer, ProfessionSerializer, 
     ExpansionSerializer, ProfessionSkillTierSerializer, ReagentSerializer,
-    RecipeSerializer, RegionSerializer, StgRecipeItemSerializer)
+    RealmSerializer, RecipeSerializer, RegionSerializer, StgRecipeItemSerializer)
     
 
 
@@ -384,14 +384,14 @@ class ExpansionDetail(generics.RetrieveUpdateDestroyAPIView):
     
     
 '''
----------
+------
 Region
----------
+------
 '''
 
 
 '''
-Creates an Region
+Creates a Region
 Supported methods: POST
 '''
 class RegionCreate(generics.CreateAPIView):
@@ -415,3 +415,37 @@ Supported methods: GET / PUT / PATCH / DELETE
 class RegionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
+    
+    
+'''
+---------
+Realm
+---------
+'''
+
+
+'''
+Creates a Realm
+Supported methods: POST
+'''
+class RealmCreate(generics.CreateAPIView):
+    queryset = Realm.objects.all()
+    serializer_class = RealmSerializer
+    
+
+'''
+Retrieve list of Realms
+Supported methods: GET
+'''
+class RealmList(generics.ListAPIView):
+    queryset = Realm.objects.all()
+    serializer_class = RealmSerializer
+    
+    
+'''
+Manages read / update / delete operations for a Realm
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class RealmDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Realm.objects.all()
+    serializer_class = RealmSerializer

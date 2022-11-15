@@ -7,12 +7,12 @@ import datetime as dt
 from enum import Enum
 from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Realm, Recipe, Region, 
-    StgRecipeItem)
+from wfl.models import (ConnectedRealm, Expansion, Item, ItemClass, 
+    ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, Reagent, 
+    Realm, Recipe, Region, StgRecipeItem)
 # enums
 from wfl.utils import (GameVersion, ItemQuality, NamespaceType, RealmCategory, 
-    RealmType)
+    RealmPopulation, RealmStatus, RealmType)
 
 '''
 =================
@@ -1306,6 +1306,52 @@ class RealmDataManager:
             raise Exception('Unknown realm_category={}'.format(realm_category))
             
         return realm_categories[realm_category].value
+
+
+    '''
+    DESC
+         Get the RealmPopulation for the given input
+        
+    INPUT
+        Maybe a mappable RealmPopulation value
+        
+    RETURN
+        RealmPopulation enum
+    '''    
+    def _get_realm_population(self, realm_population) -> RealmPopulation:
+        realm_populations = {
+            'FULL': RealmPopulation.FULL,
+            'HIGH': RealmPopulation.HIGH,
+            'LOCKED': RealmPopulation.LOCKED,
+            'MEDIUM': RealmPopulation.MEDIUM,
+            'NEW': RealmPopulation.NEW,
+            }
+            
+        if realm_population not in realm_populations.keys():
+            raise Exception('Unknown realm_population={}'.format(realm_population))
+            
+        return realm_populations[realm_population].value
+
+
+    '''
+    DESC
+         Get the RealmStatus for the given input
+        
+    INPUT
+        Maybe a mappable RealmStatus value
+        
+    RETURN
+        RealmStatus enum
+    '''    
+    def _get_realm_status(self, realm_status) -> RealmStatus:
+        realm_statuses = {
+            'UP': RealmStatus.UP
+            }
+            
+        if realm_status not in realm_statuses.keys():
+            raise Exception('Unknown realm_status={}'.format(realm_status))
+            
+        return realm_statuses[realm_status].value
     
  
     '''
@@ -1420,6 +1466,56 @@ class RealmDataManager:
                 realm_type=self._get_realm_type(rid_r['type']['type']),
                 realm_category=self._get_realm_category(rid_r['category']),
                 timezone=rid_r['timezone'],
+            )
+            self._obj_loader.add(obj) 
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()
+        
+        
+    '''
+    DESC
+        Loads the `connected_realmn` table
+        Mostly maps to the /connected-realm/{connectedRealmId} endpoint
+        
+    INPUT
+        GameVersion of the Connected Realm to load
+        
+    RETURN
+    '''    
+    def load_connected_realm(self, game_version):
+        
+        # call the /connected-realmn/index endpoint
+        index_r = self._bnet_api_util.get_connected_realm_index(game_version)
+        
+        if index_r is None:
+            raise Exception('Error: get_connected_realm_index() in bnet_data_loader.load_connected_realm()')
+        
+        # iterate through each realm
+        for realm in index_r['connected_realms']:
+            
+            # parse connected_realm_id from URL
+            parse = urlparse(realm['href'])
+            connected_realm_id = int(parse.path.split('/')[-1])
+            
+            # call the /connected-realm/{connectedRealmId} endpoint
+            rid_r = self._bnet_api_util.get_connected_realm_metadata(
+                game_version, connected_realm_id)
+            
+            if rid_r is None:
+                raise Exception('Error: get_connected_realm_metadata() in bnet_data_loader.load_connected_realm()')
+            
+            # get Realm object
+            realm = Realm.objects.get(realm_id=rid_r['id'])
+            
+            # enqueue ConnectedRealm object for loading 
+            obj = ConnectedRealm(
+                connected_realm_id=rid_r['id'],
+                realm=realm,
+                name=realm.name,
+                status=self._get_realm_status(rid_r['status']['type']),
+                population=self._get_realm_population(
+                    rid_r['population']['type']),
             )
             self._obj_loader.add(obj) 
 

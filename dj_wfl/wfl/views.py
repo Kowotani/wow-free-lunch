@@ -5,14 +5,15 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Realm, Recipe, Region, 
-    StgRecipeItem)
+from wfl.models import (ConnectedRealm, Expansion, Item, ItemClass, 
+    ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, Reagent, 
+    Realm, Recipe, Region, StgRecipeItem)
     
-from wfl.serializers import (ItemSerializer, ItemClassSerializer, 
-    ItemClassHierarchySerializer, ItemDataSerializer, ProfessionSerializer, 
-    ExpansionSerializer, ProfessionSkillTierSerializer, ReagentSerializer,
-    RealmSerializer, RecipeSerializer, RegionSerializer, StgRecipeItemSerializer)
+from wfl.serializers import (ConnectedRealmSerializer, ExpansionSerializer, 
+    ItemClassSerializer, ItemClassHierarchySerializer, ItemDataSerializer, 
+    ItemSerializer, ProfessionSerializer,  ProfessionSkillTierSerializer, 
+    ReagentSerializer, RealmSerializer, RecipeSerializer, RegionSerializer, 
+    StgRecipeItemSerializer)
     
 
 
@@ -418,9 +419,9 @@ class RegionDetail(generics.RetrieveUpdateDestroyAPIView):
     
     
 '''
----------
+-----
 Realm
----------
+-----
 '''
 
 
@@ -449,3 +450,37 @@ Supported methods: GET / PUT / PATCH / DELETE
 class RealmDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Realm.objects.all()
     serializer_class = RealmSerializer
+    
+    
+'''
+--------------
+ConnectedRealm
+--------------
+'''
+
+
+'''
+Creates a ConnectedRealm
+Supported methods: POST
+'''
+class ConnectedRealmCreate(generics.CreateAPIView):
+    queryset = ConnectedRealm.objects.all()
+    serializer_class = ConnectedRealmSerializer
+    
+
+'''
+Retrieve list of ConnectedRealms
+Supported methods: GET
+'''
+class ConnectedRealmList(generics.ListAPIView):
+    queryset = ConnectedRealm.objects.all()
+    serializer_class = ConnectedRealmSerializer
+    
+    
+'''
+Manages read / update / delete operations for a ConnectedRealm
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class ConnectedRealmDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ConnectedRealm.objects.all()
+    serializer_class = ConnectedRealmSerializer

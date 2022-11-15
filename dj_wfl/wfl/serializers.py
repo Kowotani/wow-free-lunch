@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Realm, Recipe, Region, 
-    StgRecipeItem)
+from wfl.models import (ConnectedRealm, Item, ItemClass, ItemClassHierarchy, 
+    ItemData, Expansion, Profession, ProfessionSkillTier, Reagent, Realm, Recipe, 
+    Region, StgRecipeItem)
 
 
 '''
@@ -161,4 +161,15 @@ DESC
 class RealmSerializer(serializers.ModelSerializer):
     class Meta:
         model = Realm
+        fields = '__all__'
+        
+        
+'''
+DESC
+    Connected Realm serializer
+'''
+
+class ConnectedRealmSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConnectedRealm
         fields = '__all__'

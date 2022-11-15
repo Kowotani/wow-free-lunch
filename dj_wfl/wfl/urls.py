@@ -1,5 +1,7 @@
 from django.urls import path
 from wfl.views import (
+    ConnectedRealmCreate, ConnectedRealmList, ConnectedRealmDetail,
+    
     ItemCreate, ItemList, ItemDetail,
     
     ItemClassCreate, ItemClassList, ItemClassDetail,
@@ -94,4 +96,8 @@ urlpatterns = [
     path('realm/create', RealmCreate.as_view()),
     path('realm/all', RealmList.as_view()),
     path('realm/<pk>', RealmDetail.as_view()),
+    
+    path('connected_realm/create', ConnectedRealmCreate.as_view()),
+    path('connected_realm/all', ConnectedRealmList.as_view()),
+    path('connected_realm/<pk>', ConnectedRealmDetail.as_view()),
 ]

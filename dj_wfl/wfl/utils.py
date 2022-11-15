@@ -59,7 +59,35 @@ class RealmCategory(Enum):
     @classmethod
     def choices(cls):
         return [(key.value, key.name) for key in cls]        
+    
         
+'''
+This enum represents the realm population
+'''
+class RealmPopulation(Enum):
+    FULL = 'FULL'
+    HIGH = 'HIGH'
+    LOCKED = 'LOCKED'
+    MEDIUM = 'MEDIUM'
+    NEW = 'NEW'
+    
+
+    @classmethod
+    def choices(cls):
+        return [(key.value, key.name) for key in cls]
+
+
+'''
+This enum represents the realm status
+'''
+class RealmStatus(Enum):
+    UP = 'UP'
+    
+
+    @classmethod
+    def choices(cls):
+        return [(key.value, key.name) for key in cls]
+
 
 '''
 This enum represents the realm types

@@ -1,5 +1,6 @@
 from django.db import models
-from wfl.utils import GameVersion, ItemQuality, RealmCategory, RealmType
+from wfl.utils import (GameVersion, ItemQuality, RealmCategory, RealmPopulation, 
+    RealmStatus, RealmType)
 
 
 '''
@@ -92,7 +93,7 @@ class Region(CommonData):
 
 '''
 DESC
-    Dim table for Region
+    Dim table for Realm
     Mostly maps to /realm/{realmId} endpoint
 '''
 
@@ -112,6 +113,26 @@ class Realm(CommonData):
     def __str__(self):
         return CommonData.__str__(self)
 
+
+'''
+DESC
+    Dim table for ConnectedRealm
+    Mostly maps to /connected-realm/{connectedRealmId} endpoint
+'''
+
+class ConnectedRealm(CommonData):
+    connected_realm_id = models.SmallIntegerField('connected realm ID', primary_key=True)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE)
+    status = models.CharField('Seems to just be UP', max_length=256, choices=RealmStatus.choices(), default=RealmStatus.UP)
+    population = models.CharField('NEW / MEDIUM / HIGH / FULL / LOCKED', max_length=256, choices=RealmPopulation.choices(), default=RealmPopulation.NEW)
+    
+
+    class Meta:
+        db_table = 'connected_realm'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
 
 '''
 =================

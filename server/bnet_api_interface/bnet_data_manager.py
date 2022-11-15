@@ -5,11 +5,14 @@ from django.apps import apps
 from django.db.models import Q
 import datetime as dt
 from enum import Enum
+from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
 from wfl.models import (Item, ItemClass, ItemClassHierarchy, ItemData, 
-    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, StgRecipeItem)
+    Expansion, Profession, ProfessionSkillTier, Reagent, Recipe, Region, 
+    StgRecipeItem)
 # enums
-from wfl.utils import (GameVersion, ItemQuality, RealmCategory, RealmType)
+from wfl.utils import (GameVersion, ItemQuality, NamespaceType, RealmCategory, 
+    RealmType)
 
 '''
 =================
@@ -1316,23 +1319,39 @@ class RealmDataManager:
         Mostly maps to the /region/{regionId} endpoint
         
     INPUT
+        GameVersion of the Region to create
         
     RETURN
     '''    
-    def load_region(self):
-        pass  
-        # # iterate through expansion data
-        # for expansion_id, expansion_data in self.expansion_data.items():
+    def load_region(self, game_version):
+        
+        # call the /region/index endpoint
+        index_r = self._bnet_api_util.get_region_index(game_version)
+        
+        if index_r is None:
+            raise Exception('Error: get_region_index() in bnet_data_loader.load_region()')
+        
+        # iterate through each region
+        for region in index_r['regions']:
             
-        #     # enqueue ItemSubclass object for loading 
-        #     obj = Expansion(
-        #         expansion_id=expansion_id,
-        #         name=expansion_data.name,
-        #         skill_tier_prefix=expansion_data.skill_tier_prefix,
-        #         max_level=expansion_data.max_level,
-        #         is_classic=expansion_data.is_classic,
-        #     )
-        #     self._obj_loader.add(obj) 
+            # parse region_id from URL
+            parse = urlparse(region['href'])
+            region_id = int(parse.path.split('/')[-1])
+            
+            # call the /region/{regionId} endpoint
+            rid_r = self._bnet_api_util.get_region_metadata(game_version, region_id)
+            
+            if rid_r is None:
+                raise Exception('Error: get_region_metadata() in bnet_data_loader.load_region()')
+            
+            # enqueue Region object for loading 
+            obj = Region(
+                region_id=region_id,
+                name=rid_r['name'],
+                tag=rid_r['tag'],
+                game_version=game_version.value
+            )
+            self._obj_loader.add(obj) 
 
-        # # load any remaining objects
-        # self._obj_loader.commit_remaining()
+        # load any remaining objects
+        self._obj_loader.commit_remaining()

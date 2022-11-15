@@ -525,12 +525,34 @@ class BNetAPIUtil:
     RETURN
         JSON response body
     '''
-    def get_region_index(self, namespace_type, game_version) -> dict:  
+    def get_region_index(self, game_version) -> dict:  
         
         # prepare GET metadata
-        self._verify_game_version(game_version)
         url = self.base_api_url + '/region/index'
-        payload = self._get_base_payload(namespace_type, game_version)
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
+        
+        # GET request
+        r = requests.get(url, params=payload)
+        return BNetAPIUtil.handle_request_response(r)  
+        
+        
+    '''
+    DESC
+        Region index endpoint /region/{regionId}
+        
+    INPUT
+        - Version of WoW (Classic / Retail)
+        - Region ID
+        
+    RETURN
+        JSON response body
+    '''
+    def get_region_metadata(self, game_version, region_id) -> dict:  
+        
+        # prepare GET metadata
+        base_url = self.base_api_url + '/region/{region_id}'
+        url = base_url.format(region_id=region_id)
+        payload = self._get_base_payload(NamespaceType.DYNAMIC, game_version)
         
         # GET request
         r = requests.get(url, params=payload)

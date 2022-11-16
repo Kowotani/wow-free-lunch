@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from wfl.models import (ConnectedRealm, Item, ItemClass, ItemClassHierarchy, 
-    ItemData, Expansion, Profession, ProfessionSkillTier, Reagent, Realm, 
-    RealmConnection, Recipe, Region, StgRecipeItem)
+from wfl.models import (Auction, AuctionHouse, ConnectedRealm, Item, ItemClass,
+    ItemClassHierarchy, ItemData, Expansion, Profession, ProfessionSkillTier, 
+    Reagent, Realm, RealmConnection, Recipe, Region, StgRecipeItem)
 
 
 '''
@@ -183,4 +183,26 @@ DESC
 class RealmConnectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RealmConnection
+        fields = '__all__'
+        
+        
+'''
+DESC
+    Auction serializer
+'''
+
+class AuctionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Auction
+        fields = '__all__'
+        
+        
+'''
+DESC
+    AuctionHouse serializer
+'''
+
+class AuctionHouseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuctionHouse
         fields = '__all__'

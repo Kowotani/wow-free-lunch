@@ -5,15 +5,16 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from wfl.models import (ConnectedRealm, Expansion, Item, ItemClass, 
-    ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, Reagent, 
-    Realm, RealmConnection, Recipe, Region, StgRecipeItem)
+from wfl.models import (Auction, AuctionHouse, ConnectedRealm, Expansion, Item, 
+    ItemClass, ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, 
+    Reagent, Realm, RealmConnection, Recipe, Region, StgRecipeItem)
     
-from wfl.serializers import (ConnectedRealmSerializer, ExpansionSerializer, 
-    ItemClassSerializer, ItemClassHierarchySerializer, ItemDataSerializer, 
-    ItemSerializer, ProfessionSerializer,  ProfessionSkillTierSerializer, 
-    ReagentSerializer, RealmSerializer, RealmConnectionSerializer, 
-    RecipeSerializer, RegionSerializer, StgRecipeItemSerializer)
+from wfl.serializers import (AuctionSerializer, AuctionHouseSerializer, 
+    ConnectedRealmSerializer, ExpansionSerializer, ItemClassSerializer, 
+    ItemClassHierarchySerializer, ItemDataSerializer, ItemSerializer, 
+    ProfessionSerializer,  ProfessionSkillTierSerializer, ReagentSerializer, 
+    RealmSerializer, RealmConnectionSerializer, RecipeSerializer, 
+    RegionSerializer, StgRecipeItemSerializer)
     
 
 
@@ -188,7 +189,7 @@ Retrieve list of Item Datas
 Supported methods: GET
 '''
 class ItemDataList(generics.ListAPIView):
-    queryset = ItemData.objects.all()
+    queryset = ItemData.objects.all()[:1000]
     serializer_class = ItemDataSerializer
     
     
@@ -221,7 +222,7 @@ Retrieve list of Items
 Supported methods: GET
 '''
 class ItemList(generics.ListAPIView):
-    queryset = Item.objects.all()
+    queryset = Item.objects.all()[:1000]
     serializer_class = ItemSerializer
     
     
@@ -262,7 +263,7 @@ Retrieve list of Stg Recipe Items
 Supported methods: GET
 '''
 class StgRecipeItemList(generics.ListAPIView):
-    queryset = StgRecipeItem.objects.all()
+    queryset = StgRecipeItem.objects.all()[:1000]
     serializer_class = StgRecipeItemSerializer
     
     
@@ -296,7 +297,7 @@ Retrieve list of Recipes
 Supported methods: GET
 '''
 class RecipeList(generics.ListAPIView):
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.all()[:1000]
     serializer_class = RecipeSerializer
     
     
@@ -330,7 +331,7 @@ Retrieve list of Reagents
 Supported methods: GET
 '''
 class ReagentList(generics.ListAPIView):
-    queryset = Reagent.objects.all()
+    queryset = Reagent.objects.all()[:1000]
     serializer_class = ReagentSerializer
     
     
@@ -460,7 +461,7 @@ ConnectedRealm
 
 
 '''
-Creates a ConnectedRealm
+Creates a Connected Realm
 Supported methods: POST
 '''
 class ConnectedRealmCreate(generics.CreateAPIView):
@@ -469,7 +470,7 @@ class ConnectedRealmCreate(generics.CreateAPIView):
     
 
 '''
-Retrieve list of ConnectedRealms
+Retrieve list of Connected Realms
 Supported methods: GET
 '''
 class ConnectedRealmList(generics.ListAPIView):
@@ -478,7 +479,7 @@ class ConnectedRealmList(generics.ListAPIView):
     
     
 '''
-Manages read / update / delete operations for a ConnectedRealm
+Manages read / update / delete operations for a Connected Realm
 Supported methods: GET / PUT / PATCH / DELETE
 '''
 class ConnectedRealmDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -494,7 +495,7 @@ RealmConnection
 
 
 '''
-Creates a RealmConnection
+Creates a Realm Connection
 Supported methods: POST
 '''
 class RealmConnectionCreate(generics.CreateAPIView):
@@ -503,7 +504,7 @@ class RealmConnectionCreate(generics.CreateAPIView):
     
 
 '''
-Retrieve list of RealmConnections
+Retrieve list of Realm Connections
 Supported methods: GET
 '''
 class RealmConnectionList(generics.ListAPIView):
@@ -512,9 +513,77 @@ class RealmConnectionList(generics.ListAPIView):
     
     
 '''
-Manages read / update / delete operations for a RealmConnection
+Manages read / update / delete operations for a Realm Connection
 Supported methods: GET / PUT / PATCH / DELETE
 '''
 class RealmConnectionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = RealmConnection.objects.all()
     serializer_class = RealmConnectionSerializer
+    
+    
+'''
+-------
+Auction
+-------
+'''
+
+
+'''
+Creates an Auction
+Supported methods: POST
+'''
+class AuctionCreate(generics.CreateAPIView):
+    queryset = Auction.objects.all()
+    serializer_class = AuctionSerializer
+    
+
+'''
+Retrieve list of Auctions
+Supported methods: GET
+'''
+class AuctionList(generics.ListAPIView):
+    queryset = Auction.objects.all()[:1000]
+    serializer_class = AuctionSerializer
+    
+    
+'''
+Manages read / update / delete operations for an Auction
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class AuctionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Auction.objects.all()
+    serializer_class = AuctionSerializer
+    
+
+'''
+------------
+AuctionHouse
+------------
+'''
+
+
+'''
+Creates an Auction House
+Supported methods: POST
+'''
+class AuctionHouseCreate(generics.CreateAPIView):
+    queryset = AuctionHouse.objects.all()
+    serializer_class = AuctionHouseSerializer
+    
+
+'''
+Retrieve list of Auction Houses
+Supported methods: GET
+'''
+class AuctionHouseList(generics.ListAPIView):
+    queryset = AuctionHouse.objects.all()
+    serializer_class = AuctionHouseSerializer
+    
+    
+'''
+Manages read / update / delete operations for an Auction House
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class AuctionHouseDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = AuctionHouse.objects.all()
+    serializer_class = AuctionHouseSerializer

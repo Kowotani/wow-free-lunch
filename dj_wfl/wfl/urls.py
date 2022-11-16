@@ -1,5 +1,9 @@
 from django.urls import path
 from wfl.views import (
+    AuctionCreate, AuctionList, AuctionDetail,    
+    
+    AuctionHouseCreate, AuctionHouseList, AuctionHouseDetail,
+
     ConnectedRealmCreate, ConnectedRealmList, ConnectedRealmDetail,
     
     ItemCreate, ItemList, ItemDetail,
@@ -87,9 +91,17 @@ urlpatterns = [
     # Game Metadata
     # =============
     
+    # ----------
+    # Expansions
+    # ----------
+    
     path('expansion/create', ExpansionCreate.as_view()),
     path('expansion/all', ExpansionList.as_view()),
     path('expansion/<pk>', ExpansionDetail.as_view()),
+    
+    # ------
+    # Realms
+    # ------
     
     path('region/create', RegionCreate.as_view()),
     path('region/all', RegionList.as_view()),
@@ -106,4 +118,16 @@ urlpatterns = [
     path('connected_realm/realm_connection/create', RealmConnectionCreate.as_view()),
     path('connected_realm/realm_connection/all', RealmConnectionList.as_view()),
     path('connected_realm/realm_connection/<pk>', RealmConnectionDetail.as_view()),
+    
+    # --------
+    # Auctions
+    # --------
+    
+    path('auction/create', AuctionCreate.as_view()),
+    path('auction/all', AuctionList.as_view()),
+    path('auction/<pk>', AuctionDetail.as_view()),
+    
+    path('auction_house/create', AuctionHouseCreate.as_view()),
+    path('auction_house/all', AuctionHouseList.as_view()),
+    path('auction_house/<pk>', AuctionHouseDetail.as_view()),
 ]

@@ -1,6 +1,9 @@
+from datetime import date
 from django.db import models
-from wfl.utils import (AuctionHouseFaction, Faction, GameVersion, ItemQuality, 
-    RealmCategory, RealmPopulation, RealmStatus, RealmType)
+from django.utils import timezone
+from wfl.utils import (AuctionHouseFaction, AuctionTimeLeft, Faction, 
+    GameVersion, ItemQuality, RealmCategory, RealmPopulation, RealmStatus, 
+    RealmType)
 
 
 '''
@@ -150,6 +153,53 @@ class RealmConnection(CommonData):
 
     class Meta:
         db_table = 'realm_connection'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
+
+'''
+DESC
+    Dim table for AuctionHouse
+    Mostly maps to /connected-realm/{connectedRealmId}/auctions/index endpoint
+'''
+
+class AuctionHouse(CommonData):
+    auction_house_id = models.CharField('concat connected_realm_id and faction_id as dummy PK', max_length=256, primary_key=True)
+    connected_realm = models.ForeignKey(ConnectedRealm, on_delete=models.CASCADE)
+    faction = models.CharField('Alliance / Horde / Blackwater', max_length=256, choices=Faction.choices(), default=Faction.ALLIANCE)
+    faction_id = models.SmallIntegerField('auction house faction ID', choices=AuctionHouseFaction.choices(), default=AuctionHouseFaction.ALLIANCE)
+    
+
+    class Meta:
+        db_table = 'auction_house'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
+
+'''
+DESC
+    Dim table for Auction
+    Mostly maps to /connected-realm/{connectedRealmId}/auctions/{auctionHouseId} endpoint
+'''
+
+class Auction(CommonData):
+    auction_id = models.IntegerField('auction ID', primary_key=True)
+    auction_house = models.ForeignKey(AuctionHouse, on_delete=models.CASCADE)
+    item_id = models.IntegerField('item ID of the auctioned item', default=0)
+    quantity = models.SmallIntegerField('quantity of auction item', default=1)
+    bid_unit_price = models.IntegerField('bid price per auction item', default=1)
+    buyout_unit_price = models.IntegerField('buyout price per auction item', null=True)
+    time_left = models.CharField('SHORT / MEDIUM / LONG / VERY_LONG', max_length=256, choices=AuctionTimeLeft.choices(), default=AuctionTimeLeft.LONG)
+    update_time =  models.DateTimeField('datetime the auction was loaded', default=timezone.now)
+    update_date = models.DateField('date the auction was loaded', default=date.today)
+    
+
+    class Meta:
+        db_table = 'auction'
 
         
     def __str__(self):

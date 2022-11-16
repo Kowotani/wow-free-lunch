@@ -2,6 +2,20 @@ from enum import Enum
 
 
 '''
+This enum represents the auction house factions
+'''
+class AuctionHouseFaction(Enum):
+    ALLIANCE = 2
+    HORDE = 6
+    BLACKWATER = 7
+    
+    
+    @classmethod
+    def choices(cls):
+        return [(key.value, key.name) for key in cls]
+
+
+'''
 This enum represents the time left for auctions
 '''
 class AuctionTimeLeft(Enum):
@@ -9,6 +23,20 @@ class AuctionTimeLeft(Enum):
     MEDIUM = 'MEDIUM'
     LONG = 'LONG'
     VERY_LONG = 'VERY_LONG'
+    
+    
+    @classmethod
+    def choices(cls):
+        return [(key.value, key.name) for key in cls]
+
+
+'''
+This enum represents the WoW factions
+'''
+class Faction(Enum):
+    ALLIANCE = 'ALLIANCE'
+    HORDE = 'HORDE'
+    BLACKWATER = 'BLACKWATER'
     
     
     @classmethod

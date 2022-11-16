@@ -7,13 +7,13 @@ from rest_framework.views import APIView
 
 from wfl.models import (ConnectedRealm, Expansion, Item, ItemClass, 
     ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, Reagent, 
-    Realm, Recipe, Region, StgRecipeItem)
+    Realm, RealmConnection, Recipe, Region, StgRecipeItem)
     
 from wfl.serializers import (ConnectedRealmSerializer, ExpansionSerializer, 
     ItemClassSerializer, ItemClassHierarchySerializer, ItemDataSerializer, 
     ItemSerializer, ProfessionSerializer,  ProfessionSkillTierSerializer, 
-    ReagentSerializer, RealmSerializer, RecipeSerializer, RegionSerializer, 
-    StgRecipeItemSerializer)
+    ReagentSerializer, RealmSerializer, RealmConnectionSerializer, 
+    RecipeSerializer, RegionSerializer, StgRecipeItemSerializer)
     
 
 
@@ -484,3 +484,37 @@ Supported methods: GET / PUT / PATCH / DELETE
 class ConnectedRealmDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ConnectedRealm.objects.all()
     serializer_class = ConnectedRealmSerializer
+    
+    
+'''
+---------------
+RealmConnection
+---------------
+'''
+
+
+'''
+Creates a RealmConnection
+Supported methods: POST
+'''
+class RealmConnectionCreate(generics.CreateAPIView):
+    queryset = RealmConnection.objects.all()
+    serializer_class = RealmConnectionSerializer
+    
+
+'''
+Retrieve list of RealmConnections
+Supported methods: GET
+'''
+class RealmConnectionList(generics.ListAPIView):
+    queryset = RealmConnection.objects.all()
+    serializer_class = RealmConnectionSerializer
+    
+    
+'''
+Manages read / update / delete operations for a RealmConnection
+Supported methods: GET / PUT / PATCH / DELETE
+'''
+class RealmConnectionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = RealmConnection.objects.all()
+    serializer_class = RealmConnectionSerializer

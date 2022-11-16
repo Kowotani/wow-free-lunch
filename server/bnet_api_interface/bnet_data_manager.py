@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
 from wfl.models import (ConnectedRealm, Expansion, Item, ItemClass, 
     ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, Reagent, 
-    Realm, Recipe, Region, StgRecipeItem)
+    Realm, RealmConnection, Recipe, Region, StgRecipeItem)
 # enums
 from wfl.utils import (GameVersion, ItemQuality, NamespaceType, RealmCategory, 
     RealmPopulation, RealmStatus, RealmType)
@@ -1475,7 +1475,7 @@ class RealmDataManager:
         
     '''
     DESC
-        Loads the `connected_realmn` table
+        Loads the `connected_realm` and 'realm_connection' tables
         Mostly maps to the /connected-realm/{connectedRealmId} endpoint
         
     INPUT
@@ -1483,7 +1483,7 @@ class RealmDataManager:
         
     RETURN
     '''    
-    def load_connected_realm(self, game_version):
+    def load_connected_realm_and_realm_connection(self, game_version):
         
         # call the /connected-realmn/index endpoint
         index_r = self._bnet_api_util.get_connected_realm_index(game_version)
@@ -1491,11 +1491,11 @@ class RealmDataManager:
         if index_r is None:
             raise Exception('Error: get_connected_realm_index() in bnet_data_loader.load_connected_realm()')
         
-        # iterate through each realm
-        for realm in index_r['connected_realms']:
+        # iterate through each connected realm
+        for connected_realm in index_r['connected_realms']:
             
             # parse connected_realm_id from URL
-            parse = urlparse(realm['href'])
+            parse = urlparse(connected_realm['href'])
             connected_realm_id = int(parse.path.split('/')[-1])
             
             # call the /connected-realm/{connectedRealmId} endpoint
@@ -1505,19 +1505,32 @@ class RealmDataManager:
             if rid_r is None:
                 raise Exception('Error: get_connected_realm_metadata() in bnet_data_loader.load_connected_realm()')
             
-            # get Realm object
-            realm = Realm.objects.get(realm_id=rid_r['id'])
-            
             # enqueue ConnectedRealm object for loading 
-            obj = ConnectedRealm(
-                connected_realm_id=rid_r['id'],
-                realm=realm,
-                name=realm.name,
+            connected_realm_obj = ConnectedRealm(
+                connected_realm_id=connected_realm_id,
+                name='Connected Realm - {}'.format(connected_realm_id),
                 status=self._get_realm_status(rid_r['status']['type']),
                 population=self._get_realm_population(
                     rid_r['population']['type']),
-            )
-            self._obj_loader.add(obj) 
+                )
+            self._obj_loader.add(connected_realm_obj, auto_commit=False) 
+            
+            # iterate through each realm
+            for realm in rid_r['realms']:
+            
+                # get Realm object
+                realm_obj = Realm.objects.get(realm_id=realm['id'])
+                
+                # enqueue RealmConnection object for loading
+                realm_connection_obj = RealmConnection(
+                    realm_connection_id='{}_{}'.format(connected_realm_id, 
+                        realm_obj.realm_id),
+                    connected_realm=connected_realm_obj,
+                    realm=realm_obj,
+                    name='Realm Connection - {}_{}'.format(connected_realm_id, 
+                        realm_obj.realm_id),
+                    )
+                self._obj_loader.add(realm_connection_obj, auto_commit=False) 
 
         # load any remaining objects
-        self._obj_loader.commit_remaining()
+        self._obj_loader.commit_remaining([ConnectedRealm, RealmConnection])

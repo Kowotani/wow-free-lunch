@@ -21,6 +21,8 @@ from wfl.views import (
     
     RealmCreate, RealmList, RealmDetail,
     
+    RealmConnectionCreate, RealmConnectionList, RealmConnectionDetail,    
+    
     RecipeCreate, RecipeList, RecipeDetail,
     
     RegionCreate, RegionList, RegionDetail,
@@ -100,4 +102,8 @@ urlpatterns = [
     path('connected_realm/create', ConnectedRealmCreate.as_view()),
     path('connected_realm/all', ConnectedRealmList.as_view()),
     path('connected_realm/<pk>', ConnectedRealmDetail.as_view()),
+    
+    path('connected_realm/realm_connection/create', RealmConnectionCreate.as_view()),
+    path('connected_realm/realm_connection/all', RealmConnectionList.as_view()),
+    path('connected_realm/realm_connection/<pk>', RealmConnectionDetail.as_view()),
 ]

@@ -1,6 +1,6 @@
 from django.db import models
-from wfl.utils import (GameVersion, ItemQuality, RealmCategory, RealmPopulation, 
-    RealmStatus, RealmType)
+from wfl.utils import (AuctionHouseFaction, Faction, GameVersion, ItemQuality, 
+    RealmCategory, RealmPopulation, RealmStatus, RealmType)
 
 
 '''
@@ -117,12 +117,12 @@ class Realm(CommonData):
 '''
 DESC
     Dim table for ConnectedRealm
+    To be used with the RealmConnection model
     Mostly maps to /connected-realm/{connectedRealmId} endpoint
 '''
 
 class ConnectedRealm(CommonData):
     connected_realm_id = models.SmallIntegerField('connected realm ID', primary_key=True)
-    realm = models.ForeignKey(Realm, on_delete=models.CASCADE)
     status = models.CharField('Seems to just be UP', max_length=256, choices=RealmStatus.choices(), default=RealmStatus.UP)
     population = models.CharField('NEW / MEDIUM / HIGH / FULL / LOCKED', max_length=256, choices=RealmPopulation.choices(), default=RealmPopulation.NEW)
     
@@ -133,6 +133,28 @@ class ConnectedRealm(CommonData):
         
     def __str__(self):
         return CommonData.__str__(self)
+
+
+'''
+DESC
+    Dim table for RealmConnection
+    To be used with the ConnectedRealm model
+    Mostly maps to /connected-realm/{connectedRealmId} endpoint
+'''
+
+class RealmConnection(CommonData):
+    realm_connection_id = models.CharField('concat connected_realm_id and realm_id as dummy PK', max_length=256, primary_key=True)
+    realm = models.ForeignKey(Realm, on_delete=models.CASCADE)
+    connected_realm = models.ForeignKey(ConnectedRealm, on_delete=models.CASCADE)
+    
+
+    class Meta:
+        db_table = 'realm_connection'
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
 
 '''
 =================

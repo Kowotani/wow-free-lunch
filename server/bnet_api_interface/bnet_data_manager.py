@@ -1320,11 +1320,13 @@ class RealmDataManager:
     '''    
     def _get_realm_population(self, realm_population) -> RealmPopulation:
         realm_populations = {
-            'FULL': RealmPopulation.FULL,
-            'HIGH': RealmPopulation.HIGH,
-            'LOCKED': RealmPopulation.LOCKED,
-            'MEDIUM': RealmPopulation.MEDIUM,
             'NEW': RealmPopulation.NEW,
+            'RECOMMENDED': RealmPopulation.RECOMMENDED,
+            'LOW': RealmPopulation.LOW,
+            'MEDIUM': RealmPopulation.MEDIUM,
+            'HIGH': RealmPopulation.HIGH,
+            'FULL': RealmPopulation.FULL,
+            'LOCKED': RealmPopulation.LOCKED,
             }
             
         if realm_population not in realm_populations.keys():
@@ -1431,7 +1433,7 @@ class RealmDataManager:
         
     '''
     DESC
-        Loads the `realmn` table
+        Loads the `realm` table
         Mostly maps to the /realmn/{realm_slug} endpoint
         
     INPUT

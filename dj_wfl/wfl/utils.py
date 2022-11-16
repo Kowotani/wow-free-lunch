@@ -109,6 +109,8 @@ This enum represents the realm population
 '''
 class RealmPopulation(Enum):
     NEW = 'NEW'
+    RECOMMENDED = 'RECOMMENDED'
+    LOW = 'LOW'
     MEDIUM = 'MEDIUM'
     HIGH = 'HIGH'
     FULL = 'FULL'

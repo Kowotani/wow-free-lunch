@@ -191,7 +191,7 @@ class Auction(CommonData):
     auction_house = models.ForeignKey(AuctionHouse, on_delete=models.CASCADE)
     item_id = models.IntegerField('item ID of the auctioned item', default=0)
     quantity = models.SmallIntegerField('quantity of auction item', default=1)
-    bid_unit_price = models.IntegerField('bid price per auction item', default=1)
+    bid_unit_price = models.IntegerField('bid price per auction item', null=True)
     buyout_unit_price = models.IntegerField('buyout price per auction item', null=True)
     time_left = models.CharField('SHORT / MEDIUM / LONG / VERY_LONG', max_length=256, choices=AuctionTimeLeft.choices(), default=AuctionTimeLeft.LONG)
     update_time =  models.DateTimeField('datetime the auction was loaded', default=timezone.now)
@@ -200,6 +200,9 @@ class Auction(CommonData):
 
     class Meta:
         db_table = 'auction'
+        indexes = [
+            models.Index(fields=['auction_house', 'update_date'])
+            ]
 
         
     def __str__(self):

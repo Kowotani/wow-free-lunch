@@ -82,25 +82,29 @@ class BulkObjectLoader:
     INPUT
         - Model object to queue up for bulk creation
         - [OPTIONAL] Auto-commit objects if chunk_size threshold is met
+        - [OPTIONAL] Force add the object (eg. skip existence check as it will
+          be performed before calling this function)
         
     RETURN
     '''
-    def add(self, obj, auto_commit=True) -> None:
+    def add(self, obj, auto_commit=True, force_add=False) -> None:
         
         model_class = type(obj)
         model_key = model_class._meta.label
         
-        # check existence of obj
-        if not model_class.objects.filter(pk=obj.pk).exists():
+        # maybe check existence of obj
+        if not force_add:
+            if model_class.objects.filter(pk=obj.pk).exists():
+                return
         
-            # add to respective queue
-            self._create_queues[model_key].append(obj)
-            print('{} queue - added pk={}'.format(model_key, obj.pk))
-        
-            # bulk create if threshold has been met and auto_commit enabled
-            if (len(self._create_queues[model_key]) >= self.chunk_size
-                and auto_commit):
-                self._commit(model_class)
+        # add to respective queue
+        self._create_queues[model_key].append(obj)
+        print('{} queue - added pk={}'.format(model_key, obj.pk))
+    
+        # bulk create if threshold has been met and auto_commit enabled
+        if (len(self._create_queues[model_key]) >= self.chunk_size
+            and auto_commit):
+            self._commit(model_class)
                 
                 
     '''
@@ -1686,6 +1690,7 @@ class AuctionDataManager:
         
     RETURN
     '''    
+    # TODO: figure out how this works for RETAIL
     def load_auction_house(self, game_version):
         
         # iterate through each connected realm
@@ -1725,6 +1730,68 @@ class AuctionDataManager:
                     connected_realm=connected_realm
                 )
                 self._obj_loader.add(obj) 
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()
+        
+        
+    '''
+    DESC
+        Loads the `auction` table
+        Mostly maps to the /connected-realm/{connectedRealmId}/auctions/{auctionHouseId} 
+        endpoint
+        
+    INPUT
+        - GameVersion of the Region to load
+        - Connected Realm ID
+        - Auction House Faction ID
+        
+    RETURN
+    '''    
+    # TODO: figure out how this works for RETAIL
+    def load_auction(self, game_version, connected_realm_id, auction_house_faction_id):
+        
+        # call the /connected-realm/{connectedRealmId}/auctions/{auctionHouseId} endpoint
+        auction_r = self._bnet_api_util.get_auctions(game_version, 
+            connected_realm_id, auction_house_faction_id)
+       
+        if auction_r is None:
+            raise Exception('Error: get_auctions() in bnet_data_loader.load_auction()')
+       
+        # set the load timestamps
+        update_time = dt.datetime.now()
+        update_date = update_time.date()
+    
+        # get list of existing auction ids
+        auctions = Auction.objects.filter(update_date=update_date).values('auction_id')
+        existing_auction_ids = [x['auction_id'] for x in auctions]
+    
+        # iterate through each auction
+        for auction in auction_r['auctions']:
+    
+            # check existence of auction
+            if auction['id'] not in existing_auction_ids:
+    
+                # get unit prices
+                bid_unit_price = None if 'bid' not in auction else auction['bid'] / auction['quantity']
+                buyout_unit_price = None if 'buyout' not in auction else auction['buyout'] / auction['quantity']
+    
+                # enqueue Auction object for loading 
+                obj = Auction(
+                    auction_id=auction['id'],
+                    item_id=auction['item']['id'],
+                    quantity=auction['quantity'],
+                    bid_unit_price=bid_unit_price,
+                    buyout_unit_price=buyout_unit_price,
+                    time_left=self._get_auction_time_left(auction['time_left']),
+                    update_time=update_time,
+                    update_date=update_date,
+                    auction_house=AuctionHouse.objects.get(
+                        connected_realm_id=connected_realm_id, 
+                        faction_id=auction_house_faction_id),
+                    name='Auction - {}'.format(auction['id'])
+                )
+                self._obj_loader.add(obj, force_add=True) 
 
         # load any remaining objects
         self._obj_loader.commit_remaining()

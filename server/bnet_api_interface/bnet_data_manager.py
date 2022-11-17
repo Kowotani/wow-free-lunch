@@ -7,18 +7,21 @@ import datetime as dt
 from enum import Enum
 from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (ConnectedRealm, Expansion, Item, ItemClass, 
-    ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, Reagent, 
-    Realm, RealmConnection, Recipe, Region, StgRecipeItem)
+from wfl.models import (Auction, AuctionHouse, ConnectedRealm, Expansion, Item, 
+    ItemClass, ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, 
+    Reagent, Realm, RealmConnection, Recipe, Region, StgRecipeItem)
 # enums
-from wfl.utils import (GameVersion, ItemQuality, NamespaceType, RealmCategory, 
-    RealmPopulation, RealmStatus, RealmType)
+from wfl.utils import (AuctionHouseFaction, AuctionTimeLeft, Faction, 
+    GameVersion, ItemQuality, NamespaceType, RealmCategory, RealmPopulation,
+    RealmStatus, RealmType)
+
 
 '''
 =================
 Bulk Loading Util
 =================
 '''
+
 
 '''
 This class handles bulk loading of data for generic model objects. It checks for 
@@ -1305,7 +1308,7 @@ class RealmDataManager:
         if realm_category not in realm_categories.keys():
             raise Exception('Unknown realm_category={}'.format(realm_category))
             
-        return realm_categories[realm_category].value
+        return realm_categories[realm_category]
 
 
     '''
@@ -1332,7 +1335,7 @@ class RealmDataManager:
         if realm_population not in realm_populations.keys():
             raise Exception('Unknown realm_population={}'.format(realm_population))
             
-        return realm_populations[realm_population].value
+        return realm_populations[realm_population]
 
 
     '''
@@ -1353,7 +1356,7 @@ class RealmDataManager:
         if realm_status not in realm_statuses.keys():
             raise Exception('Unknown realm_status={}'.format(realm_status))
             
-        return realm_statuses[realm_status].value
+        return realm_statuses[realm_status]
     
  
     '''
@@ -1465,8 +1468,8 @@ class RealmDataManager:
                 region=Region.objects.get(region_id=rid_r['region']['id']),
                 name=rid_r['name'],
                 slug=rid_r['slug'],
-                realm_type=self._get_realm_type(rid_r['type']['type']),
-                realm_category=self._get_realm_category(rid_r['category']),
+                realm_type=self._get_realm_type(rid_r['type']['type']).value,
+                realm_category=self._get_realm_category(rid_r['category']).value,
                 timezone=rid_r['timezone'],
             )
             self._obj_loader.add(obj) 
@@ -1511,9 +1514,9 @@ class RealmDataManager:
             connected_realm_obj = ConnectedRealm(
                 connected_realm_id=connected_realm_id,
                 name='Connected Realm - {}'.format(connected_realm_id),
-                status=self._get_realm_status(rid_r['status']['type']),
+                status=self._get_realm_status(rid_r['status']['type']).value,
                 population=self._get_realm_population(
-                    rid_r['population']['type']),
+                    rid_r['population']['type']).value,
                 )
             self._obj_loader.add(connected_realm_obj, auto_commit=False) 
             
@@ -1536,3 +1539,184 @@ class RealmDataManager:
 
         # load any remaining objects
         self._obj_loader.commit_remaining([ConnectedRealm, RealmConnection])
+        
+        
+'''
+------------
+Auction Data
+------------
+'''
+
+
+'''
+This class manages data for the following models
+- AuctionHouse
+- Auction
+'''
+
+
+class AuctionDataManager:
+    
+    
+    '''
+    ===============
+    Class Variables
+    ===============
+    '''
+    
+    _bnet_api_util = None
+    _obj_loader = None
+    chunk_size = 100
+
+    
+    '''
+    =============
+    Class Methods
+    =============
+    '''
+    
+    
+    '''
+    DESC
+        Class constructor
+        
+    INPUT
+        
+    RETURN
+        Empty state object
+    '''    
+    def __init__(self):
+        self._bnet_api_util = BNetAPIUtil()
+        self._obj_loader = BulkObjectLoader(self.chunk_size)
+    
+        
+    '''
+    --------------
+    Helper Methods
+    --------------
+    '''    
+    
+    
+    '''
+    DESC
+         Get the Faction enum for the given input
+        
+    INPUT
+        Maybe a mappable faction ID
+        
+    RETURN
+        Faction enum
+    '''    
+    def _get_faction(self, faction_id) -> Faction:
+        factions = {
+            2: Faction.ALLIANCE,
+            6: Faction.HORDE,
+            7: Faction.BLACKWATER
+            }
+            
+        if faction_id not in factions.keys():
+            raise Exception('Unknown faction_id={}'.format(faction_id))
+            
+        return factions[faction_id]
+
+
+    '''
+    DESC
+         Get the AuctionHouseFaction enum for the given input
+        
+    INPUT
+        Maybe a mappable auction house faction ID
+        
+    RETURN
+        AuctionHouseFaction enum
+    '''    
+    def _get_auction_house_faction(self, faction_id) -> AuctionHouseFaction:
+        factions = {
+            2: AuctionHouseFaction.ALLIANCE,
+            6: AuctionHouseFaction.HORDE,
+            7: AuctionHouseFaction.BLACKWATER
+            }
+            
+        if faction_id not in factions.keys():
+            raise Exception('Unknown faction_id={}'.format(faction_id))
+            
+        return factions[faction_id]
+ 
+    
+    '''
+    DESC
+         Get the AuctionTimeLeft enum for the given input
+        
+    INPUT
+        Maybe a mappable auction time left value
+        
+    RETURN
+        AuctionTimeLeft enum
+    '''    
+    def _get_auction_time_left(self, time_left) -> AuctionTimeLeft:
+        auction_time_left = {
+            'SHORT': AuctionTimeLeft.SHORT,
+            'MEDIUM': AuctionTimeLeft.MEDIUM,
+            'LONG': AuctionTimeLeft.LONG,
+            'VERY_LONG': AuctionTimeLeft.VERY_LONG,
+            }
+            
+        if time_left not in auction_time_left.keys():
+            raise Exception('Unknown time_left={}'.format(time_left))
+            
+        return auction_time_left[time_left]
+
+
+    '''
+    --------------
+    Loader Methods
+    --------------
+    '''
+    
+    
+    '''
+    DESC
+        Loads the `auction_house` table
+        Mostly maps to the /connected-realm/{connectedRealmId}/auctions/index 
+        endpoint
+        
+    INPUT
+        - GameVersion of the Region to load
+        - COnnected Realm ID
+        
+    RETURN
+    '''    
+    def load_auction_house(self, game_version):
+        
+        # iterate through each connected realm
+        qs = RealmConnection.objects.select_related('realm', 'realm__region').filter(realm__region__game_version=game_version.value).values('connected_realm_id')
+        for connected_realm_id in [x['connected_realm_id'] for x in qs]:
+        
+            # call the /connected-realm/{connectedRealmId}/auctions/index endpoint
+            index_r = self._bnet_api_util.get_auction_house_index(game_version, 
+                connected_realm_id)
+            
+            if index_r is None:
+                raise Exception('Error: get_auction_house_index() in bnet_data_loader.load_auction_house()')
+            
+            # iterate through each auction house
+            for auction_house in index_r['auctions']:
+                
+                # get faction ID
+                faction_id = self._get_auction_house_faction(
+                    auction_house['id']).value
+                
+                # enqueue AuctionHouse object for loading 
+                obj = AuctionHouse(
+                    auction_house_id='{}_{}'.format(connected_realm_id, 
+                        faction_id),
+                    name=auction_house['name'],
+                    faction=self._get_faction(faction_id).value,
+                    faction_id=faction_id,
+                    connected_realm=ConnectedRealm.objects.get(
+                        connected_realm_id=connected_realm_id)
+                )
+                self._obj_loader.add(obj) 
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()

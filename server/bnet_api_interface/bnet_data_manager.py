@@ -1689,12 +1689,21 @@ class AuctionDataManager:
     def load_auction_house(self, game_version):
         
         # iterate through each connected realm
-        qs = RealmConnection.objects.select_related('realm', 'realm__region').filter(realm__region__game_version=game_version.value).values('connected_realm_id')
-        for connected_realm_id in [x['connected_realm_id'] for x in qs]:
+        connected_realms = ConnectedRealm.objects.extra(
+            tables=['realm_connection', 'realm', 'region'],
+            where=[
+                'connected_realm.connected_realm_id=realm_connection.connected_realm_id',
+                'realm_connection.realm_id=realm.realm_id',
+                'realm.region_id=region.region_id',
+                'region.game_version=%s'
+                ],
+            params=[game_version.value]
+            )
+        for connected_realm in connected_realms:
         
             # call the /connected-realm/{connectedRealmId}/auctions/index endpoint
             index_r = self._bnet_api_util.get_auction_house_index(game_version, 
-                connected_realm_id)
+                connected_realm.connected_realm_id)
             
             if index_r is None:
                 raise Exception('Error: get_auction_house_index() in bnet_data_loader.load_auction_house()')
@@ -1708,13 +1717,12 @@ class AuctionDataManager:
                 
                 # enqueue AuctionHouse object for loading 
                 obj = AuctionHouse(
-                    auction_house_id='{}_{}'.format(connected_realm_id, 
-                        faction_id),
+                    auction_house_id='{}_{}'.format(
+                        connected_realm.connected_realm_id, faction_id),
                     name=auction_house['name'],
                     faction=self._get_faction(faction_id).value,
                     faction_id=faction_id,
-                    connected_realm=ConnectedRealm.objects.get(
-                        connected_realm_id=connected_realm_id)
+                    connected_realm=connected_realm
                 )
                 self._obj_loader.add(obj) 
 

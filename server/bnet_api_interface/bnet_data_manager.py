@@ -63,13 +63,15 @@ class BulkObjectLoader:
         Bulk create the objects for a given model_class
         
     INPUT
-        Name of the model class to bulk create
+        - Name of the model class to bulk create
+        - [OPTIONAL] Whether to ignore insert conflicts
         
     RETURN
     '''
-    def _commit(self, model_class) -> None:
+    def _commit(self, model_class, ignore_conflicts=False) -> None:
         model_key = model_class._meta.label
-        model_class.objects.bulk_create(self._create_queues[model_key])
+        model_class.objects.bulk_create(
+            self._create_queues[model_key], ignore_conflicts=ignore_conflicts)
         print('{} model - created {} objects'.format(
             model_key, len(self._create_queues[model_key])))
         self._create_queues[model_key].clear()
@@ -84,10 +86,11 @@ class BulkObjectLoader:
         - [OPTIONAL] Auto-commit objects if chunk_size threshold is met
         - [OPTIONAL] Force add the object (eg. skip existence check as it will
           be performed before calling this function)
+        - [OPTIONAL] Whether to ignore insert conflicts
         
     RETURN
     '''
-    def add(self, obj, auto_commit=True, force_add=False) -> None:
+    def add(self, obj, auto_commit=True, force_add=False, ignore_conflicts=False) -> None:
         
         model_class = type(obj)
         model_key = model_class._meta.label
@@ -104,7 +107,7 @@ class BulkObjectLoader:
         # bulk create if threshold has been met and auto_commit enabled
         if (len(self._create_queues[model_key]) >= self.chunk_size
             and auto_commit):
-            self._commit(model_class)
+            self._commit(model_class, ignore_conflicts)
                 
                 
     '''
@@ -112,22 +115,23 @@ class BulkObjectLoader:
         Bulk create any remaining model objects
         
     INPUT
-        [OPTIONAL] List of model classes to commit in specified order
+        - [OPTIONAL] List of model classes to commit in specified order
+        - [OPTIONAL] Whether to ignore insert conflicts
         
     RETURN
     '''
-    def commit_remaining(self, ordered_model_classes=[]) -> None:  
+    def commit_remaining(self, ordered_model_classes=[], ignore_conflicts=False) -> None:  
         
         # commit objects in specified order
         if len(ordered_model_classes) > 0:
             for model_class in ordered_model_classes:
-                self._commit(model_class)
+                self._commit(model_class, ignore_conflicts)
             
         # commit objects in any order
         else:
             for model_name, objs in self._create_queues.items():
                 if len(objs) > 0:
-                    self._commit(apps.get_model(model_name))
+                    self._commit(apps.get_model(model_name), ignore_conflicts)
 
 
 '''
@@ -1570,7 +1574,7 @@ class AuctionDataManager:
     
     _bnet_api_util = None
     _obj_loader = None
-    chunk_size = 100
+    chunk_size = 1000
 
     
     '''
@@ -1762,8 +1766,11 @@ class AuctionDataManager:
         update_time = dt.datetime.now()
         update_date = update_time.date()
     
+        
         # get list of existing auction ids
-        auctions = Auction.objects.filter(update_date=update_date).values('auction_id')
+        earliest_auction_date = update_date - dt.timedelta(days=2)  # 48 hour auctions
+        auctions = Auction.objects.filter(
+            update_date__gte=earliest_auction_date).values('auction_id')
         existing_auction_ids = [x['auction_id'] for x in auctions]
     
         # iterate through each auction
@@ -1791,7 +1798,7 @@ class AuctionDataManager:
                         faction_id=auction_house_faction_id),
                     name='Auction - {}'.format(auction['id'])
                 )
-                self._obj_loader.add(obj, force_add=True) 
+                self._obj_loader.add(obj, force_add=True, ignore_conflicts=True) 
 
         # load any remaining objects
-        self._obj_loader.commit_remaining()
+        self._obj_loader.commit_remaining(ignore_conflicts=True)

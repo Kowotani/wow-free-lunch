@@ -1,19 +1,7 @@
-import {React, useState, useContext} from 'react';
+import {useState } from 'react';
 import {
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
   Box,
-  Button, 
-  ButtonGroup,
   Image,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Spacer,
 } from '@chakra-ui/react';
 import goldCoin from '../assets/gold_coin.png'
 import silverCoin from '../assets/silver_coin.png'
@@ -66,16 +54,14 @@ export const CurrencyBox = (props) => {
 // PriceBox component
 export const PriceBox = (props) => {
   
-  const [price, setPrice] = useState(props.price);
-  
-  const goldAmount = Math.floor(price / 10000);
-  const silverAmount = Math.floor((price / 100)) % 100;
-  const copperAmount = price % 100;
+  const goldAmount = Math.floor(props.price / 10000);
+  const silverAmount = Math.floor((props.price / 100)) % 100;
+  const copperAmount = props.price % 100;
   
   return (
     <Box display="flex" height="20px">
       {goldAmount > 0 && <CurrencyBox value={goldAmount} coin={Coin.GOLD} />}
-      {(price >= 100 || silverAmount > 0) && <CurrencyBox value={silverAmount} coin={Coin.SILVER} />}
+      {(props.price >= 100 || silverAmount > 0) && <CurrencyBox value={silverAmount} coin={Coin.SILVER} />}
       <CurrencyBox value={copperAmount} coin={Coin.COPPER} />
     </Box>
   )

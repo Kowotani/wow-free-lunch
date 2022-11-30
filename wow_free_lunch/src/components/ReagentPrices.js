@@ -36,6 +36,17 @@ import { Profession, ProfessionContext, ProfessionProvider } from '../state/Prof
 // Reagent Box
 // ===========
 
+// component for Reagent with price
+const ReagentPriceBox = (props) => {
+  
+  return (
+    <>
+      <p>Reagent PriceBox</p>
+    </>
+  )
+  
+}
+
 
 // ==============
 // Main Component
@@ -46,7 +57,7 @@ import { Profession, ProfessionContext, ProfessionProvider } from '../state/Prof
 export const ReagentPrices = () => {
   return (
     <ProfessionProvider>
-      <p>Reagent Prices</p>
+      <ReagentPriceBox />
     </ProfessionProvider>
   )
 };

@@ -13,6 +13,7 @@ import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { Header } from './components/Header'
 import { PriceBox } from './components/PriceBox'
+import { ReagentPrices } from './components/ReagentPrices'
 
 
 //  ========
@@ -26,6 +27,9 @@ function App() {
     <ChakraProvider theme={theme}>
         <Header />
         <PriceBox price={12345}/>
+        <Box>
+          <ReagentPrices />
+        </Box>
         <Box textAlign="center" fontSize="xl">
           <Grid minH="100vh" p={3}>
             <ColorModeSwitcher justifySelf="flex-end" />

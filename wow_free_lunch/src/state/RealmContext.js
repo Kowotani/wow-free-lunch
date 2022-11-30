@@ -1,9 +1,13 @@
 import { React, useState, createContext } from 'react';
 
+
+// create Context
 export const RealmContext = createContext({
   name: "Skyfury"
 });
 
+
+// create Provider
 export const RealmProvider = ({children}) => {
   
   const [realm, setRealm] = useState({  

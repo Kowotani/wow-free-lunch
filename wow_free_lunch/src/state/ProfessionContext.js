@@ -1,20 +1,36 @@
-// import { React, useState, createContext } from 'react';
+import { React, useState, createContext } from 'react';
 
-// export const RealmContext = createContext({
-//   name: "Skyfury"
-// });
 
-// export const RealmProvider = ({children}) => {
+// Profession enum
+export const Profession = {
+    ALCHEMY: 'Alchemy',
+    BLACKSMITHING: 'Blacksmithing',
+    COOKING: 'Cooking',
+    ENGINEERING: 'Engineering',
+    INSCRIPTION: 'Inscription',
+    JEWELCRAFTING: 'Jewelcrafting',
+    LEATHERWORKING: 'Leatherworking',
+    TAILORING: 'Tailoring'
+}
+
+// create Context
+export const ProfessionContext = createContext({
+  name: Profession.BLACKSMITHING
+});
+
+
+// create Provider
+export const ProfessionProvider = ({children}) => {
   
-//   const [realm, setRealm] = useState({  
-//     name: "Skyfury"
-//   });
+  const [profession, setProfession] = useState({  
+    name: Profession.BLACKSMITHING
+  });
   
-//   const value = {realm, setRealm};
+  const value = {profession, setProfession};
   
-//   return (
-//     <RealmContext.Provider value={value}>
-//       {children}
-//     </RealmContext.Provider>
-//   )
-// }
+  return (
+    <ProfessionContext.Provider value={value}>
+      {children}
+    </ProfessionContext.Provider>
+  )
+}

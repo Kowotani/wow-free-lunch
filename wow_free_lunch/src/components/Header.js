@@ -10,15 +10,13 @@ import {
   MenuItem,
   Spacer,
 } from '@chakra-ui/react';
-import { ChevronDownIcon } from '@chakra-ui/icons';
 
 import logo from '../assets/logo.png';
-import hordeIcon from '../assets/horde_icon.png';
-import allianceIcon from '../assets/alliance_icon.png';
 
 import { Nav, NavContext, NavProvider } from '../state/NavContext';
 import { RealmContext, RealmProvider } from '../state/RealmContext';
 import { Faction, FactionContext, FactionProvider } from '../state/FactionContext';
+import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
 
 
 // ===========
@@ -59,11 +57,12 @@ const NavButton = (props) => {
 }
 
 
-// =============
-// Realm Section
-// =============
+// ==============
+// Realm Selector
+// ==============
 
 
+// manager displaying the Realm Selector
 const RealmSelectorManager = () => {
   
   const { nav, setNav } = useContext(NavContext);
@@ -76,7 +75,7 @@ const RealmSelectorManager = () => {
 }
 
 
-// component for realm selector
+// component for Realm Selector
 const RealmSelector = () => {
   
   const { realm, setRealm } = useContext(RealmContext);
@@ -110,6 +109,58 @@ const RealmSelector = () => {
 
 
 // ==============
+// Profession Bar
+// ==============
+
+
+// component for Profession buttons in Profession Bar
+const ProfessionButton = (props) => {
+  
+  const { profession, setProfession } = useContext(ProfessionContext);
+  
+  const variant = (profession.name === props.profession ? "solid" : "ghost");
+
+  return (
+      <Button 
+        variant={variant}
+        onClick={() => {setProfession({name: props.profession})}}
+      >
+        {props.name}
+      </Button>
+  )
+}
+
+// component for Profession Bar
+// TODO: change this to a map function
+const ProfessionBar = () => {
+  return (
+    <Box display="flex" width="100%" bg="gray.200" alignItems="center" >
+      <ButtonGroup width="100%" colorScheme="blue" size='sm' p={2} spacing={2} justifyContent="center" flexWrap="wrap">
+        <ProfessionButton name="Alchemy" profession={Profession.ALCHEMY}/>
+        <ProfessionButton name="Blacksmithing" profession={Profession.BLACKSMITHING}/>
+        <ProfessionButton name="Cooking" profession={Profession.COOKING}/>
+        <ProfessionButton name="Engineering" profession={Profession.Engineering}/>
+        <ProfessionButton name="Inscription" profession={Profession.INSCRIPTION}/>
+        <ProfessionButton name="Leatherworking" profession={Profession.LEATHERWORKING}/>
+        <ProfessionButton name="Tailoring" profession={Profession.TAILORING}/>
+      </ButtonGroup>
+    </Box>
+  )
+}
+
+// manager displaying the Realm Selector
+const ProfessionBarManager = () => {
+  
+  const { nav } = useContext(NavContext);
+  
+  return (
+    <>
+      {nav.display_profession && <ProfessionBar />}
+    </>
+  )
+}
+
+// ==============
 // Main Component
 // ==============
 
@@ -120,16 +171,19 @@ export const Header = () => {
     <NavProvider>
       <RealmProvider>
         <FactionProvider>
-          <Box display="flex" bg="gray.300">
-            <Box display="flex" alignItems="flex-end">
-              <Image src={logo} h="100"/>
-              <NavButtons />
+          <ProfessionProvider>
+            <Box display="flex" bg="gray.300">
+              <Box display="flex" alignItems="flex-end">
+                <Image src={logo} h="100"/>
+                <NavButtons />
+              </Box>
+              <Spacer />
+              <Box display="flex" alignItems="flex-end" justifyContent="flex-end">
+                <RealmSelectorManager />
+              </Box>
             </Box>
-            <Spacer />
-            <Box display="flex" alignItems="flex-end" justify="flex-end" fontSize="xl">
-              <RealmSelectorManager />
-            </Box>
-          </Box>
+            <ProfessionBarManager />
+          </ProfessionProvider>
         </FactionProvider>
       </RealmProvider>
     </NavProvider>

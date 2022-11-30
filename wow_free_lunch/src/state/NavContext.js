@@ -23,8 +23,11 @@ export const navs = {
 export const NavContext = createContext(navs.home);
 
 export const NavProvider = ({children}) => {
+  
   const [nav, setNav] = useState(navs.home);
+  
   const value = {nav, setNav};
+  
   return (
     <NavContext.Provider value={value}>
       {children}

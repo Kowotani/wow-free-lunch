@@ -16,9 +16,9 @@ import logo from '../assets/logo.png';
 import hordeIcon from '../assets/horde_icon.png';
 import allianceIcon from '../assets/alliance_icon.png';
 
-import { navs, NavContext, NavProvider } from '../state/NavContext';
+import { Nav, NavContext, NavProvider } from '../state/NavContext';
 import { RealmContext, RealmProvider } from '../state/RealmContext';
-import { FactionContext, FactionProvider } from '../state/FactionContext';
+import { Faction, FactionContext, FactionProvider } from '../state/FactionContext';
 
 
 // ===========
@@ -31,9 +31,9 @@ import { FactionContext, FactionProvider } from '../state/FactionContext';
 const NavButtons = () => {
   return (
     <ButtonGroup colorScheme="teal" spacing="2">
-      <NavButton name="Home" navkey={navs.home}/>
-      <NavButton name="Profession" navkey={navs.profession}/>
-      <NavButton name="About" navkey={navs.about}/>
+      <NavButton name="Home" navkey={Nav.HOME}/>
+      <NavButton name="Profession" navkey={Nav.PROFESSION}/>
+      <NavButton name="About" navkey={Nav.ABOUT}/>
     </ButtonGroup>
   )
 }
@@ -70,7 +70,7 @@ const RealmSelectorManager = () => {
   
   return (
     <>
-      {(nav === navs.home || nav === navs.profession) && <RealmSelector />}
+      {nav.display_realm && <RealmSelector />}
     </>
   )
 }
@@ -82,7 +82,7 @@ const RealmSelector = () => {
   const { realm, setRealm } = useContext(RealmContext);
   const { faction, setFaction } = useContext(FactionContext);
   
-  const factionColorScheme = (faction.name === "Horde" ? "red" : "blue");
+  const factionColorScheme = (faction.name === Faction.HORDE ? "red" : "blue");
   
   return (
     <>
@@ -100,8 +100,8 @@ const RealmSelector = () => {
           {faction.name}
         </MenuButton>
         <MenuList>
-          <MenuItem onClick={() => {setFaction({name: "Alliance"})}}>Alliance</MenuItem>
-          <MenuItem onClick={() => {setFaction({name: "Horde"})}}>Horde</MenuItem>
+          <MenuItem onClick={() => {setFaction({name: Faction.ALLIANCE})}}>Alliance</MenuItem>
+          <MenuItem onClick={() => {setFaction({name: Faction.HORDE})}}>Horde</MenuItem>
         </MenuList>
       </Menu>
     </>

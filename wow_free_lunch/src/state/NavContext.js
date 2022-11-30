@@ -1,18 +1,18 @@
 import { React, useState, createContext } from 'react';
 
-// metadata for navigation tabs
-export const navs = {
-    home: {
+// Navs enums for navigation metadata
+export const Nav = {
+    HOME: {
       order: 1,
       name: 'Home',
       display_realm: true
     },
-    profession: {
+    PROFESSION: {
       order: 2, 
       name: 'Profession',
       display_realm: true
     },
-    about: {
+    ABOUT: {
       order: 3,
       name: 'About',
       display_realm: false
@@ -20,11 +20,11 @@ export const navs = {
 };
 
 
-export const NavContext = createContext(navs.home);
+export const NavContext = createContext(Nav.HOME);
 
 export const NavProvider = ({children}) => {
   
-  const [nav, setNav] = useState(navs.home);
+  const [nav, setNav] = useState(Nav.HOME);
   
   const value = {nav, setNav};
   

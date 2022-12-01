@@ -39,8 +39,8 @@ export const CurrencyBox = (props) => {
   
   return (
     <Box display="flex" height="20px" alignItems="center">
-      <Box p={1}>{props.value}</Box>
-      <Image src={coin} p={1}/>
+      <Box padding="0px 4px">{props.value}</Box>
+      <Image src={coin} />
     </Box>
   )
 }

@@ -26,7 +26,6 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
         <Header />
-        <PriceBox price={12345}/>
         <Box>
           <ReagentPrices />
         </Box>

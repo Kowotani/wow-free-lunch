@@ -14,12 +14,15 @@ import {
   MenuList,
   MenuItem,
   Spacer,
+  VStack
 } from '@chakra-ui/react';
 
 import { Nav, NavContext, NavProvider } from '../state/NavContext';
 import { RealmContext, RealmProvider } from '../state/RealmContext';
 import { Faction, FactionContext, FactionProvider } from '../state/FactionContext';
 import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
+import silk from '../assets/silk.png'
+import { PriceBox } from './PriceBox'
 
 
 // =======
@@ -40,9 +43,23 @@ import { Profession, ProfessionContext, ProfessionProvider } from '../state/Prof
 const ReagentPriceBox = (props) => {
   
   return (
-    <>
-      <p>Reagent PriceBox</p>
-    </>
+    <Box display="flex" height="60px" width="225px" bg="green.200">
+      <Box display="flex" width="60px" alignItems="center" justifyContent="center">
+        <Image src={silk} height="48px" width="48px" border="4px solid white"/>
+      </Box>
+      <Box display="flex" width="165px">
+        <VStack>
+          <Box display="flex" width="100%" alignItems="flex-end" fontWeight="semibold" padding="4px 4px 0px 4px">
+            {props.name}
+          </Box>
+          <Box display="flex" width="100%" justifyContent="flex-end">
+            <Box p="0px 4px 4px 0px">
+              <PriceBox price={props.price}/>
+            </Box>
+          </Box>
+        </VStack>
+      </Box>
+    </Box>
   )
   
 }
@@ -57,7 +74,7 @@ const ReagentPriceBox = (props) => {
 export const ReagentPrices = () => {
   return (
     <ProfessionProvider>
-      <ReagentPriceBox />
+      <ReagentPriceBox name="Silk Cloth" price={123456789}/>
     </ProfessionProvider>
   )
 };

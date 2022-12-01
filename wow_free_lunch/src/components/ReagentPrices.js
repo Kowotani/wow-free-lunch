@@ -74,7 +74,7 @@ const ReagentPriceBox = (props) => {
 export const ReagentPrices = () => {
   return (
     <ProfessionProvider>
-      <ReagentPriceBox name="Silk Cloth" price={123456789}/>
+      <ReagentPriceBox name="Silk Cloth" price={1234567}/>
     </ProfessionProvider>
   )
 };

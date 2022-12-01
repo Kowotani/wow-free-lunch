@@ -18,6 +18,7 @@ import { RealmContext, RealmProvider } from '../state/RealmContext';
 import { Faction, FactionContext, FactionProvider } from '../state/FactionContext';
 import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
 
+import axios from 'axios';
 
 // ===========
 // Nav Section
@@ -159,6 +160,7 @@ const ProfessionBarManager = () => {
     </>
   )
 }
+
 
 // ==============
 // Main Component

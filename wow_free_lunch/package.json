@@ -2,7 +2,7 @@
   "name": "wow_free_lunch",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://localhost:3000",
+  "proxy": "https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com:8081",
   "dependencies": {
     "@chakra-ui/react": "^2.4.2",
     "@emotion/react": "^11.10.5",

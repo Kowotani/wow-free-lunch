@@ -1,4 +1,4 @@
-import {React, useState, useContext} from 'react';
+import { useContext} from 'react';
 import {
   Box,
   Button, 
@@ -19,6 +19,7 @@ import { Faction, FactionContext, FactionProvider } from '../state/FactionContex
 import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
 
 import axios from 'axios';
+
 
 // ===========
 // Nav Section
@@ -66,7 +67,7 @@ const NavButton = (props) => {
 // manager displaying the Realm Selector
 const RealmSelectorManager = () => {
   
-  const { nav, setNav } = useContext(NavContext);
+  const { nav } = useContext(NavContext);
   
   return (
     <>
@@ -161,6 +162,19 @@ const ProfessionBarManager = () => {
   )
 }
 
+const Test = () => {
+  
+  const url = '/profession/all'
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => console.log(data));
+    
+  return (
+    <Box>Here is the data: </Box>
+    )
+}
+
 
 // ==============
 // Main Component
@@ -185,6 +199,7 @@ export const Header = () => {
               </Box>
             </Box>
             <ProfessionBarManager />
+            <Test />
           </ProfessionProvider>
         </FactionProvider>
       </RealmProvider>

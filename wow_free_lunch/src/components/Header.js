@@ -18,8 +18,6 @@ import { RealmContext, RealmProvider } from '../state/RealmContext';
 import { Faction, FactionContext, FactionProvider } from '../state/FactionContext';
 import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
 
-import axios from 'axios';
-
 
 // ===========
 // Nav Section
@@ -164,9 +162,15 @@ const ProfessionBarManager = () => {
 
 const Test = () => {
   
-  const url = '/profession/all'
+  const url = '/profession/all';
+  
+  const config = {
+    headers: {
+      'Accept': 'application/json'
+    }
+  };
 
-  fetch(url)
+  fetch(url, config)
     .then(response => response.json())
     .then(data => console.log(data));
     

@@ -141,6 +141,7 @@ const ProfessionBar = () => {
         <ProfessionButton name="Cooking" profession={Profession.COOKING}/>
         <ProfessionButton name="Engineering" profession={Profession.Engineering}/>
         <ProfessionButton name="Inscription" profession={Profession.INSCRIPTION}/>
+        <ProfessionButton name="Jewelcrafting" profession={Profession.JEWELCRAFTING}/>
         <ProfessionButton name="Leatherworking" profession={Profession.LEATHERWORKING}/>
         <ProfessionButton name="Tailoring" profession={Profession.TAILORING}/>
       </ButtonGroup>
@@ -187,6 +188,26 @@ const ProfessionBarManager = () => {
 // ==============
 
 
+// Header content
+const HeaderContent = () => {
+  return (
+    <>
+      <Box display="flex" bg="gray.300">
+        <Box display="flex" alignItems="flex-end">
+          <Image src={logo} h="100"/>
+          <NavButtons />
+        </Box>
+        <Spacer />
+        <Box display="flex" alignItems="flex-end" justifyContent="flex-end">
+          <RealmSelectorManager />
+        </Box>
+      </Box>    
+      <ProfessionBarManager />
+    </>
+  )
+}
+
+
 // Header component
 export const Header = () => {
   return (
@@ -194,17 +215,7 @@ export const Header = () => {
       <RealmProvider>
         <FactionProvider>
           <ProfessionProvider>
-            <Box display="flex" bg="gray.300">
-              <Box display="flex" alignItems="flex-end">
-                <Image src={logo} h="100"/>
-                <NavButtons />
-              </Box>
-              <Spacer />
-              <Box display="flex" alignItems="flex-end" justifyContent="flex-end">
-                <RealmSelectorManager />
-              </Box>
-            </Box>
-            <ProfessionBarManager />
+            <HeaderContent />
           </ProfessionProvider>
         </FactionProvider>
       </RealmProvider>

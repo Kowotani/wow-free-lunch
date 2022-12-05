@@ -6,12 +6,19 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  HStack,
   Image,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Radio,
+  RadioGroup,
   Spacer,
-  VStack
 } from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons'
 
 import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
+import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
 import { PriceBox } from './PriceBox'
 
 
@@ -23,6 +30,28 @@ function GenRandomInt(min, max) {
 // =======
 // Filters 
 // =======
+
+// component for Reagent Price Box filters
+const ReagentFilters = () => {
+  
+  const { priceType, setPriceType } = useContext(PriceTypeContext);
+  
+  return (
+    <Box display='flex' alignItems='center'>
+      <Box fontWeight='semibold' p='8px'>Price Type </Box>
+      <RadioGroup onChange={setPriceType} value={priceType} defaultValue={PriceType.VWAP} p='8px'>
+        <HStack>
+          <Radio value={PriceType.VWAP}>VWAP</Radio>
+          <Radio value={PriceType.MIN}>Min</Radio>
+        </HStack>
+      </RadioGroup>
+      <Spacer />
+      <InputGroup width='200px' p='8px'>
+        <Input type='search' placeholder='Reagent name' />
+      </InputGroup>
+    </Box>
+  )
+}
 
 
 // ====================
@@ -132,12 +161,38 @@ const ReagentPriceBox = (props) => {
 // Main Component
 // ==============
 
+// Reagent Prices content
+const ReagentPricesContent = () => {
+  
+  return (
+    <>
+      <Box display='block' p='10px 0px 10px 0px'>
+        <Accordion allowMultiple>
+          <AccordionItem>
+            <AccordionButton bg='purple.200' _expanded={{ bg: 'purple.100', color: 'gray.400' }}>
+              <Box flex='1' textAlign='left'>
+                Reagent Prices
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
+              <ReagentFilters />
+              <ItemClassAccordion name='Item Class 1'/>
+            </AccordionPanel>          
+          </AccordionItem>
+        </Accordion>
+      </Box>
+    </>
+  )
+  
+}
 
-// Header component
+
+// Reagent Prices component
 export const ReagentPrices = () => {
   return (
     <ProfessionProvider>
-      <ItemClassAccordion name='Item Class 1'/>
+      <ReagentPricesContent />
     </ProfessionProvider>
   )
 };

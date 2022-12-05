@@ -31,7 +31,7 @@ export const NavContext = createContext(Nav.PROFESSION);
 // create Provider
 export const NavProvider = ({children}) => {
   
-  const [nav, setNav] = useState(Nav.HOME);
+  const [nav, setNav] = useState(Nav.PROFESSION);
   
   const value = {nav, setNav};
   

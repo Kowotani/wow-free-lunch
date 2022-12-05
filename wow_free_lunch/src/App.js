@@ -12,7 +12,6 @@ import {
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { Header } from './components/Header'
-import { PriceBox } from './components/PriceBox'
 import { ReagentPrices } from './components/ReagentPrices'
 
 

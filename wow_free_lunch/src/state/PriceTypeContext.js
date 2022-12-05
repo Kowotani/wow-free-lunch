@@ -20,7 +20,7 @@ export const PriceTypeProvider = ({children}) => {
   const [priceType, setPriceType] = useState({  
     type: PriceType.VWAP
   });
-setPriceType
+
   const value = {priceType, setPriceType};
   
   return (

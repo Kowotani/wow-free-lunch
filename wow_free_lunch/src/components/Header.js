@@ -1,4 +1,4 @@
-import { useContext} from 'react';
+import { useContext, useEffect } from 'react';
 import {
   Box,
   Button, 
@@ -170,9 +170,11 @@ const Test = () => {
     }
   };
 
-  fetch(url, config)
-    .then(response => response.json())
-    .then(data => console.log(data));
+  useEffect(() => {
+    fetch(url, config)
+      .then(response => response.json())
+      .then(data => console.log(data));
+  });
     
   return (
     <Box>Here is the data: </Box>

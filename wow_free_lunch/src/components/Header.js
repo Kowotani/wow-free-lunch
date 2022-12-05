@@ -160,26 +160,26 @@ const ProfessionBarManager = () => {
   )
 }
 
-const Test = () => {
+// const Test = () => {
   
-  const url = '/profession/all';
+//   const url = '/profession/all';
   
-  const config = {
-    headers: {
-      'Accept': 'application/json'
-    }
-  };
+//   const config = {
+//     headers: {
+//       'Accept': 'application/json'
+//     }
+//   };
 
-  useEffect(() => {
-    fetch(url, config)
-      .then(response => response.json())
-      .then(data => console.log(data));
-  });
+//   useEffect(() => {
+//     fetch(url, config)
+//       .then(response => response.json())
+//       .then(data => console.log(data));
+//   });
     
-  return (
-    <Box>Here is the data: </Box>
-    )
-}
+//   return (
+//     <Box>Here is the data: </Box>
+//     )
+// }
 
 
 // ==============
@@ -205,7 +205,6 @@ export const Header = () => {
               </Box>
             </Box>
             <ProfessionBarManager />
-            <Test />
           </ProfessionProvider>
         </FactionProvider>
       </RealmProvider>

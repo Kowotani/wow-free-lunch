@@ -1,4 +1,4 @@
-import { React, useState, createContext } from 'react';
+import { useState, createContext } from 'react';
 
 
 // Nav enum for navigation metadata
@@ -25,7 +25,7 @@ export const Nav = {
 
 
 // create Context
-export const NavContext = createContext(Nav.HOME);
+export const NavContext = createContext(Nav.PROFESSION);
 
 
 // create Provider

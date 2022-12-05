@@ -1,9 +1,8 @@
-import { React, useState, createContext } from 'react';
-
+import { useState, createContext } from 'react';
 
 // create Context
 export const RealmContext = createContext({
-  name: "Skyfury"
+  name: 'Skyfury'
 });
 
 
@@ -11,7 +10,7 @@ export const RealmContext = createContext({
 export const RealmProvider = ({children}) => {
   
   const [realm, setRealm] = useState({  
-    name: "Skyfury"
+    name: 'Skyfury'
   });
   
   const value = {realm, setRealm};

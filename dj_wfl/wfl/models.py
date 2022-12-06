@@ -326,6 +326,7 @@ class ItemData(CommonData, MediaData):
     level = models.SmallIntegerField('item level', default=0)
     required_level = models.SmallIntegerField('required player level', default=0)
     quality = models.CharField('quality level', max_length=256, choices=ItemQuality.choices(), default=ItemQuality.COMMON)
+    is_vendor_item = models.BooleanField('TRUE if this item is sold by vendors', default=False)
 
 
     class Meta:

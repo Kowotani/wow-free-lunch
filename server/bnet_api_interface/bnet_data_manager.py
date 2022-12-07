@@ -435,6 +435,83 @@ class ItemDataManager:
     _obj_loader = None
     chunk_size = 100
     
+    # vendor items used in crafting recipes, keyed by item_id
+    vendor_items = {
+        159: 'Refreshing Spring Water',
+        2320: 'Coarse Thread',
+        2321: 'Fine Thread',
+        2324: 'Bleach',
+        2325: 'Black Dye',
+        2604: 'Red Dye',
+        2605: 'Green Dye',
+        2678: 'Mild Spices',
+        2880: 'Weak Flux',
+        2901: 'Mining Pick',
+        3371: 'Empty Vial',
+        3372: 'Leaded Vial',
+        3466: 'Strong Flux',
+        3857: 'Coal',
+        4289: 'Salt',
+        4291: 'Silken Thread',
+        4340: 'Gray Dye',
+        4341: 'Yellow Dye',
+        4342: 'Purple Dye',
+        4357: 'Rough Blasting Powder',
+        4361: 'Copper Tube',
+        4363: 'Copper Modulator',
+        4364: 'Coarse Blasting Powder',
+        4371: 'Bronze Tube',
+        4382: 'Bronze Framework',
+        4389: 'Gyrochronatom',
+        4399: 'Wooden Stock',
+        4400: 'Heavy Stock',
+        4404: 'Silver Contact',
+        4470: 'Simple Wood',
+        5565: 'Infernal Stone',
+        6217: 'Copper Rod',
+        6260: 'Blue Dye',
+        6261: 'Orange Dye',
+        8343: 'Heavy Silken Thread',
+        8925: 'Crystal Vial',
+        10290: 'Pink Dye',
+        10647: "Engineer's Ink",
+        10648: 'Common Parchment',
+        11291: 'Star Wood',
+        14341: 'Rune Thread',
+        16583: 'Demonic Figurine',
+        17020: 'Arcane Powder',
+        17021: 'Wild Berries',
+        17026: 'Wild Thornroot',
+        17028: 'Holy Candle',
+        17029: 'Sacred Candle',
+        17030: 'Ankh',
+        17031: 'Rune of Teleportation',
+        17032: 'Rune of Portals',
+        17033: 'Symbol of Divinity',
+        17037: 'Hornbeam Seed',
+        17038: 'Ironwood Seed',
+        18256: 'Imbued Vial',
+        18567: 'Elemental Flux',
+        20815: "Jeweler's Kit",
+        20824: 'Simple Grinder',
+        21177: 'Symbol of Kings',
+        22147: 'Flintweed Seed',
+        22148: 'Wild Quillvine',
+        30817: 'Simple Flour',
+        37201: 'Corpse Dust',
+        38426: 'Eternium Thread',
+        39354: 'Light Parchment',
+        39501: 'Heavy Parchment',
+        39502: 'Resilient Parchment',
+        39505: 'Virtuoso Inking Set',
+        39684: 'Hair Trigger',
+        40411: 'Enchanted Vial',
+        40533: 'Walnut Stock',
+        43007: 'Northern Spices',
+        44605: 'Wild Spineleaf',
+        44614: 'Starleaf Seed',
+        44615: 'Devout Candle',
+    }
     
     '''
     =============
@@ -718,6 +795,33 @@ class ItemDataManager:
             # load any remaining objects
             self._obj_loader.commit_remaining([ItemData, Item])
             
+
+    '''
+    DESC
+        Updates the is_vendor_item metadata in the `item_data` table
+        
+    INPUT
+        
+    RETURN
+    '''    
+    def update_is_vendor_item_for_item_data(self):
+        
+        # get item_data objects for item_ids in vendor_items dict
+        item_datas = ItemData.objects.extra(
+          	tables=['item'],
+          	where=[
+          	  'item_data.item_data_id=item.classic_item_data_id OR item_data.item_data_id=item.retail_item_data_id',
+          	  'item.item_id IN %s'
+          	],
+          	params=[list(self.vendor_items.keys())]
+          )
+        
+        # iterate through each item_data
+        for item_data in item_datas:
+            item_data.is_vendor_item = True
+
+        ItemData.objects.bulk_update(item_datas, ['is_vendor_item'])
+        print('Updated item_datas to set is_vendor_item = True for vendor items')
 
 '''
 ===========

@@ -1,5 +1,7 @@
 from django.urls import path
 from wfl.views import (
+    
+    # Metadata
     AuctionCreate, AuctionList, AuctionDetail,    
     
     AuctionHouseCreate, AuctionHouseList, AuctionHouseDetail,
@@ -32,6 +34,9 @@ from wfl.views import (
     RegionCreate, RegionList, RegionDetail,
 
     StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail,
+    
+    # FE API Endpoints
+    ReagentPrices,
     )
 
 urlpatterns = [
@@ -130,4 +135,11 @@ urlpatterns = [
     path('auction_house/create', AuctionHouseCreate.as_view()),
     path('auction_house/all', AuctionHouseList.as_view()),
     path('auction_house/<pk>', AuctionHouseDetail.as_view()),
+    
+    
+    # ================
+    # FE API Endpoints
+    # ================
+    
+    path('api/reagent_prices', ReagentPrices.as_view()),
 ]

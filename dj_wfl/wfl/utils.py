@@ -1,4 +1,40 @@
+from django.db import connection
 from enum import Enum
+
+'''
+This class manages custom SQL queries to the database
+'''
+class QueryManager:
+    
+    
+    '''
+    DESC
+        Returns the queryset from the input SQL with the given params 
+        
+    INPUT
+        - SQL query to execute
+        - [OPTIONAL] params for the SQL query
+        
+    RETURN
+        List of dicts where each dict is a row of the queryset
+    '''   
+    def query(self, sql, params=[]):
+        
+        # establish connection
+        with connection.cursor() as cursor:
+            
+            # execute query
+            if len(params) > 0:
+                cursor.execute(sql, params)
+            else:
+                cursor.execute(sql)
+            
+            # get column names
+            columns = [col[0] for col in cursor.description]
+            
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
+        raise Exception('Error in query: {} with params: {}'.format(sql, params))
 
 
 '''

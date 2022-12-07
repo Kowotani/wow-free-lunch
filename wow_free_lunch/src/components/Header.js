@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import {
   Box,
   Button, 
@@ -160,27 +160,6 @@ const ProfessionBarManager = () => {
     </>
   )
 }
-
-// const Test = () => {
-  
-//   const url = '/profession/all';
-  
-//   const config = {
-//     headers: {
-//       'Accept': 'application/json'
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetch(url, config)
-//       .then(response => response.json())
-//       .then(data => console.log(data));
-//   });
-    
-//   return (
-//     <Box>Here is the data: </Box>
-//     )
-// }
 
 
 // ==============

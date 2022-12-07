@@ -151,7 +151,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Silence the following error:
 # MySQL may not allow unique CharFields to have a max_length > 255
-SILENCED_SYSTEM_CHECKS = ['mysql.E001']
+SILENCED_SYSTEM_CHECKS = ['mysql.E001', 'mysql.W003']
 
 # LOGGING = {
 #     'version': 1,

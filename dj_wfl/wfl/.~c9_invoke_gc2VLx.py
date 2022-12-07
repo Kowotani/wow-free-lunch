@@ -624,7 +624,7 @@ class ReagentPrices(View) :
         qm = QueryManager()
         
         # parse inputs
-        data = json.loads(request.body)
+        data = request.POST
         profession = data.get('profession')
         realm = data.get('realm')
         faction = data.get('faction')
@@ -633,7 +633,7 @@ class ReagentPrices(View) :
         # get latest update_data if required
         if date == 'latest':
             sql = '''
-				SELECT MAX(update_date) AS update_date
+				SELECT MAX(update_date) AS update_data
 				FROM auction a
 				JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
 				JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
@@ -644,7 +644,7 @@ class ReagentPrices(View) :
             '''
             params = [realm, faction]
             res = qm.query(sql, params)
-            date = res[0]['update_date'].strftime('%Y-%m-%d')
+            date = res[0]['update_date']
         
         # query data
         sql = '''
@@ -656,9 +656,9 @@ class ReagentPrices(View) :
             	id.level,
             	id.quality,
             	id.media_url,
-            	CAST(ap.quantity  AS UNSIGNED) AS quantity,
-            	CAST(IF(id.is_vendor_item, id.purchase_price, ap.min_price)  AS UNSIGNED) AS min_price,
-            	CAST(IF(id.is_vendor_item, id.purchase_price, ap.vwap_price) AS UNSIGNED) AS vwap_price
+            	ap.quantity,
+            	IF(id.is_vendor_item, id.purchase_price, ap.min_price) AS min_price,
+            	IF(id.is_vendor_item, id.purchase_price, ap.vwap_price) AS vwap_price
             FROM profession p
             JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             JOIN expansion e ON pst.expansion_id = e.expansion_id
@@ -671,9 +671,9 @@ class ReagentPrices(View) :
             (
             	SELECT 
             		a.item_id,
-            		SUM(COALESCE(a.quantity, 0)) AS quantity,
-            		MIN(COALESCE(CASE WHEN a.buyout_unit_price > 0 THEN a.buyout_unit_price END, 0)) AS min_price,
-            		CEIL(COALESCE(SUM(a.buyout_unit_price * a.quantity) / SUM(a.quantity), 0)) AS vwap_price
+            		SUM(a.quantity) AS quantity,
+            		MIN(CASE WHEN a.buyout_unit_price > 0 THEN a.buyout_unit_price END) AS min_price,
+            		CEIL(SUM(a.buyout_unit_price * a.quantity) / SUM(a.quantity)) AS vwap_price
             	FROM auction a 
             	JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
             	JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
@@ -696,23 +696,8 @@ class ReagentPrices(View) :
         '''
         params = [realm, faction, date, profession]
         res = qm.query(sql, params)
-
-        # format data
-        d = {}
-        for k in {(x['class_name']) for x in res}:
-            d[k] = {}
-        for t in {(x['class_name'], x['subclass_name']) for x in res}:
-            d[t[0]][t[1]] = {}
-        for r in res:
-            d[r['class_name']][r['subclass_name']][r['name']] = {
-                'item_id': r['item_id'],
-                'level': r['level'],
-                'quality': r['quality'],
-                'media_url': r['media_url'],
-                'quantity': r['quantity'],
-                'min_price': r['min_price'],
-                'vwap_price': r['vwap_price'],
-            }
-
+        
         # return data
-        return HttpResponse(json.dumps(d), content_type='application/json')
+        
+        return HttpResponse(json.dumps(res), 
+            content_type='application/json')

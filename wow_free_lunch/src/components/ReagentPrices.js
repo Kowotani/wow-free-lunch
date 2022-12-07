@@ -1,4 +1,4 @@
-import {React, useState, useContext} from 'react';
+import { useContext, useEffect, useState} from 'react';
 import {
   Accordion,
   AccordionItem,
@@ -10,12 +10,14 @@ import {
   Image,
   Input,
   InputGroup,
-  InputLeftElement,
+  // InputLeftElement,
   Radio,
   RadioGroup,
   Spacer,
 } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons'
+// import { SearchIcon } from '@chakra-ui/icons'
+
+import Cookies from 'js-cookie'
 
 import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
 import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
@@ -192,7 +194,39 @@ const ReagentPricesContent = () => {
 export const ReagentPrices = () => {
   return (
     <ProfessionProvider>
+      <Test />
       <ReagentPricesContent />
     </ProfessionProvider>
   )
 };
+
+
+const Test = () => {
+  
+  const url = '/api/reagent_prices';
+  
+  const config = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': Cookies.get('csrftoken'),
+    },
+    body: JSON.stringify({
+      profession: 'Tailoring',
+      realm: 'Skyfury',
+      faction: 'Horde',
+      date: 'latest'
+    })
+  };
+
+  useEffect(() => {
+    fetch(url, config)
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch(err => console.log(err));
+  });
+    
+  return (
+    <Box bg='tomato'>Here is the data: </Box>
+    )
+}

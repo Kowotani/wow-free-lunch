@@ -13,10 +13,10 @@ import {
 
 import logo from '../assets/logo.png';
 
-import { Nav, NavContext, NavProvider } from '../state/NavContext';
-import { RealmContext, RealmProvider } from '../state/RealmContext';
 import { Faction, FactionContext, FactionProvider } from '../state/FactionContext';
+import { Nav, NavContext, NavProvider } from '../state/NavContext';
 import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
+import { RealmContext, RealmProvider } from '../state/RealmContext';
 
 
 // ===========
@@ -190,14 +190,14 @@ const HeaderContent = () => {
 // Header component
 export const Header = () => {
   return (
-    <NavProvider>
-      <RealmProvider>
-        <FactionProvider>
-          <ProfessionProvider>
+    <FactionProvider>
+      <NavProvider>
+        <ProfessionProvider>
+          <RealmProvider>
             <HeaderContent />
-          </ProfessionProvider>
-        </FactionProvider>
-      </RealmProvider>
-    </NavProvider>
+          </RealmProvider>
+        </ProfessionProvider>
+      </NavProvider>
+    </FactionProvider>
   )
 };

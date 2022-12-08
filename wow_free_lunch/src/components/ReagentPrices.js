@@ -19,8 +19,12 @@ import {
 
 import Cookies from 'js-cookie'
 
-import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
+import { FactionContext, FactionProvider } from '../state/FactionContext';
 import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
+import { ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
+import { ReagentPricesContext, ReagentPricesProvider } from '../state/ReagentPricesContext';
+import { RealmContext, RealmProvider } from '../state/RealmContext';
+
 import { PriceBox } from './PriceBox'
 
 
@@ -63,7 +67,7 @@ const ReagentFilters = () => {
 // component for Item Class accordion
 const ItemClassAccordion = (props) => {
   
-  const [itemSubclasses, setItemSubClasses] = useState();
+  // const [itemSubclasses, setItemSubClasses] = useState();
   
   return (
     <Accordion allowMultiple>
@@ -93,7 +97,7 @@ const ItemClassAccordion = (props) => {
 // component for Item Subclass accordion
 const ItemSubclassAccordion = (props) => {
   
-  const [reagents, setReagents] = useState();
+  // const [reagents, setReagents] = useState();
   
   return (
     <Accordion allowMultiple>
@@ -166,6 +170,43 @@ const ReagentPriceBox = (props) => {
 // Reagent Prices content
 const ReagentPricesContent = () => {
   
+  const { faction } = useContext(FactionContext);
+  const { profession } = useContext(ProfessionContext);
+  const { reagentPrices, setReagentPrices } = useContext(ReagentPricesContext);
+  const { realm } = useContext(RealmContext);
+  
+  useEffect(() => {
+    
+    async function fetchData() {
+      
+      const url = '/api/reagent_prices';
+  
+      const config = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': Cookies.get('csrftoken'),
+        },
+        body: JSON.stringify({
+          profession: profession.name,
+          realm: realm.name,
+          faction: faction.name, 
+          date: 'latest'
+        })
+      };
+      
+      const res = await fetch(url, config)
+          .catch(err => console.log(err));
+      const json = await res.json();
+      
+      setReagentPrices(json);
+      
+      console.log(reagentPrices);
+    }
+    
+    fetchData();
+  }, [profession, realm, faction]);
+  
   return (
     <>
       <Box display='block' p='10px 0px 10px 0px'>
@@ -192,41 +233,18 @@ const ReagentPricesContent = () => {
 
 // Reagent Prices component
 export const ReagentPrices = () => {
+  
   return (
-    <ProfessionProvider>
-      <Test />
-      <ReagentPricesContent />
-    </ProfessionProvider>
+    <FactionProvider>
+      <PriceTypeProvider>
+        <ProfessionProvider>
+          <ReagentPricesProvider>
+            <RealmProvider>
+              <ReagentPricesContent />
+            </RealmProvider>
+          </ReagentPricesProvider>
+        </ProfessionProvider>
+      </PriceTypeProvider>
+    </FactionProvider>
   )
 };
-
-
-const Test = () => {
-  
-  const url = '/api/reagent_prices';
-  
-  const config = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': Cookies.get('csrftoken'),
-    },
-    body: JSON.stringify({
-      profession: 'Tailoring',
-      realm: 'Skyfury',
-      faction: 'Horde',
-      date: 'latest'
-    })
-  };
-
-  useEffect(() => {
-    fetch(url, config)
-      .then(response => response.json())
-      .then(data => console.log(data))
-      .catch(err => console.log(err));
-  });
-    
-  return (
-    <Box bg='tomato'>Here is the data: </Box>
-    )
-}

@@ -1,4 +1,3 @@
-import {useState } from 'react';
 import {
   Box,
   Image,
@@ -35,6 +34,8 @@ export const CurrencyBox = (props) => {
     case Coin.COPPER:
       coin = copperCoin;
       break;
+    default:
+      console.log('Expected coin paramter in CurrencyBox props');
   }
   
   return (

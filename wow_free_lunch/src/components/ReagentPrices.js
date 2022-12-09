@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState} from 'react';
+import { useContext, useEffect } from 'react';
 import {
   Accordion,
   AccordionItem,
@@ -6,7 +6,6 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
-  Button,
   HStack,
   Image,
   Input,
@@ -19,10 +18,11 @@ import {
 // import { SearchIcon } from '@chakra-ui/icons'
 
 import Cookies from 'js-cookie'
+import { firstBy } from 'thenby'
 
 import { FactionContext } from '../state/FactionContext';
 import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
-import { Profession, ProfessionContext } from '../state/ProfessionContext';
+import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext, ReagentPricesProvider } from '../state/ReagentPricesContext';
 import { RealmContext } from '../state/RealmContext';
 
@@ -68,25 +68,35 @@ const ReagentFilters = () => {
 // component for Item Class accordion
 const ItemClassAccordion = (props) => {
   
-  // const [itemSubclasses, setItemSubClasses] = useState();
+  const { reagentPrices } = useContext(ReagentPricesContext);
   
   return (
     <Accordion allowMultiple>
       <AccordionItem>
         <AccordionButton bg='orange.200' _expanded={{ bg: 'orange.100', color: 'gray.400' }}>
           <Box flex='1' textAlign='left'>
-            {props.name}
+            {props.itemClass}
           </Box>
           <AccordionIcon />
         </AccordionButton>
         <AccordionPanel>
           <Box justifyContent='center'>
-            <Box display='block' padding='10px'>
-              <ItemSubclassAccordion name='Item Subclass 1'/>
-            </Box>
-            <Box display='block' padding='10px'>
-              <ItemSubclassAccordion name='Item Subclass 2'/>
-            </Box>
+              {
+                Object.keys(reagentPrices[props.itemClass])
+                .sort()
+                .map( 
+                  itemSubclass => {
+                    return (
+                      <Box key={itemSubclass} display='block' padding='8px'>
+                        <ItemSubclassAccordion 
+                          itemClass={props.itemClass} 
+                          itemSubclass={itemSubclass} 
+                        />
+                      </Box>
+                    )
+                  }
+                )
+              }
           </Box>
         </AccordionPanel>
       </AccordionItem>
@@ -98,25 +108,43 @@ const ItemClassAccordion = (props) => {
 // component for Item Subclass accordion
 const ItemSubclassAccordion = (props) => {
   
-  // const [reagents, setReagents] = useState();
-  
+  const { reagentPrices } = useContext(ReagentPricesContext);
+  const { priceType } = useContext(PriceTypeContext);
+
   return (
     <Accordion allowMultiple>
       <AccordionItem>
         <AccordionButton bg='blue.200' _expanded={{ bg: 'blue.100', color: 'gray.400' }}>
           <Box flex='1' textAlign='left'>
-            {props.name}
+            {props.itemSubclass}
           </Box>
           <AccordionIcon />
         </AccordionButton>
         <AccordionPanel>
-          <Box display='flex' gap='10px' justifyContent='flex-start' flexWrap='wrap'>
-            <ReagentPriceBox name='Reagent 1' price={123}/>
-            <ReagentPriceBox name='Reagent 2' price={GenRandomInt(0, 100000)}/>
-            <ReagentPriceBox name='Reagent 4' price={GenRandomInt(0, 100000)}/>
-            <ReagentPriceBox name='Reagent 5' price={GenRandomInt(0, 100000)}/>
-            <ReagentPriceBox name='Reagent 6' price={GenRandomInt(0, 100000)}/>
-            <ReagentPriceBox name='Reagent 7' price={GenRandomInt(0, 100000)}/>
+          <Box display='flex' gap='8px' justifyContent='flex-start' flexWrap='wrap'>
+              {
+                Object.entries(reagentPrices[props.itemClass][props.itemSubclass])
+                .sort(
+                  firstBy(function (a, b) { return a[1].level - b[1].level})
+                  .thenBy(function (a, b) { return a[1].item_id - b[1].item_id})
+                )
+                .map(
+                  reagent => {
+                    return (
+                      <Box key={reagent[1].item_id} display='block' padding='8px'>
+                        <ReagentPriceBox 
+                          name={reagent[0]} 
+                          price={priceType.type === PriceType.VWAP 
+                            ? reagent[1].vwap_price : reagent[1].min_price}
+                          quality={reagent[1].quality}
+                          mediaUrl={reagent[1].media_url}
+                          isDisabled={reagent[1].quantity === 0}
+                        />
+                      </Box>
+                    )
+                  }
+                )
+              }
           </Box>
         </AccordionPanel>
       </AccordionItem>
@@ -132,21 +160,10 @@ const ItemSubclassAccordion = (props) => {
 // component for Reagent with price
 const ReagentPriceBox = (props) => {
   
-  const images = [
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_linen_01.jpg',
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_wool_01.jpg',
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_silk_01.jpg',
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_mageweave_01.jpg',
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_purplefire_01.jpg',
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_moonrag_01.jpg',
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_netherweave.jpg',
-      'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_soulcloth.jpg',
-    ]
-  
   return (
     <Box display='flex' height='60px' width='225px' bg='green.200'>
       <Box display='flex' width='60px' alignItems='center' justifyContent='center'>
-        <Image src={images[GenRandomInt(0, images.length)]} height='48px' width='48px' border='4px solid white'/>
+        <Image src={props.mediaUrl} height='48px' width='48px' border='4px solid white'/>
       </Box>
       <Box width='165px'>
         <Box display='block' width='100%' alignItems='flex-end' fontWeight='semibold' padding='4px 4px 0px 4px'>
@@ -173,7 +190,7 @@ const ReagentPricesContent = () => {
   
   const { faction } = useContext(FactionContext);
   const { profession } = useContext(ProfessionContext);
-  const { setReagentPrices } = useContext(ReagentPricesContext);
+  const { reagentPrices, setReagentPrices } = useContext(ReagentPricesContext);
   const { realm } = useContext(RealmContext);
   
   useEffect(() => {
@@ -214,8 +231,8 @@ const ReagentPricesContent = () => {
     fetchData()
       .catch(console.error);
       
-  }, [profession, realm, faction]);
-  
+  }, [profession, realm, faction, setReagentPrices]);
+
   return (
     <>
       <Box display='block' p='10px 0px 10px 0px'>
@@ -229,7 +246,19 @@ const ReagentPricesContent = () => {
             </AccordionButton>
             <AccordionPanel>
               <ReagentFilters />
-              <ItemClassAccordion name='Item Class 1'/>
+                {
+                  Object.keys(reagentPrices)
+                  .sort()
+                  .map( 
+                    itemClass => {
+                      return (
+                        <Box key={itemClass} display='block' padding='8px'>
+                          <ItemClassAccordion itemClass={itemClass} />
+                        </Box>
+                      )
+                    }
+                  )
+                }
             </AccordionPanel>          
           </AccordionItem>
         </Accordion>
@@ -244,8 +273,10 @@ const ReagentPricesContent = () => {
 export const ReagentPrices = () => {
   
   return (
-    <ReagentPricesProvider>
-      <ReagentPricesContent />
-    </ReagentPricesProvider>
+    <PriceTypeProvider>
+      <ReagentPricesProvider>
+        <ReagentPricesContent />
+      </ReagentPricesProvider>
+    </PriceTypeProvider>
   )
 };

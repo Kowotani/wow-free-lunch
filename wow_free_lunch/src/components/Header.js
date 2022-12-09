@@ -13,10 +13,10 @@ import {
 
 import logo from '../assets/logo.png';
 
-import { Faction, FactionContext, FactionProvider } from '../state/FactionContext';
-import { Nav, NavContext, NavProvider } from '../state/NavContext';
-import { Profession, ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
-import { RealmContext, RealmProvider } from '../state/RealmContext';
+import { Faction, FactionContext } from '../state/FactionContext';
+import { Nav, NavContext } from '../state/NavContext';
+import { Profession, ProfessionContext } from '../state/ProfessionContext';
+import { RealmContext } from '../state/RealmContext';
 
 
 // ===========
@@ -139,7 +139,7 @@ const ProfessionBar = () => {
         <ProfessionButton name="Alchemy" profession={Profession.ALCHEMY}/>
         <ProfessionButton name="Blacksmithing" profession={Profession.BLACKSMITHING}/>
         <ProfessionButton name="Cooking" profession={Profession.COOKING}/>
-        <ProfessionButton name="Engineering" profession={Profession.Engineering}/>
+        <ProfessionButton name="Engineering" profession={Profession.ENGINEERING}/>
         <ProfessionButton name="Inscription" profession={Profession.INSCRIPTION}/>
         <ProfessionButton name="Jewelcrafting" profession={Profession.JEWELCRAFTING}/>
         <ProfessionButton name="Leatherworking" profession={Profession.LEATHERWORKING}/>
@@ -190,14 +190,16 @@ const HeaderContent = () => {
 // Header component
 export const Header = () => {
   return (
-    <FactionProvider>
-      <NavProvider>
-        <ProfessionProvider>
-          <RealmProvider>
-            <HeaderContent />
-          </RealmProvider>
-        </ProfessionProvider>
-      </NavProvider>
-    </FactionProvider>
+    <HeaderContent />
   )
 };
+
+    // <FactionProvider>
+    //   <NavProvider>
+    //     <ProfessionProvider>
+    //       <RealmProvider>
+    //         <HeaderContent />
+    //       </RealmProvider>
+    //     </ProfessionProvider>
+    //   </NavProvider>
+    // </FactionProvider>

@@ -6,6 +6,7 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  Button,
   HStack,
   Image,
   Input,
@@ -19,11 +20,11 @@ import {
 
 import Cookies from 'js-cookie'
 
-import { FactionContext, FactionProvider } from '../state/FactionContext';
+import { FactionContext } from '../state/FactionContext';
 import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
-import { ProfessionContext, ProfessionProvider } from '../state/ProfessionContext';
+import { Profession, ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext, ReagentPricesProvider } from '../state/ReagentPricesContext';
-import { RealmContext, RealmProvider } from '../state/RealmContext';
+import { RealmContext } from '../state/RealmContext';
 
 import { PriceBox } from './PriceBox'
 
@@ -172,15 +173,19 @@ const ReagentPricesContent = () => {
   
   const { faction } = useContext(FactionContext);
   const { profession } = useContext(ProfessionContext);
-  const { reagentPrices, setReagentPrices } = useContext(ReagentPricesContext);
+  const { setReagentPrices } = useContext(ReagentPricesContext);
   const { realm } = useContext(RealmContext);
   
   useEffect(() => {
     
-    async function fetchData() {
+    // async data fetch
+    const fetchData = async() => {
       
+      console.log('fetching data...', profession, realm, faction);
+      
+      // prepare config
       const url = '/api/reagent_prices';
-  
+
       const config = {
         method: 'POST',
         headers: {
@@ -195,16 +200,20 @@ const ReagentPricesContent = () => {
         })
       };
       
+      // get response
       const res = await fetch(url, config)
-          .catch(err => console.log(err));
-      const json = await res.json();
       
-      setReagentPrices(json);
+      // convert to json
+      const data = await res.json();
       
-      console.log(reagentPrices);
-    }
+      // update state
+      setReagentPrices(data);
+    };
     
-    fetchData();
+    // invoke function
+    fetchData()
+      .catch(console.error);
+      
   }, [profession, realm, faction]);
   
   return (
@@ -235,16 +244,8 @@ const ReagentPricesContent = () => {
 export const ReagentPrices = () => {
   
   return (
-    <FactionProvider>
-      <PriceTypeProvider>
-        <ProfessionProvider>
-          <ReagentPricesProvider>
-            <RealmProvider>
-              <ReagentPricesContent />
-            </RealmProvider>
-          </ReagentPricesProvider>
-        </ProfessionProvider>
-      </PriceTypeProvider>
-    </FactionProvider>
+    <ReagentPricesProvider>
+      <ReagentPricesContent />
+    </ReagentPricesProvider>
   )
 };

@@ -657,9 +657,9 @@ class ReagentPrices(View) :
             	id.quality,
             	id.media_url,
             	id.is_vendor_item,
-            	CAST(ap.quantity  AS UNSIGNED) AS quantity,
-            	CAST(IF(id.is_vendor_item, id.purchase_price, ap.min_price)  AS UNSIGNED) AS min_price,
-            	CAST(IF(id.is_vendor_item, id.purchase_price, ap.vwap_price) AS UNSIGNED) AS vwap_price
+            	CAST(COALESCE(ap.quantity, 0)  AS UNSIGNED) AS quantity,
+            	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, ap.min_price), 0) AS UNSIGNED) AS min_price,
+            	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, ap.vwap_price), 0) AS UNSIGNED) AS vwap_price
             FROM profession p
             JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             JOIN expansion e ON pst.expansion_id = e.expansion_id
@@ -672,9 +672,9 @@ class ReagentPrices(View) :
             (
             	SELECT 
             		a.item_id,
-            		SUM(COALESCE(a.quantity, 0)) AS quantity,
-            		MIN(COALESCE(CASE WHEN a.buyout_unit_price > 0 THEN a.buyout_unit_price END, 0)) AS min_price,
-            		CEIL(COALESCE(SUM(a.buyout_unit_price * a.quantity) / SUM(a.quantity), 0)) AS vwap_price
+            		SUM(a.quantity) AS quantity,
+            		MIN(CASE WHEN a.buyout_unit_price > 0 THEN a.buyout_unit_price END) AS min_price,
+            		CEIL(SUM(a.buyout_unit_price * a.quantity) / SUM(a.quantity)) AS vwap_price
             	FROM auction a 
             	JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
             	JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id

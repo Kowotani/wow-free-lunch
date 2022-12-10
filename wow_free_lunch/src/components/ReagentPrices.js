@@ -135,7 +135,8 @@ const ItemSubclassAccordion = (props) => {
                           price={reagent[1].min_price}
                           quality={reagent[1].quality}
                           mediaUrl={reagent[1].media_url}
-                          isDisabled={reagent[1].quantity === 0}
+                          isDisabled={!reagent[1].is_vendor_item 
+                            && reagent[1].quantity == 0}
                         />
                       </Box>
                     )
@@ -157,8 +158,10 @@ const ItemSubclassAccordion = (props) => {
 // component for Reagent with price
 const ReagentPriceBox = (props) => {
   
+  const bgColor = props.isDisabled ? 'gray.100' : 'green.200'; 
+  
   return (
-    <Box display='flex' height='60px' width='225px' bg='green.200'>
+    <Box display='flex' height='60px' width='225px' bg={bgColor}>
       <Box display='flex' width='60px' alignItems='center' justifyContent='center'>
         <Image src={props.mediaUrl} height='48px' width='48px' border='4px solid white'/>
       </Box>

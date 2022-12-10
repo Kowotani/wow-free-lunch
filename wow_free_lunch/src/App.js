@@ -13,6 +13,7 @@ import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { Header } from './components/Header'
 import { ReagentPrices } from './components/ReagentPrices'
+import { FreeLunches } from './components/FreeLunches'
 
 
 import { FactionProvider } from './state/FactionContext';
@@ -37,6 +38,10 @@ function App() {
               <Box>
                 <ReagentPrices />
               </Box>
+              <Box>
+                <FreeLunches />
+              </Box>
+              
               <Box textAlign="center" fontSize="xl">
                 <Grid minH="100vh" p={3}>
                   <ColorModeSwitcher justifySelf="flex-end" />
@@ -57,6 +62,7 @@ function App() {
                   </VStack>
                 </Grid>
               </Box>
+              
             </RealmProvider>
           </ProfessionProvider>
         </NavProvider>

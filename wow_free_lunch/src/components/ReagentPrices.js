@@ -41,7 +41,7 @@ const ReagentFilters = () => {
   // const { priceType, setPriceType } = useContext(PriceTypeContext);
   
   return (
-    <Box display='flex' alignItems='center'>
+    <Box display='flex' alignItems='center' flexWrap='wrap'>
       <ButtonGroup colorScheme='pink' spacing='2'>
         <Button>Expand All</Button>
         <Button>Collapse All</Button>
@@ -54,10 +54,6 @@ const ReagentFilters = () => {
   )
 }
 
-
-function CollapseAccordionItems(accordion) {
-  
-}
 
 // ====================
 // Item Class Hierarchy
@@ -136,7 +132,7 @@ const ItemSubclassAccordion = (props) => {
                           quality={reagent[1].quality}
                           mediaUrl={reagent[1].media_url}
                           isDisabled={!reagent[1].is_vendor_item 
-                            && reagent[1].quantity == 0}
+                            && reagent[1].quantity === 0}
                         />
                       </Box>
                     )

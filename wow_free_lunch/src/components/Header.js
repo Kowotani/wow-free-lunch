@@ -171,7 +171,7 @@ const ProfessionBarManager = () => {
 const HeaderContent = () => {
   return (
     <>
-      <Box display="flex" bg="gray.300">
+      <Box display="flex" bg="gray.300" flexWrap='wrap'>
         <Box display="flex" alignItems="flex-end">
           <Image src={logo} h="100"/>
           <NavButtons />

@@ -656,6 +656,7 @@ class ReagentPrices(View) :
             	id.level,
             	id.quality,
             	id.media_url,
+            	id.is_vendor_item,
             	CAST(ap.quantity  AS UNSIGNED) AS quantity,
             	CAST(IF(id.is_vendor_item, id.purchase_price, ap.min_price)  AS UNSIGNED) AS min_price,
             	CAST(IF(id.is_vendor_item, id.purchase_price, ap.vwap_price) AS UNSIGNED) AS vwap_price

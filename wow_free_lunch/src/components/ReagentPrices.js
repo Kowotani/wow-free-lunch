@@ -5,14 +5,16 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Button,
+  ButtonGroup,
   Box,
-  HStack,
+  // HStack,
   Image,
   Input,
   InputGroup,
   // InputLeftElement,
-  Radio,
-  RadioGroup,
+  // Radio,
+  // RadioGroup,
   Spacer,
 } from '@chakra-ui/react';
 // import { SearchIcon } from '@chakra-ui/icons'
@@ -21,17 +23,12 @@ import Cookies from 'js-cookie'
 import { firstBy } from 'thenby'
 
 import { FactionContext } from '../state/FactionContext';
-import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
+// import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
 import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext, ReagentPricesProvider } from '../state/ReagentPricesContext';
 import { RealmContext } from '../state/RealmContext';
 
 import { PriceBox } from './PriceBox'
-
-
-function GenRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min))
-}
 
 
 // =======
@@ -41,17 +38,14 @@ function GenRandomInt(min, max) {
 // component for Reagent Price Box filters
 const ReagentFilters = () => {
   
-  const { priceType, setPriceType } = useContext(PriceTypeContext);
+  // const { priceType, setPriceType } = useContext(PriceTypeContext);
   
   return (
     <Box display='flex' alignItems='center'>
-      <Box fontWeight='semibold' p='8px'>Price Type </Box>
-      <RadioGroup onChange={setPriceType} value={priceType} defaultValue={PriceType.VWAP} p='8px'>
-        <HStack>
-          <Radio value={PriceType.VWAP}>VWAP</Radio>
-          <Radio value={PriceType.MIN}>Min</Radio>
-        </HStack>
-      </RadioGroup>
+      <ButtonGroup colorScheme='pink' spacing='2'>
+        <Button>Expand All</Button>
+        <Button>Collapse All</Button>
+      </ButtonGroup>
       <Spacer />
       <InputGroup width='200px' p='8px'>
         <Input type='search' placeholder='Reagent name' />
@@ -60,6 +54,10 @@ const ReagentFilters = () => {
   )
 }
 
+
+function CollapseAccordionItems(accordion) {
+  
+}
 
 // ====================
 // Item Class Hierarchy
@@ -109,7 +107,7 @@ const ItemClassAccordion = (props) => {
 const ItemSubclassAccordion = (props) => {
   
   const { reagentPrices } = useContext(ReagentPricesContext);
-  const { priceType } = useContext(PriceTypeContext);
+  // const { priceType } = useContext(PriceTypeContext);
 
   return (
     <Accordion allowMultiple>
@@ -134,8 +132,7 @@ const ItemSubclassAccordion = (props) => {
                       <Box key={reagent[1].item_id} display='block' padding='8px'>
                         <ReagentPriceBox 
                           name={reagent[0]} 
-                          price={priceType.type === PriceType.VWAP 
-                            ? reagent[1].vwap_price : reagent[1].min_price}
+                          price={reagent[1].min_price}
                           quality={reagent[1].quality}
                           mediaUrl={reagent[1].media_url}
                           isDisabled={reagent[1].quantity === 0}
@@ -222,6 +219,7 @@ const ReagentPricesContent = () => {
       
       // convert to json
       const data = await res.json();
+      console.log(data);
       
       // update state
       setReagentPrices(data);
@@ -273,10 +271,8 @@ const ReagentPricesContent = () => {
 export const ReagentPrices = () => {
   
   return (
-    <PriceTypeProvider>
-      <ReagentPricesProvider>
-        <ReagentPricesContent />
-      </ReagentPricesProvider>
-    </PriceTypeProvider>
+    <ReagentPricesProvider>
+      <ReagentPricesContent />
+    </ReagentPricesProvider>
   )
 };

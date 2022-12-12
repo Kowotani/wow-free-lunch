@@ -56,13 +56,13 @@ function GetReactTable(options) {
 // Data Table
 // ==========
 
-export const DataTable = ({ data, columns }) => {
+export const DataTable = ({ data, columns, hiddenColumns }) => {
   
   const [sorting, setSorting] = useState([]);
-  const [columnVisibility, setColumnVisibility] = useState({
-    // hide the item_id column by default
-    'item_id': false
-  });
+  
+  // set default column visibility
+  let visibilityState = Object.fromEntries(hiddenColumns.map(x => [x, false]));
+  const [columnVisibility, setColumnVisibility] = useState(visibilityState);
   
   const table = GetReactTable({
     columns,

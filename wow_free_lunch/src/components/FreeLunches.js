@@ -231,8 +231,7 @@ const FreeLunchesContent = () => {
       header: 'Item ID',
       enableHiding: true,
       meta: {
-        isNumeric: true,
-        isHidden: true
+        isNumeric: true
       }
     }),
     
@@ -306,6 +305,9 @@ const FreeLunchesContent = () => {
     })
   ];
 
+  // hide certain columns by default
+  const hiddenColumns = ['item_id'];
+
   return (
     <>
       <Box display='block' bg='cyan.300' p='10px 14px'>
@@ -313,7 +315,11 @@ const FreeLunchesContent = () => {
       </Box>
       <FreeLunchesFilters />
       <Box display='block'>
-        <DataTable columns={columns} data={data} />
+        <DataTable 
+          columns={columns} 
+          data={data} 
+          hiddenColumns={hiddenColumns}
+        />
       </Box>
     </>
   )

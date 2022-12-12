@@ -656,7 +656,6 @@ class ReagentPrices(View) :
             	id.level,
             	id.quality,
             	id.media_url,
-            	id.is_vendor_item,
             	CAST(COALESCE(ap.quantity, 0)  AS UNSIGNED) AS quantity,
             	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, ap.min_price), 0) AS UNSIGNED) AS min_price,
             	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, ap.vwap_price), 0) AS UNSIGNED) AS vwap_price
@@ -700,20 +699,23 @@ class ReagentPrices(View) :
 
         # format data
         d = {}
-        for k in {(x['class_name']) for x in res}:
-            d[k] = {}
-        for t in {(x['class_name'], x['subclass_name']) for x in res}:
-            d[t[0]][t[1]] = {}
+        for class_name in {(x['class_name']) for x in res}:
+            d[class_name] = {}
+        for (class_name, subclass_name) in {(x['class_name'], x['subclass_name']) for x in res}:
+            d[class_name][subclass_name] = []
         for r in res:
-            d[r['class_name']][r['subclass_name']][r['name']] = {
-                'item_id': r['item_id'],
-                'level': r['level'],
-                'quality': r['quality'],
-                'media_url': r['media_url'],
-                'quantity': r['quantity'],
-                'min_price': r['min_price'],
-                'vwap_price': r['vwap_price'],
-            }
+            d[r['class_name']][r['subclass_name']].append(
+                {
+                    'name': r['name'],
+                    'item_id': r['item_id'],
+                    'level': r['level'],
+                    'quality': r['quality'],
+                    'media_url': r['media_url'],
+                    'quantity': r['quantity'],
+                    'min_price': r['min_price'],
+                    'vwap_price': r['vwap_price'],
+                }
+            )
 
         # return data
         return HttpResponse(json.dumps(d), content_type='application/json')

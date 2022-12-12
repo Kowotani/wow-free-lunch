@@ -117,22 +117,22 @@ const ItemSubclassAccordion = (props) => {
         <AccordionPanel>
           <Box display='flex' gap='8px' justifyContent='flex-start' flexWrap='wrap'>
               {
-                Object.entries(reagentPrices[props.itemClass][props.itemSubclass])
+                reagentPrices[props.itemClass][props.itemSubclass]
                 .sort(
-                  firstBy(function (a, b) { return a[1].level - b[1].level})
-                  .thenBy(function (a, b) { return a[1].item_id - b[1].item_id})
+                  firstBy(function (a, b) { return a.level - b.level})
+                  .thenBy(function (a, b) { return a.item_id - b.item_id})
                 )
                 .map(
                   reagent => {
                     return (
-                      <Box key={reagent[1].item_id} display='block' padding='8px'>
+                      <Box key={reagent.item_id} display='block' padding='8px'>
                         <ReagentPriceBox 
-                          name={reagent[0]} 
-                          price={reagent[1].min_price}
-                          quality={reagent[1].quality}
-                          mediaUrl={reagent[1].media_url}
-                          isDisabled={!reagent[1].is_vendor_item 
-                            && reagent[1].quantity === 0}
+                          name={reagent.name} 
+                          price={reagent.min_price}
+                          quality={reagent.quality}
+                          mediaUrl={reagent.media_url}
+                          isDisabled={!reagent.is_vendor_item 
+                            && reagent.quantity === 0}
                         />
                       </Box>
                     )

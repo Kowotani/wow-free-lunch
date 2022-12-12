@@ -1,6 +1,6 @@
 import { useState} from "react"
 import { Table, Thead, Tbody, Tr, Th, Td, chakra } from "@chakra-ui/react"
-import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
+// import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
 import {
   flexRender,
   getCoreRowModel,

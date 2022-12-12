@@ -176,7 +176,7 @@ const FreeLunchesContent = () => {
       ],
       vendor_price: 17744,
       cost: 36000,
-      unit_profit: -18256,
+      unit_profit: -10256,
       percent_profit: -0.5071
     }),
     FreeLunch.create({

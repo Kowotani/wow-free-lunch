@@ -39,8 +39,8 @@ export const CurrencyBox = (props) => {
   }
   
   return (
-    <Box display="flex" height="20px" alignItems="center">
-      <Box padding="0px 4px">{props.value}</Box>
+    <Box display='flex' height='20px' alignItems='center' color={props.isNegative ? 'red' : 'black'}>
+      <Box padding='0px 4px'>{props.zeroPad ? '0' : null}{props.amount}</Box>
       <Image src={coin} />
     </Box>
   )
@@ -55,15 +55,36 @@ export const CurrencyBox = (props) => {
 // PriceBox component
 export const PriceBox = (props) => {
   
-  const goldAmount = Math.floor(props.price / 10000);
-  const silverAmount = Math.floor((props.price / 100)) % 100;
-  const copperAmount = props.price % 100;
+  const isNegative = props.price < 0;
+  
+  const goldAmount = Math.floor(Math.abs(props.price) / 10000);
+  const silverAmount = Math.floor((Math.abs(props.price) / 100)) % 100;
+  const copperAmount = Math.abs(props.price) % 100;
   
   return (
-    <Box display="flex" height="20px">
-      {goldAmount > 0 && <CurrencyBox value={goldAmount} coin={Coin.GOLD} />}
-      {(props.price >= 100 || silverAmount > 0) && <CurrencyBox value={silverAmount} coin={Coin.SILVER} />}
-      <CurrencyBox value={copperAmount} coin={Coin.COPPER} />
+    <Box display='flex' height='20px'>
+      {isNegative && <Box color='red'>-</Box>}
+      {goldAmount > 0 &&
+        <CurrencyBox 
+          amount={goldAmount} 
+          coin={Coin.GOLD} 
+          isNegative={isNegative}
+        />
+      }
+      {(goldAmount > 0 || silverAmount > 0) &&
+        <CurrencyBox 
+          amount={silverAmount} 
+          coin={Coin.SILVER} 
+          isNegative={isNegative}
+          zeroPad={goldAmount > 0 && silverAmount < 10}
+        />
+      }
+      <CurrencyBox 
+        amount={copperAmount} 
+        coin={Coin.COPPER} 
+        isNegative={isNegative}
+        zeroPad={silverAmount > 0 && copperAmount < 10}
+      />
     </Box>
   )
 };

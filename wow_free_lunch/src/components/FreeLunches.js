@@ -296,7 +296,13 @@ const FreeLunchesContent = () => {
     
     // percent profit
     columnHelper.accessor('percent_profit', {
-      cell: (props) => props.getValue(),
+      cell: (props) => {
+        return (
+          <Box color={props.getValue() < 0 ? 'red' : 'black'}>
+            {(props.getValue() * 100).toFixed(2)}%
+          </Box>
+        )
+      },
       header: 'Percent Profit',
       meta: {
         isNumeric: true

@@ -194,7 +194,7 @@ const ReagentPricesContent = () => {
     // async data fetch
     const fetchData = async() => {
       
-      console.log('fetching data...', profession, realm, faction);
+      console.log('fetching /api/reagent_prices ...', profession, realm, faction);
       
       // prepare config
       const url = '/api/reagent_prices';

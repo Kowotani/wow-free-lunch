@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Box,
   Button, 
@@ -10,24 +10,16 @@ import {
   Spacer,
 } from '@chakra-ui/react';
 
-import { 
-  createColumnHelper, 
-  useReactTable,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel
-} from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 
-
+import Cookies from 'js-cookie'
 import { Data } from 'dataclass';
+
 import { DataTable } from './DataTable';
 import { PriceBox } from './PriceBox';
 
+import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext, ReagentPricesProvider } from '../state/ReagentPricesContext';
-// import { Faction, FactionContext } from '../state/FactionContext';
-// import { Nav, NavContext } from '../state/NavContext';
-// import { Profession, ProfessionContext } from '../state/ProfessionContext';
-// import { RealmContext } from '../state/RealmContext';
 
 
 // =======
@@ -240,10 +232,49 @@ const FreeLunchTable = (props) => {
 // Free Lunches content
 const FreeLunchesContent = () => {
   
-//   const { reagentPrices } = useContext(ReagentPricesContext);
-//   const [ freeLunches, setFreeLunches] = useState({});
+  const { reagentPrices } = useContext(ReagentPricesContext);
+  const { profession } = useContext(ProfessionContext);
+  const [ craftedItemRecipes, setCraftedItemRecipes] = useState({});
 
   // query recipe data
+
+  useEffect(() => {
+    
+    // async data fetch
+    const fetchData = async() => {
+      
+      console.log('fetching /api/crafted_item_recipes ...', profession);
+      
+      // prepare config
+      const url = '/api/crafted_item_recipes';
+
+      const config = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': Cookies.get('csrftoken'),
+        },
+        body: JSON.stringify({
+          profession: profession.name
+        })
+      };
+      
+      // get response
+      const res = await fetch(url, config)
+      
+      // convert to json
+      const data = await res.json();
+      console.log(data);
+      
+      // update state
+      setCraftedItemRecipes(data);
+    };
+    
+    // invoke function
+    fetchData()
+      .catch(console.error);
+      
+  }, [profession]);
   
   // calculate Free Lunch data
   const data = [

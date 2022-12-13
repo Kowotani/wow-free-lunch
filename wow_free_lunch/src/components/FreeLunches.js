@@ -101,114 +101,22 @@ const FreeLunchesFilters = () => {
 }
 
 
-// ==============
-// Main Component
-// ==============
+// ================
+// Free Lunch Table
+// ================
 
 
+// return WoWHead url formatted with item_id
 function getWowHeadeUrl(item_id) {
   return `https://www.wowhead.com/wotlk/item=${item_id}/`
 }
 
 
-// Free Lunches content
-const FreeLunchesContent = () => {
+// DataTable component
+const FreeLunchTable = (props) => {
   
-//   const { faction } = useContext(FactionContext);
-//   const { profession } = useContext(ProfessionContext);
-// const { reagentPrices } = useContext(ReagentPricesContext);
-//   const { realm } = useContext(RealmContext);
-
-  const data = [
-    FreeLunch.create({
-      name: 'Azure Silk Vest',
-      item_id: 4324,
-      quality: 'UNCOMMON',
-      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_chest_cloth_37.jpg',
-      reagents: [
-        Reagent.create({
-          name: 'Bolt of Silk Cloth',
-          item_id: 4305,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_silk_03.jpg',
-          quantity: 5,
-          price: 350
-        }),
-        Reagent.create({
-          name: 'Blue Dye',
-          item_id: 6260,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_potion_15.jpg',
-          quantity: 4,
-          price: 50
-        }),
-      ],
-      vendor_price: 1874,
-      cost: 1950,
-      unit_profit: -76,
-      percent_profit: -0.0389
-    }),
-    FreeLunch.create({
-      name: 'Gloves of the Dawn',
-      item_id: 19057,
-      quality: 'RARE',
-      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_gauntlets_29.jpg',
-      reagents: [
-        Reagent.create({
-          name: 'Arcanite Bar',
-          item_id: 12360,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_stonetablet_05.jpg',
-          quantity: 2,
-          price: 4250
-        }),
-        Reagent.create({
-          name: 'Truesilver Bar',
-          item_id: 6037,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_ingot_08.jpg',
-          quantity: 10,
-          price: 750
-        }),
-        Reagent.create({
-          name: 'Righteous Orb',
-          item_id: 12811,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_gem_pearl_03.jpg',
-          quantity: 1,
-          price: 20000
-        }),
-      ],
-      vendor_price: 17744,
-      cost: 36000,
-      unit_profit: -10256,
-      percent_profit: -0.5071
-    }),
-    FreeLunch.create({
-      name: 'Nightscape Tunic',
-      item_id: 8175,
-      quality: 'UNCOMMON',
-      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_chest_leather_03.jpg',
-      reagents: [
-        Reagent.create({
-          name: 'Thick Leather',
-          item_id: 4304,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_leatherscrap_08.jpg',
-          quantity: 7,
-          price: 575
-        }),
-        Reagent.create({
-          name: 'Silken Thread',
-          item_id: 4291,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_silk_02.jpg',
-          quantity: 2,
-          price: 500
-        }),
-      ],
-      vendor_price: 5971,
-      cost: 5025,
-      unit_profit: 946,
-      percent_profit: 0.1893
-    })
-  ];
-  
+  // Define columns
   const columnHelper = createColumnHelper();
-
   const columns = [
     
     // item icon
@@ -313,6 +221,120 @@ const FreeLunchesContent = () => {
 
   // hide certain columns by default
   const hiddenColumns = ['item_id'];
+  
+  return (
+    <DataTable 
+      columns={columns} 
+      data={props.data} 
+      hiddenColumns={hiddenColumns}
+    />
+  )
+}
+
+
+// ==============
+// Main Component
+// ==============
+
+
+// Free Lunches content
+const FreeLunchesContent = () => {
+  
+//   const { reagentPrices } = useContext(ReagentPricesContext);
+//   const [ freeLunches, setFreeLunches] = useState({});
+
+  // query recipe data
+  
+  // calculate Free Lunch data
+  const data = [
+    FreeLunch.create({
+      name: 'Azure Silk Vest',
+      item_id: 4324,
+      quality: 'UNCOMMON',
+      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_chest_cloth_37.jpg',
+      reagents: [
+        Reagent.create({
+          name: 'Bolt of Silk Cloth',
+          item_id: 4305,
+          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_silk_03.jpg',
+          quantity: 5,
+          price: 350
+        }),
+        Reagent.create({
+          name: 'Blue Dye',
+          item_id: 6260,
+          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_potion_15.jpg',
+          quantity: 4,
+          price: 50
+        }),
+      ],
+      vendor_price: 1874,
+      cost: 1950,
+      unit_profit: -76,
+      percent_profit: -0.0389
+    }),
+    FreeLunch.create({
+      name: 'Gloves of the Dawn',
+      item_id: 19057,
+      quality: 'RARE',
+      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_gauntlets_29.jpg',
+      reagents: [
+        Reagent.create({
+          name: 'Arcanite Bar',
+          item_id: 12360,
+          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_stonetablet_05.jpg',
+          quantity: 2,
+          price: 4250
+        }),
+        Reagent.create({
+          name: 'Truesilver Bar',
+          item_id: 6037,
+          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_ingot_08.jpg',
+          quantity: 10,
+          price: 750
+        }),
+        Reagent.create({
+          name: 'Righteous Orb',
+          item_id: 12811,
+          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_gem_pearl_03.jpg',
+          quantity: 1,
+          price: 20000
+        }),
+      ],
+      vendor_price: 17744,
+      cost: 36000,
+      unit_profit: -10256,
+      percent_profit: -0.5071
+    }),
+    FreeLunch.create({
+      name: 'Nightscape Tunic',
+      item_id: 8175,
+      quality: 'UNCOMMON',
+      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_chest_leather_03.jpg',
+      reagents: [
+        Reagent.create({
+          name: 'Thick Leather',
+          item_id: 4304,
+          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_leatherscrap_08.jpg',
+          quantity: 7,
+          price: 575
+        }),
+        Reagent.create({
+          name: 'Silken Thread',
+          item_id: 4291,
+          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_silk_02.jpg',
+          quantity: 2,
+          price: 500
+        }),
+      ],
+      vendor_price: 5971,
+      cost: 5025,
+      unit_profit: 946,
+      percent_profit: 0.1893
+    })
+  ];
+  
+  
 
   return (
     <>
@@ -321,18 +343,12 @@ const FreeLunchesContent = () => {
       </Box>
       <FreeLunchesFilters />
       <Box display='block'>
-        <DataTable 
-          columns={columns} 
-          data={data} 
-          hiddenColumns={hiddenColumns}
-        />
+        <FreeLunchTable data={data} />
       </Box>
     </>
   )
   
 }
-
-
 
 
 // Free Lunches component

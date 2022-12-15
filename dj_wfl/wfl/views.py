@@ -606,7 +606,7 @@ Profession Nav
 '''
 
 '''
-This class provides endpoints for retrieving Reagent prices
+This class provides endpoints for retrieving Reagent Prices
 '''
 class ReagentPrices(View) :
     
@@ -716,6 +716,99 @@ class ReagentPrices(View) :
                     'vwap_price': r['vwap_price'],
                 }
             )
+
+        # return data
+        return HttpResponse(json.dumps(d), content_type='application/json')
+
+
+'''
+This class provides endpoints for retrieving Crafted Item Recipes
+'''
+class CraftedItemRecipes(View) :
+    
+    '''
+    Retrieve Crafted Item Recipes for the given inputs
+    - profession
+    Supported methods: POST
+    '''
+    def post(self, request):
+    
+        response_data = {}
+        qm = QueryManager()
+        
+        # parse inputs
+        data = json.loads(request.body)
+        profession = data.get('profession')
+        
+        # query data
+        sql = '''
+            SELECT DISTINCT
+            	-- crafted item
+            	ci.name AS crafted_item_name,
+            	ci.item_id AS crafted_item_id,
+            	cid.level AS level,
+            	cid.media_url AS crafted_item_media_url,
+            	cid.sell_price AS vendor_price,
+            	cid.quality,
+            	-- reagents
+            	ri.name AS reagent_item_name,
+            	ri.item_id AS reagent_item_id,
+            	rid.media_url AS reagent_item_media_url,
+            	rea.item_quantity AS quantity
+            FROM profession p
+            JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
+            JOIN expansion e ON pst.expansion_id = e.expansion_id
+            JOIN recipe rec ON pst.skill_tier_id = rec.skill_tier_id
+            JOIN reagent rea ON rec.recipe_id = rea.recipe_id
+            -- reagents
+            JOIN item ri ON rea.item_id = ri.item_id
+            JOIN item_data rid ON ri.classic_item_data_id = rid.item_data_id
+            -- crafted items
+            JOIN item ci ON rec.crafted_item_id = ci.item_id
+            JOIN item_data cid ON ci.classic_item_data_id = cid.item_data_id
+            WHERE 
+            	p.name = %s
+            	AND e.is_classic
+            ORDER BY
+            	cid.level,
+            	ci.item_id,
+            	ri.item_id;         
+        '''
+        params = [profession]
+        res = qm.query(sql, params)
+
+        # aggregate data
+        temp = {}
+        for row in res:
+            
+            crafted_item_id = row['crafted_item_id']
+            
+            # create key with crafted item metadata if not exists
+            if crafted_item_id not in temp.keys():
+                temp[crafted_item_id] = {
+                    'name': row['crafted_item_name'],
+                    'item_id': crafted_item_id,
+                    'level': row['level'],
+                    'media_url': row['crafted_item_media_url'],
+                    'vendor_price': row['vendor_price'],
+                    'quality': row['quality'],
+                    'reagents': []
+                }
+            
+            # add reagent data
+            temp[crafted_item_id]['reagents'].append({
+                'name': row['reagent_item_name'],
+                'item_id': row['reagent_item_id'],
+                'media_url': row['reagent_item_media_url'],
+                'quantity': row['quantity']
+            })  
+            
+        # format data            
+        d = {
+            'data': []
+        }
+        for v in temp.values():
+            d['data'].append(v)
 
         # return data
         return HttpResponse(json.dumps(d), content_type='application/json')

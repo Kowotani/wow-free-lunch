@@ -19,7 +19,7 @@ import { DataTable } from './DataTable';
 import { PriceBox } from './PriceBox';
 
 import { ProfessionContext } from '../state/ProfessionContext';
-import { ReagentPricesContext, ReagentPricesProvider } from '../state/ReagentPricesContext';
+import { ReagentPricesContext } from '../state/ReagentPricesContext';
 
 
 // =======
@@ -235,11 +235,12 @@ const FreeLunchesContent = () => {
   const { reagentPrices } = useContext(ReagentPricesContext);
   const { profession } = useContext(ProfessionContext);
   const [ craftedItemRecipes, setCraftedItemRecipes] = useState({});
-
-  // query recipe data
-
+  const [ freeLunchData, setFreeLunchData] = useState({});
+  
   useEffect(() => {
-    
+  
+    // query recipe data
+
     // async data fetch
     const fetchData = async() => {
       
@@ -264,108 +265,63 @@ const FreeLunchesContent = () => {
       
       // convert to json
       const data = await res.json();
-      console.log(data);
+      console.log('retrieved /api/crafted_item_recipes: ', data);
       
       // update state
-      setCraftedItemRecipes(data);
+      setCraftedItemRecipes(data['data']);
     };
     
     // invoke function
     fetchData()
       .catch(console.error);
-      
+
   }, [profession]);
   
-  // calculate Free Lunch data
-  const data = [
-    FreeLunch.create({
-      name: 'Azure Silk Vest',
-      item_id: 4324,
-      quality: 'UNCOMMON',
-      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_chest_cloth_37.jpg',
-      reagents: [
-        Reagent.create({
-          name: 'Bolt of Silk Cloth',
-          item_id: 4305,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_silk_03.jpg',
-          quantity: 5,
-          price: 350
-        }),
-        Reagent.create({
-          name: 'Blue Dye',
-          item_id: 6260,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_potion_15.jpg',
-          quantity: 4,
-          price: 50
-        }),
-      ],
-      vendor_price: 1874,
-      cost: 1950,
-      unit_profit: -76,
-      percent_profit: -0.0389
-    }),
-    FreeLunch.create({
-      name: 'Gloves of the Dawn',
-      item_id: 19057,
-      quality: 'RARE',
-      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_gauntlets_29.jpg',
-      reagents: [
-        Reagent.create({
-          name: 'Arcanite Bar',
-          item_id: 12360,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_stonetablet_05.jpg',
-          quantity: 2,
-          price: 4250
-        }),
-        Reagent.create({
-          name: 'Truesilver Bar',
-          item_id: 6037,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_ingot_08.jpg',
-          quantity: 10,
-          price: 750
-        }),
-        Reagent.create({
-          name: 'Righteous Orb',
-          item_id: 12811,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_gem_pearl_03.jpg',
-          quantity: 1,
-          price: 20000
-        }),
-      ],
-      vendor_price: 17744,
-      cost: 36000,
-      unit_profit: -10256,
-      percent_profit: -0.5071
-    }),
-    FreeLunch.create({
-      name: 'Nightscape Tunic',
-      item_id: 8175,
-      quality: 'UNCOMMON',
-      media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_chest_leather_03.jpg',
-      reagents: [
-        Reagent.create({
-          name: 'Thick Leather',
-          item_id: 4304,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_misc_leatherscrap_08.jpg',
-          quantity: 7,
-          price: 575
-        }),
-        Reagent.create({
-          name: 'Silken Thread',
-          item_id: 4291,
-          media_url: 'https://render.worldofwarcraft.com/classic-us/icons/56/inv_fabric_silk_02.jpg',
-          quantity: 2,
-          price: 500
-        }),
-      ],
-      vendor_price: 5971,
-      cost: 5025,
-      unit_profit: 946,
-      percent_profit: 0.1893
-    })
-  ];
-  
-  
+  useEffect(() => {
+    
+    // calculate Free Lunch data
+
+    const data = (Object.keys(craftedItemRecipes).length > 0
+        && Object.keys(reagentPrices['by_item_id']).length > 0) 
+      ? craftedItemRecipes.map((item) => {
+      
+      // construct Reagents param
+      const reagents = item.reagents.map((reagent) => {
+        return Reagent.create({
+          name: reagent.name,
+          item_id: reagent.item_id,
+          media_url: reagent.media_url,
+          quantity: reagent.quantity,
+          price: reagentPrices['by_item_id'][reagent.item_id]
+        })
+      })
+      
+      const cost = reagents.reduce(
+        (total, item) => total + item.quantity * item.price, 
+        0
+      );
+      
+      // construct FreeLunch
+      const freeLunch = FreeLunch.create({
+        name: item.name,
+        item_id: item.item_id,
+        quality: item.quality,
+        media_url: item.media_url,
+        reagents: reagents,
+        vendor_price: item.vendor_price,
+        cost: cost,
+        unit_profit: item.vendor_price - cost,
+        percent_profit: item.vendor_price / cost - 1
+      })
+      
+      return freeLunch
+    }) : {}
+    
+    console.log('data: ', data)
+    
+    // update state
+    setFreeLunchData(data);
+  }, [craftedItemRecipes, reagentPrices])
 
   return (
     <>
@@ -374,7 +330,7 @@ const FreeLunchesContent = () => {
       </Box>
       <FreeLunchesFilters />
       <Box display='block'>
-        <FreeLunchTable data={data} />
+        <FreeLunchTable data={freeLunchData} />
       </Box>
     </>
   )
@@ -386,8 +342,6 @@ const FreeLunchesContent = () => {
 export const FreeLunches = () => {
   
   return (
-    <ReagentPricesProvider>
-      <FreeLunchesContent />
-    </ReagentPricesProvider>
+    <FreeLunchesContent />
   )
 }

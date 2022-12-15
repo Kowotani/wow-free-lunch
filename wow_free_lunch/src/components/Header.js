@@ -193,13 +193,3 @@ export const Header = () => {
     <HeaderContent />
   )
 };
-
-    // <FactionProvider>
-    //   <NavProvider>
-    //     <ProfessionProvider>
-    //       <RealmProvider>
-    //         <HeaderContent />
-    //       </RealmProvider>
-    //     </ProfessionProvider>
-    //   </NavProvider>
-    // </FactionProvider>

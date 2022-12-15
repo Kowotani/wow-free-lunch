@@ -8,13 +8,9 @@ import {
   Button,
   ButtonGroup,
   Box,
-  // HStack,
   Image,
   Input,
   InputGroup,
-  // InputLeftElement,
-  // Radio,
-  // RadioGroup,
   Spacer,
 } from '@chakra-ui/react';
 // import { SearchIcon } from '@chakra-ui/icons'
@@ -23,9 +19,8 @@ import Cookies from 'js-cookie'
 import { firstBy } from 'thenby'
 
 import { FactionContext } from '../state/FactionContext';
-// import { PriceType, PriceTypeContext, PriceTypeProvider } from '../state/PriceTypeContext';
 import { ProfessionContext } from '../state/ProfessionContext';
-import { ReagentPricesContext, ReagentPricesProvider } from '../state/ReagentPricesContext';
+import { ReagentPricesContext } from '../state/ReagentPricesContext';
 import { RealmContext } from '../state/RealmContext';
 
 import { PriceBox } from './PriceBox'
@@ -76,7 +71,7 @@ const ItemClassAccordion = (props) => {
         <AccordionPanel>
           <Box justifyContent='center'>
               {
-                Object.keys(reagentPrices[props.itemClass])
+                Object.keys(reagentPrices['by_item_class'][props.itemClass])
                 .sort()
                 .map( 
                   itemSubclass => {
@@ -103,7 +98,6 @@ const ItemClassAccordion = (props) => {
 const ItemSubclassAccordion = (props) => {
   
   const { reagentPrices } = useContext(ReagentPricesContext);
-  // const { priceType } = useContext(PriceTypeContext);
 
   return (
     <Accordion allowMultiple>
@@ -117,7 +111,7 @@ const ItemSubclassAccordion = (props) => {
         <AccordionPanel>
           <Box display='flex' gap='8px' justifyContent='flex-start' flexWrap='wrap'>
               {
-                reagentPrices[props.itemClass][props.itemSubclass]
+                reagentPrices['by_item_class'][props.itemClass][props.itemSubclass]
                 .sort(
                   firstBy(function (a, b) { return a.level - b.level})
                   .thenBy(function (a, b) { return a.item_id - b.item_id})
@@ -131,8 +125,6 @@ const ItemSubclassAccordion = (props) => {
                           price={reagent.min_price}
                           quality={reagent.quality}
                           mediaUrl={reagent.media_url}
-                          isDisabled={!reagent.is_vendor_item 
-                            && reagent.quantity === 0}
                         />
                       </Box>
                     )
@@ -154,7 +146,7 @@ const ItemSubclassAccordion = (props) => {
 // component for Reagent with price
 const ReagentPriceBox = (props) => {
   
-  const bgColor = props.isDisabled ? 'gray.100' : 'green.200'; 
+  const bgColor = props.price === 0 ? 'gray.100' : 'green.200'; 
   
   return (
     <Box display='flex' height='60px' width='225px' bg={bgColor}>
@@ -218,10 +210,25 @@ const ReagentPricesContent = () => {
       
       // convert to json
       const data = await res.json();
-      console.log(data);
+      console.log('retrieved /api/reagent_prices: ', data);
+      
+      // create item_id indexed price dict
+      const dataItemId = {};
+      for (const itemClass of Object.keys(data)) {
+        for (const itemSubclass of Object.keys(data[itemClass])) {
+          for (const reagent of data[itemClass][itemSubclass]) {
+            dataItemId[reagent.item_id] = reagent.min_price
+          }
+        }
+      }
       
       // update state
-      setReagentPrices(data);
+      const reagentPricesState = {
+        by_item_class: data,
+        by_item_id: dataItemId
+      }
+
+      setReagentPrices(reagentPricesState);
     };
     
     // invoke function
@@ -244,7 +251,7 @@ const ReagentPricesContent = () => {
             <AccordionPanel>
               <ReagentFilters />
                 {
-                  Object.keys(reagentPrices)
+                  Object.keys(reagentPrices['by_item_class'])
                   .sort()
                   .map( 
                     itemClass => {
@@ -270,8 +277,6 @@ const ReagentPricesContent = () => {
 export const ReagentPrices = () => {
   
   return (
-    <ReagentPricesProvider>
-      <ReagentPricesContent />
-    </ReagentPricesProvider>
+    <ReagentPricesContent />
   )
 };

@@ -50,22 +50,8 @@ class FreeLunch extends Data {
     cost = 0;
     unit_profit = 0;
     percent_profit = 0;
+    insufficient_data = false;
     
-    // // calculate estimated cost
-    // getCost() {
-    //   return 123;
-    // }
-    
-    // // calculate estimated unit profit
-    // getUnitProfit() {
-    //   return this.vendor_price - this.getCost();
-    // }
-    
-    // // calculate estimated percent profit
-    // getPercentProfit() {
-    //   return Math.Round(this.getUnitProfit() / this.getCost(), 4);
-    // }
-
 }
 
 
@@ -110,6 +96,41 @@ const FreeLunchTable = (props) => {
   // Define columns
   const columnHelper = createColumnHelper();
   const columns = [
+
+
+    // --------------
+    // hidden columns
+    // --------------
+
+    // item id
+    columnHelper.accessor('item_id', {
+      id: 'item_id',
+      cell: (props) => props.getValue(),
+      header: 'Item ID',
+      enableHiding: true,
+      meta: {
+        isNumeric: true
+      }
+    }),
+
+    // item id
+    columnHelper.accessor('insufficient_data', {
+      id: 'insufficient_data',
+      cell: (props) => {
+        return (
+          <Box>
+            {props.getValue() ? 'True': 'False'}
+          </Box>
+        )
+      },
+      header: 'Insufficient Data',
+      enableHiding: true,
+    }),
+    
+    
+    // ---------------
+    // visible columns
+    // ---------------
     
     // item icon
     columnHelper.accessor('media_url', {
@@ -124,17 +145,6 @@ const FreeLunchTable = (props) => {
       enableSorting: false
     }),
     
-    // item id
-    columnHelper.accessor('item_id', {
-      id: 'item_id',
-      cell: (props) => props.getValue(),
-      header: 'Item ID',
-      enableHiding: true,
-      meta: {
-        isNumeric: true
-      }
-    }),
-    
     // item name
     columnHelper.accessor('name', {
       cell: (props) => {
@@ -147,22 +157,6 @@ const FreeLunchTable = (props) => {
       header: 'Item'
     }),
     
-    // estimated cost
-    columnHelper.accessor('cost', {
-      cell: (props) => {
-        return (
-          <Box display='flex' justifyContent='flex-end'>
-            <PriceBox price={props.getValue()}/>
-          </Box>
-        )
-      },
-      header: 'Cost',
-      meta: {
-        isNumeric: true
-      }
-    }),
-    
-
     // vendor price
     columnHelper.accessor('vendor_price', {
       cell: (props) => {
@@ -176,15 +170,44 @@ const FreeLunchTable = (props) => {
       meta: {
         isNumeric: true
       }
+    }),    
+    
+    // estimated cost
+    columnHelper.accessor('cost', {
+      cell: (props) => {
+        return (
+          <>
+            {!props.row.getValue('insufficient_data') &&
+              <Box display='flex' justifyContent='flex-end'>
+                <PriceBox price={props.getValue()}/>
+              </Box>
+            }
+          </>
+        )
+      },
+      header: 'Cost',
+      meta: {
+        isNumeric: true
+      }
     }),
     
     // unit profit
     columnHelper.accessor('unit_profit', {
       cell: (props) => {
         return (
-          <Box display='flex' justifyContent='flex-end'>
-            <PriceBox price={props.getValue()}/>
-          </Box>
+          <>
+            {props.row.getValue('insufficient_data')
+              ? (
+                  <Box display='flex' justifyContent='flex-end'>
+                    Insufficient Data
+                  </Box>
+              ) : (
+                <Box display='flex' justifyContent='flex-end'>
+                  <PriceBox price={props.getValue()}/>
+                </Box>
+              )
+            }
+          </>
         )
       },
       header: 'Unit Profit',
@@ -198,9 +221,13 @@ const FreeLunchTable = (props) => {
     columnHelper.accessor('percent_profit', {
       cell: (props) => {
         return (
-          <Box color={props.getValue() < 0 ? 'red' : 'black'}>
-            {(props.getValue() * 100).toFixed(2)}%
-          </Box>
+          <>
+            {!props.row.getValue('insufficient_data') &&
+              <Box color={props.getValue() < 0 ? 'red' : 'black'}>
+                {(props.getValue() * 100).toFixed(2)}%
+              </Box>
+            }
+          </>
         )
       },
       header: 'Percent Profit',
@@ -212,7 +239,7 @@ const FreeLunchTable = (props) => {
   ];
 
   // hide certain columns by default
-  const hiddenColumns = ['item_id'];
+  const hiddenColumns = ['item_id', 'insufficient_data'];
   
   return (
     <DataTable 
@@ -285,8 +312,16 @@ const FreeLunchesContent = () => {
         && Object.keys(reagentPrices['by_item_id']).length > 0) 
       ? craftedItemRecipes.map((item) => {
       
+      // identify cases where there is not enough price data
+      let insufficientData = false;
+      
       // construct Reagents param
       const reagents = item.reagents.map((reagent) => {
+        
+        if (reagentPrices['by_item_id'][reagent.item_id] === 0) {
+          insufficientData = true;
+        }
+        
         return Reagent.create({
           name: reagent.name,
           item_id: reagent.item_id,
@@ -296,9 +331,9 @@ const FreeLunchesContent = () => {
         })
       })
       
-      const cost = reagents.reduce(
-        (total, item) => total + item.quantity * item.price, 
-        0
+      
+      const cost = insufficientData ? 0 : reagents.reduce(
+        (total, item) => total + item.quantity * item.price, 0
       );
       
       // construct FreeLunch
@@ -310,8 +345,9 @@ const FreeLunchesContent = () => {
         reagents: reagents,
         vendor_price: item.vendor_price,
         cost: cost,
-        unit_profit: item.vendor_price - cost,
-        percent_profit: item.vendor_price / cost - 1
+        unit_profit: insufficientData ? 0 : item.vendor_price - cost,
+        percent_profit: insufficientData ? 0 : item.vendor_price / cost - 1,
+        insufficient_data: insufficientData
       })
       
       return freeLunch

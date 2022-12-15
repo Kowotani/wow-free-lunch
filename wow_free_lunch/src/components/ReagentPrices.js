@@ -139,27 +139,31 @@ const ItemSubclassAccordion = (props) => {
 }
 
 
-// ===========
-// Reagent Box
-// ===========
+// =================
+// Reagent Price Box
+// =================
 
 // component for Reagent with price
 const ReagentPriceBox = (props) => {
   
-  const bgColor = props.price === 0 ? 'gray.100' : 'green.200'; 
-  
   return (
-    <Box display='flex' height='60px' width='225px' bg={bgColor}>
+    <Box display='flex' height='60px' width='225px' bg={props.price === 0 ? 'gray.100' : 'green.200'}>
       <Box display='flex' width='60px' alignItems='center' justifyContent='center'>
         <Image src={props.mediaUrl} height='48px' width='48px' border='4px solid white'/>
       </Box>
       <Box width='165px'>
-        <Box display='block' width='100%' alignItems='flex-end' fontWeight='semibold' padding='4px 4px 0px 4px'>
+        <Box display='flex' alignItems='flex-end' fontWeight='semibold' padding='4px 4px 0px 4px'>
           {props.name}
         </Box>
         <Box display='flex' justifyContent='flex-end'>
           <Box p='4px 4px 4px 0px'>
-            <PriceBox price={props.price}/>
+            {props.price === 0 
+              ? (
+                <Box>No data</Box>
+              ) : (
+                <PriceBox price={props.price}/>
+              )
+            }
           </Box>
         </Box>
       </Box>

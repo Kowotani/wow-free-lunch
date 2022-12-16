@@ -772,7 +772,7 @@ class CraftedItemRecipes(View) :
             ORDER BY
             	cid.level,
             	ci.item_id,
-            	ri.item_id;         
+            	ri.item_id;
         '''
         params = [profession]
         res = qm.query(sql, params)

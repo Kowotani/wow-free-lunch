@@ -59,24 +59,15 @@ class FreeLunch extends Data {
 // Filters 
 // =======
 
-// component for Free Lunches filters
-const FreeLunchesFilters = () => {
+// // component for Free Lunches filters
+// const FreeLunchesFilters = () => {
   
-  // const { priceType, setPriceType } = useContext(PriceTypeContext);
+//   // const { priceType, setPriceType } = useContext(PriceTypeContext);
   
-  return (
-    <Box display='flex' alignItems='center' flexWrap='wrap'>
-      <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
-        <Button>Show All</Button>
-        <Button>Show Profitable Only</Button>
-      </ButtonGroup>
-      <Spacer />
-      <InputGroup width='200px' p='14px'>
-        <Input type='search' placeholder='Crafted item name' />
-      </InputGroup>
-    </Box>
-  )
-}
+//   return (
+
+//   )
+// }
 
 
 // ================
@@ -193,6 +184,7 @@ const FreeLunchTable = (props) => {
     
     // unit profit
     columnHelper.accessor('unit_profit', {
+      id: 'unit_profit',
       cell: (props) => {
         return (
           <>
@@ -214,7 +206,9 @@ const FreeLunchTable = (props) => {
       meta: {
         isNumeric: true
       },
-      sortingFn: 'basic'
+      sortingFn: 'basic',
+      filterFn: 'inNumberRange',
+      enableColumnFilter: true
     }),
     
     // percent profit
@@ -241,11 +235,25 @@ const FreeLunchTable = (props) => {
   // hide certain columns by default
   const hiddenColumns = ['item_id', 'insufficient_data'];
   
+  
+  // ----------------
+  // filtered columns
+  // ----------------
+  
+  // // default to only profitable crafted items
+  // const defaultColumnFilters = [
+  //   {
+  //     id: 'unit_profit', 
+  //     value: [1, 999999]
+  //   }
+  // ]
+  
   return (
     <DataTable 
       columns={columns} 
       data={props.data} 
       hiddenColumns={hiddenColumns}
+      inputColumnFilters={props.columnFilters}
     />
   )
 }
@@ -261,8 +269,11 @@ const FreeLunchesContent = () => {
   
   const { reagentPrices } = useContext(ReagentPricesContext);
   const { profession } = useContext(ProfessionContext);
+  
   const [ craftedItemRecipes, setCraftedItemRecipes] = useState({});
   const [ freeLunchData, setFreeLunchData] = useState({});
+  const [ columnFilters, setColumnFilters] = useState([]);
+  
   
   useEffect(() => {
   
@@ -364,9 +375,29 @@ const FreeLunchesContent = () => {
       <Box display='block' bg='cyan.300' p='10px 14px'>
         Free Lunches
       </Box>
-      <FreeLunchesFilters />
+      <Box display='flex' alignItems='center' flexWrap='wrap'>
+        <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
+          <Button onClick={() => {setColumnFilters([])}}>
+            Show All
+          </Button>
+          <Button 
+            onClick={() => {setColumnFilters([{
+              id: 'unit_profit', value: [1, 999999]
+            }])}}
+          >
+            Show Profitable
+          </Button>
+        </ButtonGroup>
+        <Spacer />
+        <InputGroup width='200px' p='14px'>
+          <Input type='search' placeholder='Item name' />
+        </InputGroup>
+      </Box>
       <Box display='block'>
-        <FreeLunchTable data={freeLunchData} />
+        <FreeLunchTable 
+          data={freeLunchData} 
+          columnFilters={columnFilters}
+        />
       </Box>
     </>
   )

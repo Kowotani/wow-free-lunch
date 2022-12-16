@@ -1,9 +1,10 @@
-import { useState} from "react"
+import { useEffect, useState } from "react"
 import { Table, Thead, Tbody, Tr, Th, Td, chakra } from "@chakra-ui/react"
 // import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
 import {
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel
 } from "@tanstack/react-table"
 import { createTable } from '@tanstack/table-core';
@@ -56,9 +57,10 @@ function GetReactTable(options) {
 // Data Table
 // ==========
 
-export const DataTable = ({ data, columns, hiddenColumns }) => {
+export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) => {
   
   const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState(inputColumnFilters);
   
   // set default column visibility
   let visibilityState = Object.fromEntries(hiddenColumns.map(x => [x, false]));
@@ -71,11 +73,17 @@ export const DataTable = ({ data, columns, hiddenColumns }) => {
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      columnVisibility
+      columnVisibility,
+      columnFilters
     }
   });
+
+  useEffect(() => {
+    setColumnFilters(inputColumnFilters)
+  }, [inputColumnFilters]);  
 
   // something below causes this warning
   // emotion-react.browser.esm.js:398 You are loading @emotion/react when it is already loaded

@@ -138,6 +138,7 @@ const FreeLunchTable = (props) => {
     
     // item name
     columnHelper.accessor('name', {
+      id: 'name',
       cell: (props) => {
         return (
           <Link href={getWowHeadeUrl(props.row.getValue('item_id'))} isExternal>
@@ -315,6 +316,7 @@ const FreeLunchesContent = () => {
 
   }, [profession]);
   
+  
   useEffect(() => {
     
     // calculate Free Lunch data
@@ -370,6 +372,46 @@ const FreeLunchesContent = () => {
     setFreeLunchData(data);
   }, [craftedItemRecipes, reagentPrices])
 
+
+  // manage updating the FreeLunch table filters
+  // filterColumn === null -> remove all filters
+  // filterValue === null -> remove that filterColumn
+  function updateColumnFilters(filterColumn = null, filterValue = null) {
+    
+    const newColumnFilters = [];
+    
+    // modify a single column filter, otherwise reset all filters
+    if (filterColumn !== null) {
+    
+      // update 
+      for (const obj of columnFilters) {
+        if (obj.id !== filterColumn) {
+          newColumnFilters.push(obj)
+        }
+      }
+      if (filterValue !== null) {
+        newColumnFilters.push({
+          id: filterColumn, 
+          value: filterValue
+        });
+      }
+    }
+    
+    // update state
+    console.log('new filters: ', newColumnFilters)
+    setColumnFilters(newColumnFilters);
+  }
+
+
+  // handler for Item Name search input
+  function handleItemNameSearchChange(e) {
+    if (e.target.value.length >= 3) {
+      updateColumnFilters('name', e.target.value);
+    } else if (e.target.value.length === 0) {
+      updateColumnFilters('name', null);
+    }
+  }
+
   return (
     <>
       <Box display='block' bg='cyan.300' p='10px 14px'>
@@ -377,20 +419,22 @@ const FreeLunchesContent = () => {
       </Box>
       <Box display='flex' alignItems='center' flexWrap='wrap'>
         <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
-          <Button onClick={() => {setColumnFilters([])}}>
+          <Button onClick={() => {updateColumnFilters()}}>
             Show All
           </Button>
           <Button 
-            onClick={() => {setColumnFilters([{
-              id: 'unit_profit', value: [1, 999999]
-            }])}}
+            onClick={() => {updateColumnFilters('unit_profit', [1, 999999])}}
           >
             Show Profitable
           </Button>
         </ButtonGroup>
         <Spacer />
         <InputGroup width='200px' p='14px'>
-          <Input type='search' placeholder='Item name' />
+          <Input 
+            type='search' 
+            placeholder='Item name'
+            onChange={(e) => handleItemNameSearchChange(e)}
+          />
         </InputGroup>
       </Box>
       <Box display='block'>

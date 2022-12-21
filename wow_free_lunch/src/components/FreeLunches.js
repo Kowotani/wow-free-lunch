@@ -55,21 +55,6 @@ class FreeLunch extends Data {
 }
 
 
-// =======
-// Filters 
-// =======
-
-// // component for Free Lunches filters
-// const FreeLunchesFilters = () => {
-  
-//   // const { priceType, setPriceType } = useContext(PriceTypeContext);
-  
-//   return (
-
-//   )
-// }
-
-
 // ================
 // Free Lunch Table
 // ================
@@ -78,6 +63,28 @@ class FreeLunch extends Data {
 // return WoWHead url formatted with item_id
 function getWowHeadeUrl(item_id) {
   return `https://www.wowhead.com/wotlk/item=${item_id}/`
+}
+
+
+// return text color for an item given the input quality
+function getItemQualityColor(quality) {
+  switch (quality) {
+    
+    case 'COMMON':
+      return 'black'
+      
+    case 'UNCOMMON':
+      return '#1eff00'
+      
+    case 'RARE':
+      return '#0070dd'
+      
+    case 'EPIC': 
+      return '#a335ee'
+    
+    default:
+      return 'black'
+  }
 }
 
 
@@ -104,7 +111,7 @@ const FreeLunchTable = (props) => {
       }
     }),
 
-    // item id
+    // insufficient data
     columnHelper.accessor('insufficient_data', {
       id: 'insufficient_data',
       cell: (props) => {
@@ -115,6 +122,20 @@ const FreeLunchTable = (props) => {
         )
       },
       header: 'Insufficient Data',
+      enableHiding: true,
+    }),
+    
+    // quality
+    columnHelper.accessor('quality', {
+      id: 'quality',
+      cell: (props) => {
+        return (
+          <Box>
+            {props.getValue()}
+          </Box>
+        )
+      },
+      header: 'Quality',
       enableHiding: true,
     }),
     
@@ -141,7 +162,11 @@ const FreeLunchTable = (props) => {
       id: 'name',
       cell: (props) => {
         return (
-          <Link href={getWowHeadeUrl(props.row.getValue('item_id'))} isExternal>
+          <Link
+            color={getItemQualityColor(props.row.getValue('quality'))}
+            href={getWowHeadeUrl(props.row.getValue('item_id'))} 
+            isExternal
+          >
             {props.getValue()}
           </Link>
         )
@@ -234,7 +259,7 @@ const FreeLunchTable = (props) => {
   ];
 
   // hide certain columns by default
-  const hiddenColumns = ['item_id', 'insufficient_data'];
+  const hiddenColumns = ['item_id', 'insufficient_data', 'quality'];
   
   
   // ----------------

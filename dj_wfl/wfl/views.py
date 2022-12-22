@@ -769,6 +769,7 @@ class CraftedItemRecipes(View) :
             WHERE 
             	p.name = %s
             	AND e.is_classic
+            	AND cid.level <= 10
             ORDER BY
             	cid.level,
             	ci.item_id,

@@ -7,6 +7,7 @@ import {
   Input,
   InputGroup,
   Link,
+  Progress, 
   Spacer,
 } from '@chakra-ui/react';
 
@@ -300,6 +301,7 @@ const FreeLunchesContent = () => {
   const [ freeLunchData, setFreeLunchData] = useState({});
   const [ columnFilters, setColumnFilters] = useState([]);
   
+  const [ isLoading, setIsLoading ] = useState(true);
   
   useEffect(() => {
   
@@ -307,6 +309,8 @@ const FreeLunchesContent = () => {
 
     // async data fetch
     const fetchData = async() => {
+      
+      setIsLoading(true);
       
       console.log('fetching /api/crafted_item_recipes ...', profession);
       
@@ -333,6 +337,7 @@ const FreeLunchesContent = () => {
       
       // update state
       setCraftedItemRecipes(data['data']);
+      setIsLoading(false);
     };
     
     // invoke function
@@ -436,41 +441,47 @@ const FreeLunchesContent = () => {
       updateColumnFilters('name', null);
     }
   }
-
+  
   return (
     <>
       <Box display='block' bg='cyan.300' p='10px 14px'>
         Free Lunches
       </Box>
       <Box display='flex' alignItems='center' flexWrap='wrap'>
-        <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
-          <Button onClick={() => {updateColumnFilters()}}>
-            Show All
-          </Button>
-          <Button 
-            onClick={() => {updateColumnFilters('unit_profit', [1, 999999])}}
-          >
-            Show Profitable
-          </Button>
-        </ButtonGroup>
-        <Spacer />
-        <InputGroup width='200px' p='14px'>
-          <Input 
-            type='search' 
-            placeholder='Item name'
-            onChange={(e) => handleItemNameSearchChange(e)}
+          <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
+            <Button onClick={() => {updateColumnFilters()}}>
+              Show All
+            </Button>
+            <Button 
+              onClick={() => {updateColumnFilters('unit_profit', [1, 999999])}}
+            >
+              Show Profitable
+            </Button>
+          </ButtonGroup>
+          <Spacer />
+          <InputGroup width='200px' p='14px'>
+            <Input 
+              type='search' 
+              placeholder='Item name'
+              onChange={(e) => handleItemNameSearchChange(e)}
+            />
+          </InputGroup>
+        </Box>
+      {isLoading && 
+        <Box display='block' alignItems='center' flexWrap='wrap'>
+          <Progress isIndeterminate />
+        </Box>
+      }
+      {!isLoading && 
+        <Box display='block'>
+          <FreeLunchTable 
+            data={freeLunchData} 
+            columnFilters={columnFilters}
           />
-        </InputGroup>
-      </Box>
-      <Box display='block'>
-        <FreeLunchTable 
-          data={freeLunchData} 
-          columnFilters={columnFilters}
-        />
-      </Box>
+        </Box>
+      }
     </>
   )
-  
 }
 
 

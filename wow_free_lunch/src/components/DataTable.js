@@ -151,7 +151,7 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
           )
           : (
               <Tr key={'empty_state_row'}>
-                <Td key={'empty_state_div'}>
+                <Td key={'empty_state_div'} colSpan={6}>
                   There are no free lunches
                 </Td>
               </Tr>

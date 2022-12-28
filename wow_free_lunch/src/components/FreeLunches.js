@@ -301,8 +301,8 @@ const FreeLunchesContent = () => {
   const { profession } = useContext(ProfessionContext);
   const { reagentPrices } = useContext(ReagentPricesContext);
   
-  // const [ freeLunchData, setFreeLunchData] = useState({});
   const [ columnFilters, setColumnFilters] = useState([]);
+  const [ searchValue, setSearchValue] = useState('');
   
   useEffect(() => {
   
@@ -454,11 +454,18 @@ const FreeLunchesContent = () => {
 
   // handler for Item Name search input
   function handleItemNameSearchChange(e) {
+    setSearchValue(e.target.value);
     if (e.target.value.length >= 3) {
       updateColumnFilters('name', e.target.value);
     } else if (e.target.value.length === 0) {
       updateColumnFilters('name', null);
     }
+  }
+  
+  // function to show all Free Lunches (eg. remove all filters)
+  function showAllFreeLunches() {
+    setSearchValue('');
+    updateColumnFilters();
   }
   
   return (
@@ -467,26 +474,27 @@ const FreeLunchesContent = () => {
         Free Lunches
       </Box>
       <Box display='flex' alignItems='center' flexWrap='wrap'>
-          <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
-            <Button onClick={() => {updateColumnFilters()}}>
-              Show All
-            </Button>
-            <Button 
-              onClick={() => {updateColumnFilters('unit_profit', [1, 999999])}}
-            >
-              Show Profitable
-            </Button>
-          </ButtonGroup>
-          <Spacer />
-          <InputGroup width='200px' p='14px'>
-            <Input 
-              type='search' 
-              placeholder='Item name'
-              onChange={(e) => handleItemNameSearchChange(e)}
-            />
-          </InputGroup>
-        </Box>
-      {(craftedItemRecipes['is_loading'] || reagentPrices['is_loading']) && 
+        <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
+          <Button onClick={() => {showAllFreeLunches()}}>
+            Show All
+          </Button>
+          <Button 
+            onClick={() => {updateColumnFilters('unit_profit', [1, 999999])}}
+          >
+            Show Profitable
+          </Button>
+        </ButtonGroup>
+        <Spacer />
+        <InputGroup width='200px' p='14px'>
+          <Input 
+            value={searchValue}
+            type='search' 
+            placeholder='Item name'
+            onChange={(e) => handleItemNameSearchChange(e)}
+          />
+        </InputGroup>
+      </Box>
+      {(reagentPrices['is_loading'] || craftedItemRecipes['is_loading'] || freeLunches['is_loading']) && 
         <Box display='block' alignItems='center' flexWrap='wrap'>
           <Progress isIndeterminate />
         </Box>

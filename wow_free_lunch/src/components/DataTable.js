@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { 
   Box, 
-  Button,
   Table, 
   Thead, 
   Tbody, 
@@ -103,6 +102,8 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
     setColumnFilters(inputColumnFilters)
   }, [inputColumnFilters]);  
 
+  console.log('filtered rows: ', table.getFilteredRowModel().rows.length)
+
   // something below causes this warning
   // emotion-react.browser.esm.js:398 You are loading @emotion/react when it is already loaded
   return (
@@ -161,17 +162,17 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
         }
       </Tbody>
     </Table>
-    {table.getRowModel().rows.length === 0 
-        && !craftedItemRecipes['is_loading']
-        && !freeLunches['is_loading'] 
-        && !reagentPrices['is_loading'] 
-        && (
-          <Box display='flex' alignItems='center' justifyContent='center' textAlign='center' p='10px'>
-            No free lunches found <br/>
-            Click the Show All button to view all craftable items
-          </Box>
-        )
-      }
+    {table.getFilteredRowModel().rows.length === 0 
+      && !craftedItemRecipes['is_loading']
+      && !freeLunches['is_loading'] 
+      && !reagentPrices['is_loading'] 
+      && (
+        <Box display='flex' alignItems='center' justifyContent='center' textAlign='center' p='10px'>
+          No free lunches found <br/>
+          Click the Show All button to view all craftable items
+        </Box>
+      )
+    }
     </>
   )
 }

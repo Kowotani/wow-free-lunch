@@ -9,6 +9,7 @@ import {
   Link,
   Progress, 
   Spacer,
+  Spinner,
 } from '@chakra-ui/react';
 
 import { createColumnHelper } from "@tanstack/react-table";
@@ -88,6 +89,20 @@ function getItemQualityColor(quality) {
     default:
       return 'black'
   }
+}
+
+
+// spinner component
+const TableSpinner = () => {
+  return (
+    <Spinner
+      thickness='4px'
+      size='lg'
+      speed='0.85s'
+      emptyColor='gray.200'
+      color='blue.500'
+    />
+  )
 }
 
 
@@ -199,7 +214,10 @@ const FreeLunchTable = (props) => {
           <>
             {!props.row.getValue('insufficient_data') &&
               <Box display='flex' justifyContent='flex-end'>
-                <PriceBox price={props.getValue()}/>
+                {isNaN(props.getValue())
+                  ? <TableSpinner />
+                  : <PriceBox price={props.getValue()}/>
+                }
               </Box>
             }
           </>
@@ -224,7 +242,10 @@ const FreeLunchTable = (props) => {
                   </Box>
               ) : (
                 <Box display='flex' justifyContent='flex-end'>
-                  <PriceBox price={props.getValue()}/>
+                  {isNaN(props.getValue())
+                    ? <TableSpinner />
+                    : <PriceBox price={props.getValue()}/>
+                  }
                 </Box>
               )
             }
@@ -247,7 +268,10 @@ const FreeLunchTable = (props) => {
           <>
             {!props.row.getValue('insufficient_data') &&
               <Box color={props.getValue() < 0 ? 'red' : 'black'}>
-                {(props.getValue() * 100).toFixed(2)}%
+                {isNaN(props.getValue()) 
+                  ? <TableSpinner /> 
+                  : (props.getValue() * 100).toFixed(2) + '%'
+                }
               </Box>
             }
           </>

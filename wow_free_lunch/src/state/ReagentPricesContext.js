@@ -9,6 +9,7 @@ export const ReagentPricesContext = createContext({});
 export const ReagentPricesProvider = ({children}) => {
   
   const [reagentPrices, setReagentPrices] = useState({
+    is_loading: false,
     by_item_class: {},
     by_item_id: {}
   });

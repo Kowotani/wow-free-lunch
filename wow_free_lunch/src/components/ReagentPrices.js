@@ -190,6 +190,13 @@ const ReagentPricesContent = () => {
     // async data fetch
     const fetchData = async() => {
       
+      const loadingReagentPricesState = {
+        is_loading: true,
+        by_item_class: reagentPrices['by_item_class'],
+        by_item_id: reagentPrices['by_item_id']
+      };
+      setReagentPrices(loadingReagentPricesState);
+      
       console.log('fetching /api/reagent_prices ...', profession, realm, faction);
       
       // prepare config
@@ -227,12 +234,12 @@ const ReagentPricesContent = () => {
       }
       
       // update state
-      const reagentPricesState = {
+      const loadedReagentPricesState = {
+        is_loading: false,
         by_item_class: data,
         by_item_id: dataItemId
       }
-
-      setReagentPrices(reagentPricesState);
+      setReagentPrices(loadedReagentPricesState);
     };
     
     // invoke function

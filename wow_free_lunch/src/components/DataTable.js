@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Table, Thead, Tbody, Tr, Th, Td, chakra } from "@chakra-ui/react"
 // import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
 import {
@@ -8,6 +8,10 @@ import {
   getSortedRowModel
 } from "@tanstack/react-table"
 import { createTable } from '@tanstack/table-core';
+
+import { CraftedItemRecipesContext } from '../state/CraftedItemRecipesContext';
+import { FreeLunchesContext } from '../state/FreeLunchesContext';
+import { ReagentPricesContext } from '../state/ReagentPricesContext';
 
 
 // ===========
@@ -61,6 +65,10 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
   
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState(inputColumnFilters);
+  
+  const { craftedItemRecipes } = useContext(CraftedItemRecipesContext);
+  const { freeLunches } = useContext(FreeLunchesContext);
+  const { reagentPrices } = useContext(ReagentPricesContext);  
   
   // set default column visibility
   let visibilityState = Object.fromEntries(hiddenColumns.map(x => [x, false]));
@@ -124,20 +132,31 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
         ))}
       </Thead>
       <Tbody>
-        {table.getRowModel().rows.map(row => (
-          <Tr key={row.id}>
-            {row.getVisibleCells().map(cell => {
-              // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-              const meta = cell.column.columnDef.meta
-              return (
-                <Td key={cell.id} isNumeric={meta?.isNumeric}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        {table.getRowModel().rows.length > 0
+          ? table.getRowModel().rows.map(
+            row => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map(cell => {
+                  // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                  const meta = cell.column.columnDef.meta
+                  return (
+                    <Td key={cell.id} isNumeric={meta?.isNumeric}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </Td>
+                  )
+                  
+                })}
+              </Tr>
+            )
+          )
+          : (
+              <Tr key={'empty_state_row'}>
+                <Td key={'empty_state_div'}>
+                  There are no free lunches
                 </Td>
-              )
-              
-            })}
-          </Tr>
-        ))}
+              </Tr>
+          )
+        }
       </Tbody>
     </Table>
   )

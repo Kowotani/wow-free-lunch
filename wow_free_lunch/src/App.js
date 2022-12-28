@@ -15,8 +15,9 @@ import { Header } from './components/Header'
 import { ReagentPrices } from './components/ReagentPrices'
 import { FreeLunches } from './components/FreeLunches'
 
-
+import { CraftedItemRecipesProvider } from './state/CraftedItemRecipesContext';
 import { FactionProvider } from './state/FactionContext';
+import { FreeLunchesProvider } from './state/FreeLunchesContext';
 import { NavProvider } from './state/NavContext';
 import { ProfessionProvider } from './state/ProfessionContext';
 import { ReagentPricesProvider } from './state/ReagentPricesContext';
@@ -31,44 +32,49 @@ function App() {
   
   return (
     <ChakraProvider theme={theme}>
-      <FactionProvider>
-        <NavProvider>
-          <ProfessionProvider>
-            <RealmProvider>
-              <ReagentPricesProvider>
-                <Header />
-                <Box>
-                  <ReagentPrices />
-                </Box>
-                <Box>
-                  <FreeLunches />
-                </Box>
+      <CraftedItemRecipesProvider>
+        <FactionProvider>
+          <FreeLunchesProvider>
+            <NavProvider>
+              <ProfessionProvider>
+                <RealmProvider>
+                  <ReagentPricesProvider>
                 
-                <Box textAlign="center" fontSize="xl">
-                  <Grid minH="100vh" p={3}>
-                    <ColorModeSwitcher justifySelf="flex-end" />
-                    <VStack spacing={8}>
-                      <Logo h="40vmin" pointerEvents="none" />
-                      <Text>
-                        Edit <Code fontSize="xl">src/App.js</Code> and save to reload.
-                      </Text>
-                      <Link
-                        color="teal.500"
-                        href="https://chakra-ui.com"
-                        fontSize="2xl"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Learn Chakra
-                      </Link>
-                    </VStack>
-                  </Grid>
-                </Box>
-              </ReagentPricesProvider>
-            </RealmProvider>
-          </ProfessionProvider>
-        </NavProvider>
-      </FactionProvider>
+                    <Header />
+                    <Box>
+                      <ReagentPrices />
+                    </Box>
+                    <Box>
+                      <FreeLunches />
+                    </Box>
+                    
+                    <Box textAlign="center" fontSize="xl">
+                      <Grid minH="100vh" p={3}>
+                        <ColorModeSwitcher justifySelf="flex-end" />
+                        <VStack spacing={8}>
+                          <Logo h="40vmin" pointerEvents="none" />
+                          <Text>
+                            Edit <Code fontSize="xl">src/App.js</Code> and save to reload.
+                          </Text>
+                          <Link
+                            color="teal.500"
+                            href="https://chakra-ui.com"
+                            fontSize="2xl"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Learn Chakra
+                          </Link>
+                        </VStack>
+                      </Grid>
+                    </Box>
+                  </ReagentPricesProvider>
+                </RealmProvider>
+              </ProfessionProvider>
+            </NavProvider>
+          </FreeLunchesProvider>
+        </FactionProvider>
+      </CraftedItemRecipesProvider>
     </ChakraProvider>
   );
 }

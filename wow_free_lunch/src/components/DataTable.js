@@ -1,5 +1,15 @@
 import { useContext, useEffect, useState } from "react"
-import { Table, Thead, Tbody, Tr, Th, Td, chakra } from "@chakra-ui/react"
+import { 
+  Box, 
+  Button,
+  Table, 
+  Thead, 
+  Tbody, 
+  Tr, 
+  Th, 
+  Td, 
+  chakra 
+} from "@chakra-ui/react"
 // import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
 import {
   flexRender,
@@ -96,6 +106,7 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
   // something below causes this warning
   // emotion-react.browser.esm.js:398 You are loading @emotion/react when it is already loaded
   return (
+    <>
     <Table>
       <Thead>
         {table.getHeaderGroups().map(headerGroup => (
@@ -132,8 +143,7 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
         ))}
       </Thead>
       <Tbody>
-        {table.getRowModel().rows.length > 0
-          ? table.getRowModel().rows.map(
+        {table.getRowModel().rows.map(
             row => (
               <Tr key={row.id}>
                 {row.getVisibleCells().map(cell => {
@@ -144,21 +154,24 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </Td>
                   )
-                  
                 })}
               </Tr>
             )
           )
-          : (
-              <Tr key={'empty_state_row'}>
-                <Td key={'empty_state_div'} colSpan={6}>
-                  There are no free lunches
-                </Td>
-              </Tr>
-          )
         }
       </Tbody>
     </Table>
+    {table.getRowModel().rows.length === 0 
+        && !craftedItemRecipes['is_loading']
+        && !freeLunches['is_loading'] 
+        && !reagentPrices['is_loading'] 
+        && (
+          <Box display='flex' alignItems='center' justifyContent='center' textAlign='center' p='10px'>
+            No free lunches found <br/>
+            Click the Show All button to view all craftable items
+          </Box>
+        )
+      }
+    </>
   )
-  
 }

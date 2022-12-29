@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { 
-  Box, 
+  Box,
+  Spinner,
   Table, 
   Thead, 
   Tbody, 
@@ -102,10 +103,8 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
     setColumnFilters(inputColumnFilters)
   }, [inputColumnFilters]);  
 
-  console.log('filtered rows: ', table.getFilteredRowModel().rows.length)
+  console.log('data length: ', table.getCoreRowModel().rows.length, 'rows: ', table.getFilteredRowModel().rows.length)
 
-  // something below causes this warning
-  // emotion-react.browser.esm.js:398 You are loading @emotion/react when it is already loaded
   return (
     <>
     <Table>
@@ -156,7 +155,7 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
                     </Td>
                   )
                 })}
-              </Tr>
+              </Tr> 
             )
           )
         }

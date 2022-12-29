@@ -98,7 +98,7 @@ const TableSpinner = () => {
     <Spinner
       thickness='4px'
       size='lg'
-      speed='0.85s'
+      speed='1s'
       emptyColor='gray.200'
       color='blue.500'
     />
@@ -215,7 +215,7 @@ const FreeLunchTable = (props) => {
             {!props.row.getValue('insufficient_data') &&
               <Box display='flex' justifyContent='flex-end'>
                 {isNaN(props.getValue())
-                  ? <TableSpinner />
+                  ? null
                   : <PriceBox price={props.getValue()}/>
                 }
               </Box>
@@ -269,7 +269,7 @@ const FreeLunchTable = (props) => {
             {!props.row.getValue('insufficient_data') &&
               <Box color={props.getValue() < 0 ? 'red' : 'black'}>
                 {isNaN(props.getValue()) 
-                  ? <TableSpinner /> 
+                  ? null 
                   : (props.getValue() * 100).toFixed(2) + '%'
                 }
               </Box>

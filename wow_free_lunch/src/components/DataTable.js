@@ -1,5 +1,6 @@
-import { useContext, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { 
+  chakra,
   Box,
   ScaleFade,
   Table, 
@@ -8,7 +9,7 @@ import {
   Tr, 
   Th, 
   Td, 
-  chakra 
+  VStack
 } from "@chakra-ui/react"
 // import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
 import {
@@ -18,10 +19,6 @@ import {
   getSortedRowModel
 } from "@tanstack/react-table"
 import { createTable } from '@tanstack/table-core';
-
-import { CraftedItemRecipesContext } from '../state/CraftedItemRecipesContext';
-import { FreeLunchesContext } from '../state/FreeLunchesContext';
-import { ReagentPricesContext } from '../state/ReagentPricesContext';
 
 
 // ===========
@@ -76,10 +73,6 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState(inputColumnFilters);
   
-  const { craftedItemRecipes } = useContext(CraftedItemRecipesContext);
-  const { freeLunches } = useContext(FreeLunchesContext);
-  const { reagentPrices } = useContext(ReagentPricesContext);  
-  
   // set default column visibility
   const [columnVisibility, setColumnVisibility] = useState(
     Object.fromEntries(hiddenColumns.map(x => [x, false])));
@@ -105,9 +98,6 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
   useEffect(() => {
     setColumnFilters(inputColumnFilters)
   }, [inputColumnFilters]);  
-
-  // console.log('data: ', table.getCoreRowModel().rows.length, 'filtered: ', table.getFilteredRowModel().rows.length)
-  console.log('freeLunches is loading: ', freeLunches['is_loading'])
 
   return (
     <>
@@ -170,7 +160,7 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
         <ScaleFade 
           initialScale={0.8} 
           in={true} 
-          delay={0.3}
+          delay={0.4}
           transition={{
             enter: { duration: 0.5 }
           }}
@@ -183,8 +173,22 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
             p='10px' 
             background='gray.200'
           >
-            No free lunches found <br/>
-            Click the Show All button to view all craftable items
+            <VStack>
+              <Box>No free lunches found</Box>
+              <Box>Click the 
+                <Box 
+                  display='inline' 
+                  background='pink.500' 
+                  color='white' 
+                  borderRadius='md'
+                  p='2px 6px'
+                  m='6px'
+                >
+                Show All
+                </Box> 
+                button above to view all craftable items
+              </Box>
+            </VStack>
           </Box>
         </ScaleFade>
       )

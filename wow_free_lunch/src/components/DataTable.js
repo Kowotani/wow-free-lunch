@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { 
   Box,
-  Spinner,
+  ScaleFade,
   Table, 
   Thead, 
   Tbody, 
@@ -81,8 +81,11 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
   const { reagentPrices } = useContext(ReagentPricesContext);  
   
   // set default column visibility
-  let visibilityState = Object.fromEntries(hiddenColumns.map(x => [x, false]));
-  const [columnVisibility, setColumnVisibility] = useState(visibilityState);
+  const [columnVisibility, setColumnVisibility] = useState(
+    Object.fromEntries(hiddenColumns.map(x => [x, false])));
+  
+  // ref for no Free Lunch message 
+  const noFreeLunchRef = useRef(null);
   
   const table = GetReactTable({
     columns,
@@ -103,7 +106,8 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
     setColumnFilters(inputColumnFilters)
   }, [inputColumnFilters]);  
 
-  console.log('data length: ', table.getCoreRowModel().rows.length, 'rows: ', table.getFilteredRowModel().rows.length)
+  // console.log('data: ', table.getCoreRowModel().rows.length, 'filtered: ', table.getFilteredRowModel().rows.length)
+  console.log('freeLunches is loading: ', freeLunches['is_loading'])
 
   return (
     <>
@@ -162,14 +166,27 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
       </Tbody>
     </Table>
     {table.getFilteredRowModel().rows.length === 0 
-      && !craftedItemRecipes['is_loading']
-      && !freeLunches['is_loading'] 
-      && !reagentPrices['is_loading'] 
       && (
-        <Box display='flex' alignItems='center' justifyContent='center' textAlign='center' p='10px'>
-          No free lunches found <br/>
-          Click the Show All button to view all craftable items
-        </Box>
+        <ScaleFade 
+          initialScale={0.8} 
+          in={true} 
+          delay={0.3}
+          transition={{
+            enter: { duration: 0.5 }
+          }}
+        >
+          <Box 
+            display='flex' 
+            alignItems='center' 
+            justifyContent='center' 
+            textAlign='center' 
+            p='10px' 
+            background='gray.200'
+          >
+            No free lunches found <br/>
+            Click the Show All button to view all craftable items
+          </Box>
+        </ScaleFade>
       )
     }
     </>

@@ -11,6 +11,7 @@ import {
   Image,
   Input,
   InputGroup,
+  Link,
   Spacer,
 } from '@chakra-ui/react';
 // import { SearchIcon } from '@chakra-ui/icons'
@@ -24,6 +25,8 @@ import { ReagentPricesContext } from '../state/ReagentPricesContext';
 import { RealmContext } from '../state/RealmContext';
 
 import { PriceBox } from './PriceBox'
+
+import { getWowHeadUrl } from '../utils';
 
 
 // =======
@@ -120,7 +123,8 @@ const ItemSubclassAccordion = (props) => {
                   reagent => {
                     return (
                       <Box key={reagent.item_id} display='block' padding='8px'>
-                        <ReagentPriceBox 
+                        <ReagentPriceBox
+                          itemId={reagent.item_id}
                           name={reagent.name} 
                           price={reagent.min_price}
                           quality={reagent.quality}
@@ -145,15 +149,19 @@ const ItemSubclassAccordion = (props) => {
 
 // component for Reagent with price
 const ReagentPriceBox = (props) => {
-  
+
   return (
     <Box display='flex' height='60px' width='225px' bg={props.price === 0 ? 'gray.100' : 'green.200'}>
       <Box display='flex' width='60px' alignItems='center' justifyContent='center'>
-        <Image src={props.mediaUrl} height='48px' width='48px' border='4px solid white'/>
+         <Link href={getWowHeadUrl(props.itemId)} isExternal>
+          <Image src={props.mediaUrl} height='48px' width='48px' border='4px solid white'/>
+        </Link>
       </Box>
       <Box width='165px'>
         <Box display='flex' alignItems='flex-end' fontWeight='semibold' padding='4px 4px 0px 4px'>
-          {props.name}
+          <Link href={getWowHeadUrl(props.itemId)} isExternal>
+            {props.name}
+          </Link>
         </Box>
         <Box display='flex' justifyContent='flex-end'>
           <Box p='4px 4px 4px 0px'>

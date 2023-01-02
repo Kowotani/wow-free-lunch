@@ -25,6 +25,8 @@ import { FreeLunchesContext } from '../state/FreeLunchesContext';
 import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext } from '../state/ReagentPricesContext';
 
+import { getWowHeadUrl } from '../utils';
+
 
 // =======
 // Classes 
@@ -62,12 +64,6 @@ class FreeLunch extends Data {
 // ================
 // Free Lunch Table
 // ================
-
-
-// return WoWHead url formatted with item_id
-function getWowHeadeUrl(item_id) {
-  return `https://www.wowhead.com/wotlk/item=${item_id}/`
-}
 
 
 // return text color for an item given the input quality
@@ -166,7 +162,7 @@ const FreeLunchTable = (props) => {
     columnHelper.accessor('media_url', {
       cell: (props) => {
         return (
-          <Link href={getWowHeadeUrl(props.row.getValue('item_id'))} isExternal>
+          <Link href={getWowHeadUrl(props.row.getValue('item_id'))} isExternal>
             <Image src={props.getValue()} height='48px' width='48px' border='4px solid cyan' minWidth='48px'/>
           </Link>
         )
@@ -182,7 +178,7 @@ const FreeLunchTable = (props) => {
         return (
           <Link
             color={getItemQualityColor(props.row.getValue('quality'))}
-            href={getWowHeadeUrl(props.row.getValue('item_id'))} 
+            href={getWowHeadUrl(props.row.getValue('item_id'))} 
             isExternal
           >
             {props.getValue()}

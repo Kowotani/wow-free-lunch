@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button, 
@@ -325,8 +325,9 @@ const FreeLunchesContent = () => {
   const { profession } = useContext(ProfessionContext);
   const { reagentPrices } = useContext(ReagentPricesContext);
   
-  const [ columnFilters, setColumnFilters] = useState([]);
-  const [ searchValue, setSearchValue] = useState('');
+  const [ columnFilters, setColumnFilters ] = useState([]);
+  const [ searchValue, setSearchValue ] = useState('');
+  
   
   useEffect(() => {
   
@@ -446,6 +447,20 @@ const FreeLunchesContent = () => {
   }, [craftedItemRecipes['recipes'], reagentPrices])
 
 
+  useEffect(() => {
+    
+    // debounce search value
+    
+    const timeout = searchValue.length === 0 ? 0 : 1000;
+    console.log('debouncing by: ', timeout)
+    const updateSearchValue = setTimeout(() => {
+      updateColumnFilters('name', searchValue)
+    }, timeout)
+    
+    return () => clearTimeout(updateSearchValue)
+  }, [searchValue])
+
+
   // manage updating the FreeLunch table filters
   // filterColumn === null -> remove all filters
   // filterValue === null -> remove that filterColumn
@@ -476,21 +491,19 @@ const FreeLunchesContent = () => {
   }
 
 
-  // handler for Item Name search input
-  function handleItemNameSearchChange(e) {
-    setSearchValue(e.target.value);
-    if (e.target.value.length >= 3) {
-      updateColumnFilters('name', e.target.value);
-    } else if (e.target.value.length === 0) {
-      updateColumnFilters('name', null);
-    }
-  }
-  
   // function to show all Free Lunches (eg. remove all filters)
   function showAllFreeLunches() {
     setSearchValue('');
     updateColumnFilters();
   }
+  
+  const freeLunchTable = useMemo(() => (
+    <FreeLunchTable 
+      data={freeLunches['free_lunches']} 
+      columnFilters={columnFilters}
+    />    
+  ), [freeLunches['free_lunches'], columnFilters])
+  
   
   return (
     <>
@@ -514,7 +527,7 @@ const FreeLunchesContent = () => {
             value={searchValue}
             type='search' 
             placeholder='Item name'
-            onChange={(e) => handleItemNameSearchChange(e)}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
         </InputGroup>
       </Box>
@@ -525,10 +538,7 @@ const FreeLunchesContent = () => {
       }
       {!(reagentPrices['is_loading'] || craftedItemRecipes['is_loading'] || freeLunches['is_loading']) &&
         <Box display='block'>
-          <FreeLunchTable 
-            data={freeLunches['free_lunches']} 
-            columnFilters={columnFilters}
-          />
+          {freeLunchTable}
         </Box>
       }
     </>

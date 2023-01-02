@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { 
   chakra,
   Box,
@@ -76,9 +76,6 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
   // set default column visibility
   const [columnVisibility, setColumnVisibility] = useState(
     Object.fromEntries(hiddenColumns.map(x => [x, false])));
-  
-  // ref for no Free Lunch message 
-  const noFreeLunchRef = useRef(null);
   
   const table = GetReactTable({
     columns,

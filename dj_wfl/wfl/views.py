@@ -17,7 +17,7 @@ from wfl.serializers import (AuctionSerializer, AuctionHouseSerializer,
     RealmSerializer, RealmConnectionSerializer, RecipeSerializer, 
     RegionSerializer, StgRecipeItemSerializer)
 
-from wfl.utils import QueryManager
+from wfl.utils import Profession, QueryManager
 
 import json
 
@@ -809,6 +809,129 @@ class CraftedItemRecipes(View) :
         }
         for v in temp.values():
             d['data'].append(v)
+
+        # return data
+        return HttpResponse(json.dumps(d), content_type='application/json')
+        
+
+'''
+--------
+Home Nav
+--------
+'''
+
+'''
+This class provides endpoints for retrieving All profession Free Lunches
+'''
+class AllFreeLunches(View) :
+    
+    '''
+    Retrieve Free Lunches for the given inputs
+    - realm
+    - faction
+    - date (date or latest)
+    Supported methods: POST
+    '''
+    def post(self, request):
+    
+        response_data = {}
+        qm = QueryManager()
+        
+        # parse inputs
+        data = json.loads(request.body)
+        realm = data.get('realm')
+        faction = data.get('faction')
+        date = data.get('date')
+        
+        # get latest update_data if required
+        if date == 'latest':
+            sql = '''
+				SELECT MAX(update_date) AS update_date
+				FROM auction a
+				JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
+				JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
+				JOIN realm r ON rc.realm_id = r.realm_id
+				WHERE 
+					r.name = %s
+					AND ah.faction = %s
+            '''
+            params = [realm, faction]
+            res = qm.query(sql, params)
+            date = res[0]['update_date'].strftime('%Y-%m-%d')
+        
+        # query data
+        sql = '''
+            SELECT
+                p.name AS profession,
+            	-- crafted item
+            	ci.name AS crafted_item_name,
+            	ci.item_id AS crafted_item_id,
+            	cid.level AS level,
+            	cid.media_url AS crafted_item_media_url,
+            	cid.sell_price AS vendor_price,
+            	cid.quality,
+            	-- profitability
+            	SUM(rea.item_quantity * ap.min_price) AS cost,
+            	cid.sell_price - SUM(rea.item_quantity * ap.min_price) AS unit_profit,
+            	cid.sell_price / SUM(rea.item_quantity * ap.min_price) - 1 AS percent_profit
+            FROM profession p
+            JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
+            JOIN expansion e ON pst.expansion_id = e.expansion_id
+            JOIN recipe rec ON pst.skill_tier_id = rec.skill_tier_id
+            -- crafted items
+            JOIN item ci ON rec.crafted_item_id = ci.item_id
+            JOIN item_data cid ON ci.classic_item_data_id = cid.item_data_id
+            -- reagents
+            JOIN reagent rea ON rec.recipe_id = rea.recipe_id
+            JOIN item ri ON rea.item_id = ri.item_id
+            LEFT JOIN 
+            (
+            	SELECT 
+            		a.item_id,
+            		MIN(CASE WHEN a.buyout_unit_price > 0 THEN a.buyout_unit_price END) AS min_price
+            	FROM auction a 
+            	JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
+            	JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
+            	JOIN realm r ON rc.realm_id = r.realm_id
+            	WHERE 
+            		r.name = %s
+            		AND ah.faction = %s
+            		AND a.update_date = %s
+            	GROUP BY 1
+            ) ap ON ri.item_id = ap.item_id
+            WHERE 
+            	p.is_crafting
+            	AND e.is_classic
+            GROUP BY 1, 2, 3, 4, 5, 6
+            HAVING 
+            	MAX(ap.min_price IS NULL) = False
+            ORDER BY
+                p.name,
+            	cid.level,
+            	ci.item_id;
+        '''
+        params = [realm, faction, date]
+        res = qm.query(sql, params)
+
+        # format data
+        d = {}
+        for profession in Profession:
+            d[profession.value] = []
+        for r in res:
+            d[r['profession']].append(
+                {
+                    'profession': r['profession'],
+                    'name': r['name'],
+                    'item_id': r['item_id'],
+                    'level': r['level'],
+                    'quality': r['quality'],
+                    'media_url': r['media_url'],
+                    'vendor_price': r['vendor_price'],
+                    'cost': r['cost'],
+                    'unit_profit': r['unit_profit'],
+                    'percent_profit': r['percent_profit'],
+                }
+            )
 
         # return data
         return HttpResponse(json.dumps(d), content_type='application/json')

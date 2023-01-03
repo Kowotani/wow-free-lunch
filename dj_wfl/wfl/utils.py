@@ -120,7 +120,21 @@ class NamespaceType(Enum):
     @classmethod
     def choices(cls):
         return [(key.value, key.name) for key in cls]
-        
+
+
+'''
+This enum represents the crafting professions
+'''
+class Profession(Enum):
+    ALCHEMY = 'Alchemy',
+    BLACKSMITHING = 'Blacksmithing',
+    COOKING = 'Cooking',
+    ENGINEERING = 'Engineering',
+    INSCRIPTION = 'Inscription',
+    JEWELCRAFTING = 'Jewelcrafting',
+    LEATHERWORKING = 'Leatherworking',
+    TAILORING = 'Tailoring'
+
 
 '''
 This enum represents the realm categories

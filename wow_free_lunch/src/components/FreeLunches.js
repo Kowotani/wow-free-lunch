@@ -313,8 +313,8 @@ const FreeLunchTable = (props) => {
 // ==============
 
 
-// Free Lunches content
-const FreeLunchesContent = () => {
+// Free Lunches
+export const FreeLunches = () => {
   
   const { craftedItemRecipes, setCraftedItemRecipes} = useContext(CraftedItemRecipesContext);
   const { freeLunches, setFreeLunches} = useContext(FreeLunchesContext);
@@ -536,14 +536,5 @@ const FreeLunchesContent = () => {
         </Box>
       }
     </>
-  )
-}
-
-
-// Free Lunches component
-export const FreeLunches = () => {
-  
-  return (
-    <FreeLunchesContent />
   )
 }

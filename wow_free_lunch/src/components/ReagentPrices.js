@@ -185,8 +185,8 @@ const ReagentPriceBox = (props) => {
 // Main Component
 // ==============
 
-// Reagent Prices content
-const ReagentPricesContent = () => {
+// Reagent Prices
+export const ReagentPrices = () => {
   
   const { faction } = useContext(FactionContext);
   const { profession } = useContext(ProfessionContext);
@@ -290,12 +290,3 @@ const ReagentPricesContent = () => {
   )
   
 }
-
-
-// Reagent Prices component
-export const ReagentPrices = () => {
-  
-  return (
-    <ReagentPricesContent />
-  )
-};

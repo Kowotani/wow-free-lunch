@@ -14,16 +14,14 @@ export const Profession = {
 }
 
 // create Context
-export const ProfessionContext = createContext({
-  name: Profession.BLACKSMITHING
-});
+export const ProfessionContext = createContext();
 
 
 // create Provider
 export const ProfessionProvider = ({children}) => {
   
   const [profession, setProfession] = useState({  
-    name: Profession.BLACKSMITHING
+    name: Profession.ALCHEMY
   });
   
   const value = {profession, setProfession};

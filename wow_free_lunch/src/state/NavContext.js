@@ -25,7 +25,7 @@ export const Nav = {
 
 
 // create Context
-export const NavContext = createContext(Nav.PROFESSION);
+export const NavContext = createContext();
 
 
 // create Provider

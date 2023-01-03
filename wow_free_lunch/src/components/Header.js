@@ -168,7 +168,7 @@ const ProfessionBarManager = () => {
 
 
 // Header content
-const HeaderContent = () => {
+export const Header = () => {
   return (
     <>
       <Box display="flex" bg="gray.300" flexWrap='wrap'>
@@ -185,11 +185,3 @@ const HeaderContent = () => {
     </>
   )
 }
-
-
-// Header component
-export const Header = () => {
-  return (
-    <HeaderContent />
-  )
-};

@@ -13,6 +13,7 @@ import {
   InputGroup,
   Link,
   Spacer,
+  Tooltip,
 } from '@chakra-ui/react';
 // import { SearchIcon } from '@chakra-ui/icons'
 
@@ -159,9 +160,11 @@ const ReagentPriceBox = (props) => {
       </Box>
       <Box width='190px'>
         <Box display='flex' alignItems='flex-end' fontWeight='semibold' padding='4px 4px 0px 4px' noOfLines={1}>
-          <Link href={getWowHeadUrl(props.itemId)} isExternal>
-            {props.name}
-          </Link>
+          <Tooltip label={props.name} placement='top'>
+            <Link href={getWowHeadUrl(props.itemId)} isExternal>
+              {props.name}
+            </Link>
+          </Tooltip>
         </Box>
         <Box display='flex' justifyContent='flex-end'>
           <Box p='4px 4px 4px 0px'>

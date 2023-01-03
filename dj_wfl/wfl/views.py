@@ -17,7 +17,7 @@ from wfl.serializers import (AuctionSerializer, AuctionHouseSerializer,
     RealmSerializer, RealmConnectionSerializer, RecipeSerializer, 
     RegionSerializer, StgRecipeItemSerializer)
 
-from wfl.utils import Profession, QueryManager
+from wfl.utils import CraftingProfession, QueryManager
 
 import json
 
@@ -864,10 +864,10 @@ class AllFreeLunches(View) :
             SELECT
                 p.name AS profession,
             	-- crafted item
-            	ci.name AS crafted_item_name,
-            	ci.item_id AS crafted_item_id,
+            	ci.name AS name,
+            	ci.item_id AS item_id,
             	cid.level AS level,
-            	cid.media_url AS crafted_item_media_url,
+            	cid.media_url AS media_url,
             	cid.sell_price AS vendor_price,
             	cid.quality,
             	-- profitability
@@ -915,7 +915,7 @@ class AllFreeLunches(View) :
 
         # format data
         d = {}
-        for profession in Profession:
+        for profession in CraftingProfession:
             d[profession.value] = []
         for r in res:
             d[r['profession']].append(

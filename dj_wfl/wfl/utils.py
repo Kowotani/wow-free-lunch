@@ -125,7 +125,7 @@ class NamespaceType(Enum):
 '''
 This enum represents the crafting professions
 '''
-class Profession(Enum):
+class CraftingProfession(Enum):
     ALCHEMY = 'Alchemy',
     BLACKSMITHING = 'Blacksmithing',
     COOKING = 'Cooking',

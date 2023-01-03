@@ -36,7 +36,7 @@ from wfl.views import (
     StgRecipeItemCreate, StgRecipeItemList, StgRecipeItemDetail,
     
     # FE API Endpoints
-    CraftedItemRecipes, ReagentPrices,
+    AllFreeLunches, CraftedItemRecipes, ReagentPrices,
 )
 
 urlpatterns = [
@@ -143,4 +143,5 @@ urlpatterns = [
     
     path('api/reagent_prices', ReagentPrices.as_view()),
     path('api/crafted_item_recipes', CraftedItemRecipes.as_view()),
+    path('api/all_free_lunches', AllFreeLunches.as_view()),
 ]

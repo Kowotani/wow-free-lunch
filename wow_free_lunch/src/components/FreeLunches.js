@@ -446,12 +446,10 @@ const FreeLunchesContent = () => {
   useEffect(() => {
     
     // debounce search value
-    
-    const timeout = searchValue.length === 0 ? 0 : 1000;
-    console.log('debouncing by: ', timeout)
+
     const updateSearchValue = setTimeout(() => {
       updateColumnFilters('name', searchValue)
-    }, timeout)
+    }, 500)
     
     return () => clearTimeout(updateSearchValue)
   }, [searchValue])

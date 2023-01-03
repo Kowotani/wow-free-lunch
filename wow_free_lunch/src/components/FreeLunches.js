@@ -25,7 +25,7 @@ import { FreeLunchesContext } from '../state/FreeLunchesContext';
 import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext } from '../state/ReagentPricesContext';
 
-import { getWowHeadUrl } from '../utils';
+import { getWowHeadUrl, getItemQualityColor } from '../utils';
 
 
 // =======
@@ -64,28 +64,6 @@ class FreeLunch extends Data {
 // ================
 // Free Lunch Table
 // ================
-
-
-// return text color for an item given the input quality
-function getItemQualityColor(quality) {
-  switch (quality) {
-    
-    case 'COMMON':
-      return 'black'
-      
-    case 'UNCOMMON':
-      return '#1eff00'
-      
-    case 'RARE':
-      return '#0070dd'
-      
-    case 'EPIC': 
-      return '#a335ee'
-    
-    default:
-      return 'black'
-  }
-}
 
 
 // spinner component

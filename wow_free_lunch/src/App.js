@@ -13,7 +13,7 @@ import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { Header } from './components/Header'
 import { ReagentPrices } from './components/ReagentPrices'
-import { FreeLunches } from './components/FreeLunches'
+import { ProfessionFreeLunches } from './components/ProfessionFreeLunches'
 
 import { CraftedItemRecipesProvider } from './state/CraftedItemRecipesContext';
 import { FactionProvider } from './state/FactionContext';
@@ -37,7 +37,7 @@ const MainContent = () => {
     {nav === Nav.PROFESSION && (
       <>
         <ReagentPrices/>
-        <FreeLunches/>
+        <ProfessionFreeLunches/>
       </>
     )}
     {nav === Nav.ABOUT && <Box>About Content</Box>} 

@@ -11,10 +11,13 @@ import {
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
+
+import { AllFreeLunches } from './components/AllFreeLunches'
 import { Header } from './components/Header'
 import { ReagentPrices } from './components/ReagentPrices'
 import { ProfessionFreeLunches } from './components/ProfessionFreeLunches'
 
+import { AllFreeLunchesProvider } from './state/AllFreeLunchesContext';
 import { CraftedItemRecipesProvider } from './state/CraftedItemRecipesContext';
 import { FactionProvider } from './state/FactionContext';
 import { FreeLunchesProvider } from './state/FreeLunchesContext';
@@ -33,7 +36,9 @@ const MainContent = () => {
   
   return (
     <>
-    {nav === Nav.HOME && <Box>Home Content</Box>}
+    {nav === Nav.HOME && (
+        <AllFreeLunches/>
+      )}
     {nav === Nav.PROFESSION && (
       <>
         <ReagentPrices/>
@@ -49,45 +54,47 @@ function App() {
   
   return (
     <ChakraProvider theme={theme}>
-      <CraftedItemRecipesProvider>
-        <FactionProvider>
-          <FreeLunchesProvider>
-            <NavProvider>
-              <ProfessionProvider>
-                <RealmProvider>
-                  <ReagentPricesProvider>
-                
-                    <Header />
-                    <MainContent />
-                    
-                    <Box textAlign="center" fontSize="xl">
-                      <Grid minH="100vh" p={3}>
-                        <ColorModeSwitcher justifySelf="flex-end" />
-                        <VStack spacing={8}>
-                          <Logo h="40vmin" pointerEvents="none" />
-                          <Text>
-                            Edit <Code fontSize="xl">src/App.js</Code> and save to reload.
-                          </Text>
-                          <Link
-                            color="teal.500"
-                            href="https://chakra-ui.com"
-                            fontSize="2xl"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Learn Chakra
-                          </Link>
-                        </VStack>
-                      </Grid>
-                    </Box>
-                    
-                  </ReagentPricesProvider>
-                </RealmProvider>
-              </ProfessionProvider>
-            </NavProvider>
-          </FreeLunchesProvider>
-        </FactionProvider>
-      </CraftedItemRecipesProvider>
+      <AllFreeLunchesProvider>
+        <CraftedItemRecipesProvider>
+          <FactionProvider>
+            <FreeLunchesProvider>
+              <NavProvider>
+                <ProfessionProvider>
+                  <RealmProvider>
+                    <ReagentPricesProvider>
+                  
+                      <Header />
+                      <MainContent />
+                      
+                      <Box textAlign="center" fontSize="xl">
+                        <Grid minH="100vh" p={3}>
+                          <ColorModeSwitcher justifySelf="flex-end" />
+                          <VStack spacing={8}>
+                            <Logo h="40vmin" pointerEvents="none" />
+                            <Text>
+                              Edit <Code fontSize="xl">src/App.js</Code> and save to reload.
+                            </Text>
+                            <Link
+                              color="teal.500"
+                              href="https://chakra-ui.com"
+                              fontSize="2xl"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Learn Chakra
+                            </Link>
+                          </VStack>
+                        </Grid>
+                      </Box>
+                      
+                    </ReagentPricesProvider>
+                  </RealmProvider>
+                </ProfessionProvider>
+              </NavProvider>
+            </FreeLunchesProvider>
+          </FactionProvider>
+        </CraftedItemRecipesProvider>
+      </AllFreeLunchesProvider>
     </ChakraProvider>
   );
 }

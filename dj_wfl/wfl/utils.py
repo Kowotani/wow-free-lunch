@@ -126,13 +126,13 @@ class NamespaceType(Enum):
 This enum represents the crafting professions
 '''
 class CraftingProfession(Enum):
-    ALCHEMY = 'Alchemy',
-    BLACKSMITHING = 'Blacksmithing',
-    COOKING = 'Cooking',
-    ENGINEERING = 'Engineering',
-    INSCRIPTION = 'Inscription',
-    JEWELCRAFTING = 'Jewelcrafting',
-    LEATHERWORKING = 'Leatherworking',
+    ALCHEMY = 'Alchemy'
+    BLACKSMITHING = 'Blacksmithing'
+    COOKING = 'Cooking'
+    ENGINEERING = 'Engineering'
+    INSCRIPTION = 'Inscription'
+    JEWELCRAFTING = 'Jewelcrafting'
+    LEATHERWORKING = 'Leatherworking'
     TAILORING = 'Tailoring'
 
 

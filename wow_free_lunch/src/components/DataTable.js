@@ -68,7 +68,10 @@ function GetReactTable(options) {
 // Data Table
 // ==========
 
-export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) => {
+export const DataTable = (
+  { data, columns, hiddenColumns, inputColumnFilters, 
+    enableShowAllMessage
+  }) => {
   
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState(inputColumnFilters);
@@ -172,19 +175,21 @@ export const DataTable = ({ data, columns, hiddenColumns, inputColumnFilters }) 
           >
             <VStack>
               <Box>No free lunches found</Box>
-              <Box>Click the 
-                <Box 
-                  display='inline' 
-                  background='pink.500' 
-                  color='white' 
-                  borderRadius='md'
-                  p='2px 6px'
-                  m='6px'
-                >
-                Show All
-                </Box> 
-                button above to view all craftable items
-              </Box>
+              {enableShowAllMessage && (
+                <Box>Click the 
+                  <Box 
+                    display='inline' 
+                    background='pink.500' 
+                    color='white' 
+                    borderRadius='md'
+                    p='2px 6px'
+                    m='6px'
+                  >
+                  Show All
+                  </Box> 
+                  button above to view all craftable items
+                </Box>
+              )}
             </VStack>
           </Box>
         </ScaleFade>

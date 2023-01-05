@@ -40,6 +40,7 @@ const ProfessionAccordion = (props) => {
         <AccordionPanel>
           <FreeLunchTable
             data={allFreeLunches['free_lunches'][props.profession]}
+            enableShowAllMessage={false}
           />
         </AccordionPanel>
       </AccordionItem>
@@ -141,70 +142,13 @@ export const AllFreeLunches = () => {
       .catch(console.error);
 
   }, [realm, faction]);
-  
 
-
-  // useEffect(() => {
-    
-  //   // debounce search value
-
-  //   const updateSearchValue = setTimeout(() => {
-  //     updateColumnFilters('name', searchValue)
-  //   }, 500)
-    
-  //   return () => clearTimeout(updateSearchValue)
-  // }, [searchValue])
-
-
-  // manage updating the FreeLunch table filters
-  // filterColumn === null -> remove all filters
-  // filterValue === null -> remove that filterColumn
-  // function updateColumnFilters(filterColumn = null, filterValue = null) {
-    
-  //   const newColumnFilters = [];
-    
-  //   // modify a single column filter, otherwise reset all filters
-  //   if (filterColumn !== null) {
-    
-  //     // update 
-  //     for (const obj of columnFilters) {
-  //       if (obj.id !== filterColumn) {
-  //         newColumnFilters.push(obj)
-  //       }
-  //     }
-  //     if (filterValue !== null) {
-  //       newColumnFilters.push({
-  //         id: filterColumn, 
-  //         value: filterValue
-  //       });
-  //     }
-  //   }
-    
-  //   // update state
-  //   console.log('new filters: ', newColumnFilters)
-  //   setColumnFilters(newColumnFilters);
-  // }
-
-
-  // // function to show all Free Lunches (eg. remove all filters)
-  // function showAllFreeLunches() {
-  //   setSearchValue('');
-  //   updateColumnFilters();
-  // }
-  
-  // // prevent re-render of table when user is entering search input
-  // const freeLunchTable = useMemo(() => (
-  //   <FreeLunchTable 
-  //     data={freeLunches['free_lunches']} 
-  //     columnFilters={columnFilters}
-  //   />    
-  // ), [freeLunches['free_lunches'], columnFilters])
 
   // prevent re-render of table when user is entering search input
   const freeLunchAccordions = useMemo(() => (
     <>
       {Object.keys(allFreeLunches['free_lunches']).map((profession) => {
-        return <ProfessionAccordion profession={profession} />
+        return <ProfessionAccordion key={profession} profession={profession} />
       })}  
     </>
   ), [allFreeLunches['free_lunches']])

@@ -258,6 +258,7 @@ export const FreeLunchTable = (props) => {
       data={props.data} 
       hiddenColumns={hiddenColumns}
       inputColumnFilters={props.columnFilters}
+      enableShowAllMessage={props.enableShowAllMessage}
     />
   )
 }

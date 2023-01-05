@@ -207,6 +207,7 @@ export const ProfessionFreeLunches = () => {
     <FreeLunchTable 
       data={freeLunches['free_lunches']} 
       columnFilters={columnFilters}
+      enableShowAllMessage={true}
     />    
   ), [freeLunches['free_lunches'], columnFilters])
   

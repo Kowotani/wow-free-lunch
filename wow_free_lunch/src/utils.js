@@ -11,7 +11,8 @@ export function getItemQualityColor(quality) {
       return 'black'
       
     case 'UNCOMMON':
-      return '#1eff00'
+      // return '#1eff00' true colour
+      return '#1eb600'
       
     case 'RARE':
       return '#0070dd'

@@ -27,11 +27,17 @@ import { RealmContext } from '../state/RealmContext';
 const ProfessionAccordion = (props) => {
   
   const { allFreeLunches } = useContext(AllFreeLunchesContext);
+  
+  const data = allFreeLunches['free_lunches'][props.profession];
 
   return (
-    <Accordion allowMultiple p='10px'>
+    <Accordion 
+      allowToggle={true} 
+      defaultIndex={data.length > 0 ? 0 : null} 
+      p='10px'
+    >
       <AccordionItem>
-        <AccordionButton bg='green.200' _expanded={{ bg: 'green.100', color: 'gray.400' }}>
+        <AccordionButton bg='green.100' color='gray.400' _expanded={{bg: 'green.200', color: 'black'}}>
           <AccordionIcon />
           <Box flex='1' textAlign='left'>
             {props.profession}
@@ -39,7 +45,7 @@ const ProfessionAccordion = (props) => {
         </AccordionButton>
         <AccordionPanel>
           <FreeLunchTable
-            data={allFreeLunches['free_lunches'][props.profession]}
+            data={data}
             enableShowAllMessage={false}
           />
         </AccordionPanel>

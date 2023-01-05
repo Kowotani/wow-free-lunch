@@ -144,6 +144,7 @@ export const FreeLunchTable = (props) => {
       cell: (props) => {
         return (
           <Link
+            fontWeight='medium'
             color={getItemQualityColor(props.row.getValue('quality'))}
             href={getWowHeadUrl(props.row.getValue('item_id'))} 
             isExternal

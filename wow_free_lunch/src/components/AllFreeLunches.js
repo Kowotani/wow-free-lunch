@@ -1,5 +1,10 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import {
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,  
   Box,
   Progress, 
 } from '@chakra-ui/react';
@@ -11,6 +16,37 @@ import { FreeLunch, FreeLunchTable } from './FreeLunchTable';
 import { AllFreeLunchesContext } from '../state/AllFreeLunchesContext';
 import { FactionContext } from '../state/FactionContext';
 import { RealmContext } from '../state/RealmContext';
+
+
+// ====================
+// Profession Accordion
+// ====================
+
+
+// component for Item Subclass accordion
+const ProfessionAccordion = (props) => {
+  
+  const { allFreeLunches } = useContext(AllFreeLunchesContext);
+
+  return (
+    <Accordion allowMultiple p='10px'>
+      <AccordionItem>
+        <AccordionButton bg='green.200' _expanded={{ bg: 'green.100', color: 'gray.400' }}>
+          <AccordionIcon />
+          <Box flex='1' textAlign='left'>
+            {props.profession}
+          </Box>
+        </AccordionButton>
+        <AccordionPanel>
+          <FreeLunchTable
+            data={allFreeLunches['free_lunches'][props.profession]}
+          />
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
+  )
+}
+
 
 // ==============
 // Main Component
@@ -39,11 +75,11 @@ export const AllFreeLunches = () => {
     // async data fetch
     const fetchData = async() => {
       
-      const loadingAllFreeLunchesState = {
+      const loadingState = {
         is_loading: true,
         free_lunches: allFreeLunches['free_lunches']
       };
-      setAllFreeLunches(loadingAllFreeLunchesState);
+      setAllFreeLunches(loadingState);
       
       console.log('fetching /api/all_free_lunches ...', realm, faction);
       
@@ -70,12 +106,34 @@ export const AllFreeLunches = () => {
       const data = await res.json();
       console.log('retrieved /api/all_free_lunches: ', data);
       
+      // format data
+      const free_lunches = {}
+      for (const profession of Object.keys(data)) {
+        free_lunches[profession] = data[profession].map((item) => {
+          
+          const freeLunch = FreeLunch.create({
+            name: item.name,
+            item_id: item.item_id,
+            quality: item.quality,
+            media_url: item.media_url,
+            reagents: [],
+            vendor_price: item.vendor_price,
+            cost: item.cost,
+            unit_profit: item.vendor_price - item.cost,
+            percent_profit: item.vendor_price / item.cost - 1,
+            insufficient_data: false
+          }) 
+          
+          return freeLunch
+        })
+      }
+
       // update state
-      const loadedAllFreeLunchesState = {
+      const loadedState = {
         is_loading: false,
-        free_lunches: data
+        free_lunches: free_lunches
       };
-      setAllFreeLunches(loadedAllFreeLunchesState);      
+      setAllFreeLunches(loadedState);      
     };
     
     // invoke function
@@ -141,21 +199,30 @@ export const AllFreeLunches = () => {
   //     columnFilters={columnFilters}
   //   />    
   // ), [freeLunches['free_lunches'], columnFilters])
-  
+
+  // prevent re-render of table when user is entering search input
+  const freeLunchAccordions = useMemo(() => (
+    <>
+      {Object.keys(allFreeLunches['free_lunches']).map((profession) => {
+        return <ProfessionAccordion profession={profession} />
+      })}  
+    </>
+  ), [allFreeLunches['free_lunches']])
+
   
   return (
     <>
-      <Box display='block' bg='cyan.300' p='10px 14px'>
+      <Box display='block' bg='cyan.300' p='10px 14px' m='10px 0px'>
         Free Lunches
       </Box>
       {allFreeLunches['is_loading'] && 
-        <Box display='block' alignItems='center' flexWrap='wrap'>
+        <Box display='block' alignItems='center'>
           <Progress isIndeterminate />
         </Box>
       }
       {!allFreeLunches['is_loading'] &&
         <Box display='block'>
-          All Free Lunch Table
+          {freeLunchAccordions}
         </Box>
       }
     </>

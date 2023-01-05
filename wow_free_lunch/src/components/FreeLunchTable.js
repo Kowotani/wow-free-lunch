@@ -240,7 +240,7 @@ export const FreeLunchTable = (props) => {
           </>
         )
       },
-      header: 'Percent Profit',
+      header: 'Profit Margin',
       meta: {
         isNumeric: true
       },

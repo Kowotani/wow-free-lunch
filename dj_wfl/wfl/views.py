@@ -868,8 +868,7 @@ class AllFreeLunches(View) :
             	cid.sell_price AS vendor_price,
             	cid.quality,
             	-- profitability
-            	CAST(SUM(rea.item_quantity * ap.min_price) AS UNSIGNED) AS cost,
-            	CAST(cid.sell_price - SUM(rea.item_quantity * ap.min_price) AS SIGNED) AS unit_profit
+            	CAST(SUM(rea.item_quantity * ap.min_price) AS UNSIGNED) AS cost
             FROM profession p
             JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             JOIN expansion e ON pst.expansion_id = e.expansion_id
@@ -924,7 +923,6 @@ class AllFreeLunches(View) :
                     'media_url': r['media_url'],
                     'vendor_price': r['vendor_price'],
                     'cost': r['cost'],
-                    'unit_profit': r['unit_profit'],
                 }
             )
 

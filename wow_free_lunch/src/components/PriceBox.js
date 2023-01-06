@@ -114,7 +114,8 @@ export const PriceBox = (props) => {
       height='20px'
       justifyContent='flex-end'
     >
-      {isStackView ? (
+      {isStackView 
+        || (props.isStackable && width < 900 && Math.abs(props.price) > 999999) ? (
         <Box 
           display='flex'
           flexDirection='column'

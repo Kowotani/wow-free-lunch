@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
   Box,
   Image,
@@ -11,6 +13,8 @@ import { Data } from 'dataclass';
 
 import { DataTable } from './DataTable';
 import { PriceBox } from './PriceBox';
+
+import { useWindowDimensions } from '../hooks/WindowDimensions';
 
 import { getWowHeadUrl, getItemQualityColor } from '../utils';
 
@@ -71,6 +75,24 @@ const TableSpinner = () => {
 
 // DataTable component
 export const FreeLunchTable = (props) => {
+  
+  
+  const defaultHiddenColumns = ['item_id', 'insufficient_data', 'quality'];
+  const [ hiddenColumns, setHiddenColumns ] = useState(defaultHiddenColumns);
+  const { width } = useWindowDimensions();
+  
+  useEffect(() => {
+    
+    // hide columns if window becomes too narrow 
+    if (width < 600 ) {
+      setHiddenColumns([...defaultHiddenColumns, 'vendor_price', 'cost'])
+      // setHiddenColumns(['item_id', 'insufficient_data', 'quality', 'vendor"price', 'cost']);
+    } else {
+      setHiddenColumns(defaultHiddenColumns)
+      // setHiddenColumns(['item_id', 'insufficient_data', 'quality']);
+    }
+    
+  }, [width]) 
   
   // Define columns
   const columnHelper = createColumnHelper();
@@ -201,8 +223,8 @@ export const FreeLunchTable = (props) => {
           <>
             {props.row.getValue('insufficient_data')
               ? (
-                  <Box display='flex' textAlign='center'>
-                    Insufficient Data
+                  <Box display='flex' justifyContent='center' textAlign='center'>
+                    No Data
                   </Box>
               ) : (
                 <Box display='flex' justifyContent='flex-end'>
@@ -234,7 +256,7 @@ export const FreeLunchTable = (props) => {
               <Box color={props.getValue() < 0 ? 'red' : 'black'}>
                 {isNaN(props.getValue()) 
                   ? null 
-                  : (props.getValue() * 100).toFixed(2) + '%'
+                  : (props.getValue() * 100).toFixed(width < 650 ? 0 : 2) + '%'
                 }
               </Box>
             }
@@ -248,9 +270,6 @@ export const FreeLunchTable = (props) => {
       sortingFn: 'basic'
     })
   ];
-
-  // hide certain columns by default
-  const hiddenColumns = ['item_id', 'insufficient_data', 'quality'];
   
   
   return (

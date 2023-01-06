@@ -99,6 +99,11 @@ export const DataTable = (
     setColumnFilters(inputColumnFilters)
   }, [inputColumnFilters]);  
 
+  useEffect(() => {
+    setColumnVisibility(
+      Object.fromEntries(hiddenColumns.map(x => [x, false])));
+  }, [hiddenColumns])
+
   return (
     <>
     <Table>
@@ -144,7 +149,7 @@ export const DataTable = (
                   // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                   const meta = cell.column.columnDef.meta
                   return (
-                    <Td key={cell.id} isNumeric={meta?.isNumeric}>
+                    <Td key={cell.id} isNumeric={meta?.isNumeric} p={4}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </Td>
                   )

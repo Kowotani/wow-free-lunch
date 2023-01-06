@@ -43,7 +43,7 @@ const ProfessionAccordion = (props) => {
             {props.profession}
           </Box>
         </AccordionButton>
-        <AccordionPanel>
+        <AccordionPanel p={0}>
           <FreeLunchTable
             data={data}
             enableShowAllMessage={false}
@@ -63,16 +63,9 @@ const ProfessionAccordion = (props) => {
 // All Free Lunches
 export const AllFreeLunches = () => {
   
-  // const { craftedItemRecipes, setCraftedItemRecipes} = useContext(CraftedItemRecipesContext);
   const { allFreeLunches, setAllFreeLunches} = useContext(AllFreeLunchesContext);
   const { faction } = useContext(FactionContext);
   const { realm } = useContext(RealmContext);
-  
-  // const { profession } = useContext(ProfessionContext);
-  // const { reagentPrices } = useContext(ReagentPricesContext);
-  
-  // const [ columnFilters, setColumnFilters ] = useState([]);
-  // const [ searchValue, setSearchValue ] = useState('');
   
   
   useEffect(() => {

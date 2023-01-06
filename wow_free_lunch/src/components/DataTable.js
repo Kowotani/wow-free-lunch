@@ -76,6 +76,8 @@ export const DataTable = (
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState(inputColumnFilters);
   
+  console.log('hidden cols: ', hiddenColumns)
+  
   // set default column visibility
   const [columnVisibility, setColumnVisibility] = useState(
     Object.fromEntries(hiddenColumns.map(x => [x, false])));
@@ -118,6 +120,7 @@ export const DataTable = (
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
                   isNumeric={meta?.isNumeric}
+                  p={4}
                 >
                   <chakra.span>
                     {header.column.getIsSorted() && meta?.isNumeric ? (

@@ -161,7 +161,7 @@ export const FreeLunchTable = (props) => {
       cell: (props) => {
         return (
           <Box display='flex' justifyContent='flex-end'>
-            <PriceBox price={props.getValue()}/>
+            <PriceBox price={props.getValue()} isStackable={true}/>
           </Box>
         )
       },
@@ -180,7 +180,7 @@ export const FreeLunchTable = (props) => {
               <Box display='flex' justifyContent='flex-end'>
                 {isNaN(props.getValue())
                   ? null
-                  : <PriceBox price={props.getValue()}/>
+                  : <PriceBox price={props.getValue()} isStackable={true}/>
                 }
               </Box>
             }
@@ -201,14 +201,14 @@ export const FreeLunchTable = (props) => {
           <>
             {props.row.getValue('insufficient_data')
               ? (
-                  <Box display='flex' justifyContent='flex-end'>
+                  <Box display='flex' textAlign='center'>
                     Insufficient Data
                   </Box>
               ) : (
                 <Box display='flex' justifyContent='flex-end'>
                   {isNaN(props.getValue())
                     ? <TableSpinner />
-                    : <PriceBox price={props.getValue()}/>
+                    : <PriceBox price={props.getValue()} isStackable={true}/>
                   }
                 </Box>
               )

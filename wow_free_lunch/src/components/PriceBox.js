@@ -2,6 +2,9 @@ import {
   Box,
   Image,
 } from '@chakra-ui/react';
+
+import { useWindowDimensions } from '../hooks/WindowDimensions';
+
 import goldCoin from '../assets/gold_coin.png'
 import silverCoin from '../assets/silver_coin.png'
 import copperCoin from '../assets/copper_coin.png'
@@ -63,43 +66,65 @@ export const CurrencyBox = (props) => {
 // PriceBox component
 export const PriceBox = (props) => {
   
+  const { width } = useWindowDimensions();
+  
   const isNegative = props.price < 0;
+  const isStackView = props.isStackable && width < 900;
   
   const goldAmount = Math.floor(Math.abs(props.price) / 10000);
   const silverAmount = Math.floor((Math.abs(props.price) / 100)) % 100;
   const copperAmount = Math.abs(props.price) % 100;
   
+  const Price = () => {
+    return (
+      <>
+        {goldAmount > 0 &&
+          <CurrencyBox 
+            amount={goldAmount} 
+            coin={Coin.GOLD} 
+            isNegative={isNegative}
+            hasNegativeSign={isNegative && goldAmount > 0}
+          />
+        }
+        {((!isStackView && (goldAmount > 0 || silverAmount > 0)) || (isStackView && silverAmount > 0)) &&
+          <CurrencyBox 
+            amount={silverAmount} 
+            coin={Coin.SILVER} 
+            isNegative={isNegative}
+            hasNegativeSign={isNegative && goldAmount === 0 && silverAmount > 0}
+            zeroPad={goldAmount > 0 && silverAmount < 10}
+          />
+        }
+        {(!isStackView || (isStackView && copperAmount > 0)) &&
+          <CurrencyBox 
+            amount={copperAmount} 
+            coin={Coin.COPPER} 
+            isNegative={isNegative}
+            hasNegativeSign={isNegative && goldAmount === 0 && silverAmount === 0}
+            zeroPad={(silverAmount > 0 || goldAmount > 0) && copperAmount < 10}
+          />
+        }
+      </>
+    )
+  }
+  
   return (
     <Box 
       display='flex' 
       height='20px'
-      minWidth='140px'
       justifyContent='flex-end'
     >
-      {goldAmount > 0 &&
-        <CurrencyBox 
-          amount={goldAmount} 
-          coin={Coin.GOLD} 
-          isNegative={isNegative}
-          hasNegativeSign={isNegative && goldAmount > 0}
-        />
-      }
-      {(goldAmount > 0 || silverAmount > 0) &&
-        <CurrencyBox 
-          amount={silverAmount} 
-          coin={Coin.SILVER} 
-          isNegative={isNegative}
-          hasNegativeSeign={isNegative && goldAmount === 0 && silverAmount > 0}
-          zeroPad={goldAmount > 0 && silverAmount < 10}
-        />
-      }
-      <CurrencyBox 
-        amount={copperAmount} 
-        coin={Coin.COPPER} 
-        isNegative={isNegative}
-        hasNegativeSign={isNegative && goldAmount === 0 && silverAmount === 0}
-        zeroPad={silverAmount > 0 && copperAmount < 10}
-      />
+      {isStackView ? (
+        <Box 
+          display='flex'
+          flexDirection='column'
+          justifyContent='center'
+        >
+          <Price/>
+        </Box>
+      ) : (
+        <Price/>
+      )}
     </Box>
   )
 };

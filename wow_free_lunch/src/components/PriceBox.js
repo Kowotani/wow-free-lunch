@@ -92,7 +92,7 @@ export const PriceBox = (props) => {
             coin={Coin.SILVER} 
             isNegative={isNegative}
             hasNegativeSign={isNegative && goldAmount === 0 && silverAmount > 0}
-            zeroPad={goldAmount > 0 && silverAmount < 10}
+            zeroPad={!isStackView && goldAmount > 0 && silverAmount < 10}
           />
         }
         {(!isStackView || (isStackView && copperAmount > 0)) &&
@@ -101,7 +101,7 @@ export const PriceBox = (props) => {
             coin={Coin.COPPER} 
             isNegative={isNegative}
             hasNegativeSign={isNegative && goldAmount === 0 && silverAmount === 0}
-            zeroPad={(silverAmount > 0 || goldAmount > 0) && copperAmount < 10}
+            zeroPad={!isStackView && (silverAmount > 0 || goldAmount > 0) && copperAmount < 10}
           />
         }
       </>

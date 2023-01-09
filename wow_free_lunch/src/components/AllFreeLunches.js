@@ -38,10 +38,10 @@ const ProfessionAccordion = (props) => {
     >
       <AccordionItem>
         <AccordionButton bg='green.100' color='gray.400' _expanded={{bg: 'green.200', color: 'black'}}>
-          <AccordionIcon />
           <Box flex='1' textAlign='left'>
             {props.profession}
           </Box>
+          <AccordionIcon />
         </AccordionButton>
         <AccordionPanel p={0}>
           <FreeLunchTable

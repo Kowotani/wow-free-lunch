@@ -35,23 +35,23 @@ import { getWowHeadUrl, getItemQualityColor } from '../utils';
 // =======
 
 // component for Reagent Price Box filters
-const ReagentFilters = () => {
+// const ReagentFilters = () => {
   
-  // const { priceType, setPriceType } = useContext(PriceTypeContext);
+//   // const { priceType, setPriceType } = useContext(PriceTypeContext);
   
-  return (
-    <Box display='flex' alignItems='center' flexWrap='wrap'>
-      <ButtonGroup colorScheme='pink' spacing='2'>
-        <Button>Expand All</Button>
-        <Button>Collapse All</Button>
-      </ButtonGroup>
-      <Spacer />
-      <InputGroup width='200px' p='8px'>
-        <Input type='search' placeholder='Reagent name' />
-      </InputGroup>
-    </Box>
-  )
-}
+//   return (
+//     <Box display='flex' alignItems='center' flexWrap='wrap'>
+//       <ButtonGroup colorScheme='pink' spacing='2'>
+//         <Button>Expand All</Button>
+//         <Button>Collapse All</Button>
+//       </ButtonGroup>
+//       <Spacer />
+//       <InputGroup width='200px' p='8px'>
+//         <Input type='search' placeholder='Reagent name' />
+//       </InputGroup>
+//     </Box>
+//   )
+// }
 
 
 // ====================
@@ -67,10 +67,10 @@ const ItemClassAccordion = (props) => {
     <Accordion allowMultiple>
       <AccordionItem>
         <AccordionButton bg='orange.200' _expanded={{ bg: 'orange.100', color: 'gray.400' }}>
-          <AccordionIcon />
           <Box flex='1' textAlign='left'>
             {props.itemClass}
           </Box>
+          <AccordionIcon />
         </AccordionButton>
         <AccordionPanel>
           <Box justifyContent='center'>
@@ -107,10 +107,10 @@ const ItemSubclassAccordion = (props) => {
     <Accordion allowMultiple>
       <AccordionItem>
         <AccordionButton bg='blue.200' _expanded={{ bg: 'blue.100', color: 'gray.400' }}>
-          <AccordionIcon />
           <Box flex='1' textAlign='left'>
             {props.itemSubclass}
           </Box>
+          <AccordionIcon />
         </AccordionButton>
         <AccordionPanel>
           <Box display='flex' gap='8px' justifyContent='flex-start' flexWrap='wrap'>
@@ -265,13 +265,12 @@ export const ReagentPrices = () => {
         <Accordion allowMultiple>
           <AccordionItem>
             <AccordionButton bg='purple.200' _expanded={{ bg: 'purple.100', color: 'gray.400' }}>
-              <AccordionIcon />
               <Box flex='1' textAlign='left'>
                 Reagent Prices
               </Box>
+              <AccordionIcon />
             </AccordionButton>
             <AccordionPanel>
-              <ReagentFilters />
                 {
                   Object.keys(reagentPrices['by_item_class'])
                   .sort()

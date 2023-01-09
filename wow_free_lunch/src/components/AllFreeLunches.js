@@ -81,8 +81,6 @@ export const AllFreeLunches = () => {
       };
       setAllFreeLunches(loadingState);
       
-      console.log('fetching /api/all_free_lunches ...', realm, faction);
-      
       // prepare config
       const url = '/api/all_free_lunches';
 
@@ -104,7 +102,6 @@ export const AllFreeLunches = () => {
       
       // convert to json
       const data = await res.json();
-      console.log('retrieved /api/all_free_lunches: ', data);
       
       // format data
       const free_lunches = {}

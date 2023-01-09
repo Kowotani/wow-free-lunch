@@ -28,7 +28,7 @@ import { RealmContext } from '../state/RealmContext';
 // TODO: remove hard-coded navkey prop
 const NavButtons = () => {
   return (
-    <ButtonGroup colorScheme="teal" spacing="2">
+    <ButtonGroup colorScheme='teal' spacing={0}>
       <NavButton name="Home" navkey={Nav.HOME}/>
       <NavButton name="Profession" navkey={Nav.PROFESSION}/>
       <NavButton name="About" navkey={Nav.ABOUT}/>
@@ -49,6 +49,10 @@ const NavButton = (props) => {
       <Button 
         variant={variant}
         onClick={() => {setNav(props.navkey)}}
+        borderBottomRightRadius='0px'
+        borderBottomLeftRadius='0px'
+        borderTopLeftRadius='10px'
+        borderTopRightRadius='10px'
       >
         {props.name}
       </Button>
@@ -171,7 +175,7 @@ const ProfessionBarManager = () => {
 export const Header = () => {
   return (
     <>
-      <Box display="flex" bg="gray.300" flexWrap='wrap'>
+      <Box display="flex" bg="gray.300" flexWrap='wrap' borderBottom='4px' borderColor='teal.500'>
         <Box display="flex" alignItems="flex-end">
           <Image src={logo} h="100"/>
           <NavButtons />

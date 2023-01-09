@@ -48,9 +48,7 @@ export const ProfessionFreeLunches = () => {
         recipes: craftedItemRecipes['recipes']
       };
       setCraftedItemRecipes(loadingCraftedItemRecipesState);
-      
-      console.log('fetching /api/crafted_item_recipes ...', profession);
-      
+
       // prepare config
       const url = '/api/crafted_item_recipes';
 
@@ -70,8 +68,7 @@ export const ProfessionFreeLunches = () => {
       
       // convert to json
       const data = await res.json();
-      console.log('retrieved /api/crafted_item_recipes: ', data);
-      
+
       // update state
       const loadedCraftedItemRecipesState = {
         is_loading: false,
@@ -141,9 +138,7 @@ export const ProfessionFreeLunches = () => {
       
       return freeLunch
     }) : []
-    
-    console.log('FreeLunch data: ', freeLunchData)
-    
+
     // update state
     const loadedFreeLunchesState = {
       is_loading: false,
@@ -191,7 +186,6 @@ export const ProfessionFreeLunches = () => {
     }
     
     // update state
-    console.log('new filters: ', newColumnFilters)
     setColumnFilters(newColumnFilters);
   }
 

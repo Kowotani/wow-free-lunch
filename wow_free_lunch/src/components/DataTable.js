@@ -75,9 +75,7 @@ export const DataTable = (
   
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState(inputColumnFilters);
-  
-  console.log('hidden cols: ', hiddenColumns)
-  
+
   // set default column visibility
   const [columnVisibility, setColumnVisibility] = useState(
     Object.fromEntries(hiddenColumns.map(x => [x, false])));

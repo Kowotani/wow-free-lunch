@@ -207,9 +207,7 @@ export const ReagentPrices = () => {
         by_item_id: reagentPrices['by_item_id']
       };
       setReagentPrices(loadingReagentPricesState);
-      
-      console.log('fetching /api/reagent_prices ...', profession, realm, faction);
-      
+
       // prepare config
       const url = '/api/reagent_prices';
 
@@ -232,7 +230,6 @@ export const ReagentPrices = () => {
       
       // convert to json
       const data = await res.json();
-      console.log('retrieved /api/reagent_prices: ', data);
       
       // create item_id indexed price dict
       const dataItemId = {};

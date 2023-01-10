@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Box,
   Button, 
@@ -11,12 +11,16 @@ import {
   Spacer,
 } from '@chakra-ui/react';
 
+import { CSSTransition } from 'react-transition-group'
+
 import logo from '../assets/logo.png';
 
 import { Faction, FactionContext } from '../state/FactionContext';
 import { Nav, NavContext } from '../state/NavContext';
 import { Profession, ProfessionContext } from '../state/ProfessionContext';
 import { RealmContext } from '../state/RealmContext';
+
+import '../styles.css';
 
 
 // ===========
@@ -120,25 +124,41 @@ const RealmSelector = () => {
 // component for Profession buttons in Profession Bar
 const ProfessionButton = (props) => {
   
+  const { nav } = useContext(NavContext);
   const { profession, setProfession } = useContext(ProfessionContext);
   
+  const [ isProfessionNav, setIsProfessionNav ] = useState(false);
+  
   const variant = (profession.name === props.profession ? "solid" : "ghost");
+  
+  useEffect(() => {
+    setIsProfessionNav(nav.display_profession);
+  }, [nav])  
 
   return (
-      <Button 
-        variant={variant}
-        onClick={() => {setProfession({name: props.profession})}}
+      <CSSTransition
+        timeout={500}
+        in={isProfessionNav}
+        classNames='professionbarbutton'
+        mountOnEnter={true}
+        unmountOnExit={true}
       >
-        {props.name}
-      </Button>
+        <Button 
+          variant={variant}
+          onClick={() => {setProfession({name: props.profession})}}
+        >
+          {props.name}
+        </Button>
+      </CSSTransition>
   )
 }
 
 // component for Profession Bar
 // TODO: change this to a map function
 const ProfessionBar = () => {
+
   return (
-    <Box display="flex" width="100%" bg="gray.200" alignItems="center" >
+    <Box display="flex" width="100%" bg="gray.100" alignItems="center" borderBottom='4px' borderColor='blue.500'>
       <ButtonGroup width="100%" colorScheme="blue" size='sm' p={2} spacing={2} justifyContent="center" flexWrap="wrap">
         <ProfessionButton name="Alchemy" profession={Profession.ALCHEMY}/>
         <ProfessionButton name="Blacksmithing" profession={Profession.BLACKSMITHING}/>
@@ -158,9 +178,23 @@ const ProfessionBarManager = () => {
   
   const { nav } = useContext(NavContext);
   
+  const [ isProfessionNav, setIsProfessionNav ] = useState(false);
+  
+  useEffect(() => {
+    setIsProfessionNav(nav.display_profession);
+  }, [nav])
+
   return (
     <>
-      {nav.display_profession && <ProfessionBar />}
+      <CSSTransition 
+        timeout={500}
+        in={isProfessionNav}
+        classNames='professionbar'
+        mountOnEnter={true}
+        unmountOnExit={true}
+      >
+        <ProfessionBar/>
+      </CSSTransition>
     </>
   )
 }

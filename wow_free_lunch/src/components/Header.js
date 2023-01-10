@@ -158,7 +158,7 @@ const ProfessionButton = (props) => {
 const ProfessionBar = () => {
 
   return (
-    <Box display="flex" width="100%" bg="gray.100" alignItems="center" borderBottom='4px' borderColor='blue.500'>
+    <Box display="flex" width="100%" bg="gray.100" alignItems="center">
       <ButtonGroup width="100%" colorScheme="blue" size='sm' p={2} spacing={2} justifyContent="center" flexWrap="wrap">
         <ProfessionButton name="Alchemy" profession={Profession.ALCHEMY}/>
         <ProfessionButton name="Blacksmithing" profession={Profession.BLACKSMITHING}/>

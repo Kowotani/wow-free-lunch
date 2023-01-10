@@ -6,11 +6,15 @@ ProfessionBar
   height: 0px;
 }
 .professionbar-enter-active {
-  height: 50px;
+  --h: 48px;
+  
+  height: var(--h);
   transition: all 500ms ease-in-out;
 }
 .professionbar-exit {
-  height: 50px;
+  --h: 48px;
+  
+  height: var(--h);
 }
 .professionbar-exit-active {
   height: 0px;

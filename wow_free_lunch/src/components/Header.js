@@ -15,6 +15,8 @@ import { CSSTransition } from 'react-transition-group'
 
 import logo from '../assets/logo.png';
 
+import { useWindowDimensions } from '../hooks/WindowDimensions';
+
 import { Faction, FactionContext } from '../state/FactionContext';
 import { Nav, NavContext } from '../state/NavContext';
 import { Profession, ProfessionContext } from '../state/ProfessionContext';
@@ -207,16 +209,37 @@ const ProfessionBarManager = () => {
 
 // Header content
 export const Header = () => {
+  
+  const [ realmSelectorLocation, setRealmSelectorLocation ] = useState('bottom');
+  
+  const { width } = useWindowDimensions();
+  
+  useEffect(() => {
+    setRealmSelectorLocation(width < 525 ? 'top' : 'bottom')
+  }, [width])
+  
+  
   return (
     <>
-      <Box display="flex" bg="gray.300" flexWrap='wrap' borderBottom='4px' borderColor='teal.500'>
-        <Box display="flex" alignItems="flex-end">
-          <Image src={logo} h="100"/>
-          <NavButtons />
-        </Box>
-        <Spacer />
-        <Box display="flex" alignItems="flex-end" justifyContent="flex-end">
-          <RealmSelectorManager />
+      <Box display='flex' bg='gray.300' flexWrap='wrap' borderBottom='4px' borderColor='teal.500'>
+        <Image src={logo} h='100'/>
+        <Box display='flex' flexGrow={1} flexDirection='column'>
+        
+          <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end'>
+            <Spacer />
+            {realmSelectorLocation === 'top' && <RealmSelectorManager />}
+          </Box>
+          
+          <Box display='flex'>
+            <Box display='flex' flexGrow={1} justifyContent='flex-start' alignItems='flex-end'>
+              <NavButtons />
+            </Box>
+            <Spacer flexGrow={1} />
+            <Box display='flex' flexGrow={1} justifyContent='flex-end'>
+              {realmSelectorLocation === 'bottom' && <RealmSelectorManager />}
+            </Box>
+          </Box>
+          
         </Box>
       </Box>    
       <ProfessionBarManager />

@@ -149,6 +149,7 @@ const ProfessionButton = (props) => {
         <Button 
           variant={variant}
           onClick={() => {setProfession({name: props.profession})}}
+          m='6px'
         >
           {props.name}
         </Button>
@@ -163,16 +164,28 @@ const ProfessionBar = forwardRef((props, ref) => {
   const { nav } = useContext(NavContext);
 
   return (
-    <Box ref={ref} display="flex" width="100%" bg="gray.100" alignItems="center">
-      <ButtonGroup width="100%" colorScheme="blue" size='sm' p={nav.name === 'Profession' ? 2 : 0} spacing={2} justifyContent="center" flexWrap="wrap">
-        <ProfessionButton name="Alchemy" profession={Profession.ALCHEMY}/>
-        <ProfessionButton name="Blacksmithing" profession={Profession.BLACKSMITHING}/>
-        <ProfessionButton name="Cooking" profession={Profession.COOKING}/>
-        <ProfessionButton name="Engineering" profession={Profession.ENGINEERING}/>
-        <ProfessionButton name="Inscription" profession={Profession.INSCRIPTION}/>
-        <ProfessionButton name="Jewelcrafting" profession={Profession.JEWELCRAFTING}/>
-        <ProfessionButton name="Leatherworking" profession={Profession.LEATHERWORKING}/>
-        <ProfessionButton name="Tailoring" profession={Profession.TAILORING}/>
+    <Box ref={ref}
+        display='flex'
+        width='100%' 
+        bg='gray.100'
+    >
+      <ButtonGroup 
+        width='100%' 
+        colorScheme='blue' 
+        size='sm' 
+        spacing='0px' 
+        alignItems='center'
+        justifyContent='center' 
+        flexWrap='wrap'
+      >
+        <ProfessionButton name='Alchemy' profession={Profession.ALCHEMY}/>
+        <ProfessionButton name='Blacksmithing' profession={Profession.BLACKSMITHING}/>
+        <ProfessionButton name='Cooking' profession={Profession.COOKING}/>
+        <ProfessionButton name='Engineering' profession={Profession.ENGINEERING}/>
+        <ProfessionButton name='Inscription' profession={Profession.INSCRIPTION}/>
+        <ProfessionButton name='Jewelcrafting' profession={Profession.JEWELCRAFTING}/>
+        <ProfessionButton name='Leatherworking' profession={Profession.LEATHERWORKING}/>
+        <ProfessionButton name='Tailoring' profession={Profession.TAILORING}/>
       </ButtonGroup>
     </Box>
   )
@@ -213,7 +226,7 @@ const ProfessionBarManager = () => {
       nodeRef.current?.style?.setProperty('--h', '112px');
     } else if (width < 845) {
       nodeRef.current?.style?.setProperty('--h', '80px');
-    } 
+    }
   }, [nav])
 
 

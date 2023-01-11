@@ -3,13 +3,17 @@ import {
   Box,
   Button, 
   ButtonGroup,
+  Icon,
   Input,
   InputGroup,
+  InputLeftElement,
   Progress, 
   Spacer,
 } from '@chakra-ui/react';
 
 import Cookies from 'js-cookie'
+
+import { FaSearch } from 'react-icons/fa'
 
 import { FreeLunch, FreeLunchTable, Reagent } from './FreeLunchTable';
 
@@ -212,7 +216,7 @@ export const ProfessionFreeLunches = () => {
         Free Lunches
       </Box>
       <Box display='flex' alignItems='center' flexWrap='wrap'>
-        <ButtonGroup colorScheme='pink' p='14px' spacing='2'>
+        <ButtonGroup colorScheme='pink' p='14px' spacing='8px'>
           <Button onClick={() => {showAllFreeLunches()}}>
             Show All
           </Button>
@@ -223,7 +227,11 @@ export const ProfessionFreeLunches = () => {
           </Button>
         </ButtonGroup>
         <Spacer />
-        <InputGroup width='200px' p='14px'>
+        <InputGroup display='flex' width='250px' p='14px 14px' alignItems='center'>
+          <InputLeftElement display='flex' alignItems='flex-end' justifyContent='flex-end'
+            pointerEvents='none'
+            children={<Icon as={FaSearch} color='gray.500'/>}
+          />
           <Input 
             value={searchValue}
             type='search' 

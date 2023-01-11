@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { 
   chakra,
   Box,
+  Icon,
   ScaleFade,
   Table, 
   Thead, 
@@ -11,7 +12,7 @@ import {
   Td, 
   VStack
 } from "@chakra-ui/react"
-// import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
+
 import {
   flexRender,
   getCoreRowModel,
@@ -20,6 +21,7 @@ import {
 } from "@tanstack/react-table"
 import { createTable } from '@tanstack/table-core';
 
+import { TiArrowSortedDown, TiArrowSortedUp } from 'react-icons/ti'
 
 // ===========
 // React Table
@@ -118,24 +120,35 @@ export const DataTable = (
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
                   isNumeric={meta?.isNumeric}
-                  p={4}
+                  p='8px 6px'
                 >
-                  <chakra.span>
-                    {header.column.getIsSorted() && meta?.isNumeric ? (
-                        header.column.getIsSorted() === "asc" ? '🔼' :'🔽'
-                      ) : null
+                  <Box display='flex' alignItems='center'>
+                    <Box>
+                      {header.column.getIsSorted() && meta?.isNumeric ? (
+                          header.column.getIsSorted() === "asc" 
+                            ? <Icon as={TiArrowSortedUp} boxSize='20px' color='gray.500'/> 
+                            : <Icon as={TiArrowSortedDown} boxSize='20px' color='gray.500'/> 
+                        ) : null
+                      }
+                    </Box>
+                    <Box>
+                    {
+                      header.column.columnDef.header
+                    /*{flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}*/
                     }
-                  </chakra.span>                
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                  <chakra.span>
-                    {header.column.getIsSorted() && !meta?.isNumeric ? (
-                        header.column.getIsSorted() === "asc" ? '🔼' :'🔽'
-                      ) : null
-                    }
-                  </chakra.span>
+                    </Box>
+                    <Box>
+                      {header.column.getIsSorted() && !meta?.isNumeric ? (
+                          header.column.getIsSorted() === "asc" 
+                            ? <Icon as={TiArrowSortedUp} boxSize='20px' color='gray.500'/>
+                            : <Icon as={TiArrowSortedDown} boxSize='20px' color='gray.500'/>
+                        ) : null
+                      }
+                    </Box>
+                  </Box>
                 </Th>
               )
             })}

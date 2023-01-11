@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, createRef, forwardRef, useLayoutEffect, useRef, } from 'react';
 import {
   Box,
   Button, 
@@ -134,6 +134,8 @@ const ProfessionButton = (props) => {
   const variant = (profession.name === props.profession ? "solid" : "ghost");
   
   useEffect(() => {
+    
+    // transition requires a toggle switching from false -> true
     setIsProfessionNav(nav.display_profession);
   }, [nav])  
 
@@ -142,7 +144,6 @@ const ProfessionButton = (props) => {
         timeout={500}
         in={isProfessionNav}
         classNames='professionbarbutton'
-        mountOnEnter={true}
         unmountOnExit={true}
       >
         <Button 
@@ -157,11 +158,13 @@ const ProfessionButton = (props) => {
 
 // component for Profession Bar
 // TODO: change this to a map function
-const ProfessionBar = () => {
+const ProfessionBar = forwardRef((props, ref) => {
+
+  const { nav } = useContext(NavContext);
 
   return (
-    <Box display="flex" width="100%" bg="gray.100" alignItems="center">
-      <ButtonGroup width="100%" colorScheme="blue" size='sm' p={2} spacing={2} justifyContent="center" flexWrap="wrap">
+    <Box ref={ref} display="flex" width="100%" bg="gray.100" alignItems="center">
+      <ButtonGroup width="100%" colorScheme="blue" size='sm' p={nav.name === 'Profession' ? 2 : 0} spacing={2} justifyContent="center" flexWrap="wrap">
         <ProfessionButton name="Alchemy" profession={Profession.ALCHEMY}/>
         <ProfessionButton name="Blacksmithing" profession={Profession.BLACKSMITHING}/>
         <ProfessionButton name="Cooking" profession={Profession.COOKING}/>
@@ -173,7 +176,7 @@ const ProfessionBar = () => {
       </ButtonGroup>
     </Box>
   )
-}
+})
 
 // manager displaying the Realm Selector
 const ProfessionBarManager = () => {
@@ -181,21 +184,48 @@ const ProfessionBarManager = () => {
   const { nav } = useContext(NavContext);
   
   const [ isProfessionNav, setIsProfessionNav ] = useState(false);
+
+  const { width } = useWindowDimensions();
+
+  const nodeRef = createRef();
+  
   
   useEffect(() => {
+    
+    // transition requires a toggle switching from false -> true
     setIsProfessionNav(nav.display_profession);
   }, [nav])
+  
+  
+  useEffect(() => {
+    
+    // set the CSS height property for the ProfessionBar
+    if (nodeRef.current?.offsetHeight !== undefined) {
+      nodeRef.current?.style?.setProperty('--h', nodeRef.current?.offsetHeight + 'px');
+    }
+  }, [width])
+
+
+  useEffect(() => {
+    
+    // set the CSS height property for the ProfessionBar
+    if (width < 450) {
+      nodeRef.current?.style?.setProperty('--h', '112px');
+    } else if (width < 845) {
+      nodeRef.current?.style?.setProperty('--h', '80px');
+    } 
+  }, [nav])
+
 
   return (
     <>
       <CSSTransition 
+        nodeRef={nodeRef}
         timeout={500}
         in={isProfessionNav}
         classNames='professionbar'
-        mountOnEnter={true}
-        unmountOnExit={true}
       >
-        <ProfessionBar/>
+        <ProfessionBar ref={nodeRef}/>
       </CSSTransition>
     </>
   )

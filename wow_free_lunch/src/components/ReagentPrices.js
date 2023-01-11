@@ -152,10 +152,10 @@ const ItemSubclassAccordion = (props) => {
 const ReagentPriceBox = (props) => {
 
   return (
-    <Box display='flex' height='60px' width='250px' bg={props.price === 0 ? 'gray.100' : 'purple.300'}>
+    <Box display='flex' height='60px' width='250px' bg={props.price === 0 ? 'gray.100' : 'green.100'}>
       <Box display='flex' width='60px' alignItems='center' justifyContent='center'>
          <Link href={getWowHeadUrl(props.itemId)} isExternal>
-          <Image src={props.mediaUrl} height='48px' width='48px' border='4px solid white'/>
+          <Image src={props.mediaUrl} height='48px' width='48px' border='2px solid white' borderRadius='10px' outline='2px solid black'/>
         </Link>
       </Box>
       <Box width='190px'>

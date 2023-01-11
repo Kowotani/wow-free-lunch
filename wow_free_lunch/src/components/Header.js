@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, createRef, forwardRef, useLayoutEffect, useRef, } from 'react';
+import { useContext, useEffect, useState, createRef, forwardRef, } from 'react';
 import {
   Box,
   Button, 
@@ -160,8 +160,6 @@ const ProfessionButton = (props) => {
 // component for Profession Bar
 // TODO: change this to a map function
 const ProfessionBar = forwardRef((props, ref) => {
-
-  const { nav } = useContext(NavContext);
 
   return (
     <Box ref={ref}

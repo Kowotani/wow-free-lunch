@@ -152,7 +152,7 @@ export const FreeLunchTable = (props) => {
       cell: (props) => {
         return (
           <Link href={getWowHeadUrl(props.row.getValue('item_id'))} isExternal>
-            <Image src={props.getValue()} height='48px' width='48px' border='4px solid cyan' minWidth='48px'/>
+            <Image src={props.getValue()} height='48px' width='48px' border='2px solid white' borderRadius='10px' outline='2px solid black' minWidth='48px'/>
           </Link>
         )
       },

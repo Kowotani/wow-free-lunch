@@ -7,12 +7,13 @@ import datetime as dt
 from enum import Enum
 from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (Auction, AuctionHouse, ConnectedRealm, Expansion, Item, 
-    ItemClass, ItemClassHierarchy, ItemData, Profession, ProfessionSkillTier, 
-    Reagent, Realm, RealmConnection, Recipe, Region, StgRecipeItem)
+from wfl.models import (Auction, AuctionHouse, AuctionListing, ConnectedRealm, 
+    Expansion, Item, ItemClass, ItemClassHierarchy, ItemData, Profession, 
+    ProfessionSkillTier, Reagent, Realm, RealmConnection, Recipe, Region, 
+    StgRecipeItem)
 # enums
 from wfl.utils import (AuctionHouseFaction, AuctionTimeLeft, Faction, 
-    GameVersion, ItemQuality, NamespaceType, RealmCategory, RealmPopulation,
+    GameVersion, ItemQuality, NamespaceType, RealmCategory, RealmPopulation, 
     RealmStatus, RealmType)
 
 
@@ -1906,3 +1907,74 @@ class AuctionDataManager:
 
         # load any remaining objects
         self._obj_loader.commit_remaining(ignore_conflicts=True)
+        
+
+    '''
+    DESC
+        Loads the `auction_listing` table
+        Mostly maps to the /connected-realm/{connectedRealmId}/auctions/{auctionHouseId} 
+        endpoint
+        
+    INPUT
+        - GameVersion of the Region to load
+        - Connected Realm ID
+        - Auction House Faction ID
+        
+    RETURN
+    '''    
+    # TODO: figure out how this works for RETAIL
+    def load_auction_listing(self, game_version, connected_realm_id, auction_house_faction_id):
+        
+        # call the /connected-realm/{connectedRealmId}/auctions/{auctionHouseId} endpoint
+        auction_r = self._bnet_api_util.get_auctions(game_version, 
+            connected_realm_id, auction_house_faction_id)
+       
+        if auction_r is None:
+            raise Exception('Error: get_auctions() in bnet_data_loader.load_auction_listing()')
+       
+        # set the load timestamps
+        update_time = dt.datetime.now()
+        update_date = update_time.date()
+        update_hour = update_time.strftime('%H')
+    
+        
+        # # get list of existing auction ids
+        # earliest_auction_date = update_date - dt.timedelta(days=2)  # 48 hour auctions
+        # auctions = Auction.objects.filter(
+        #     update_date__gte=earliest_auction_date).values('auction_id')
+        # existing_auction_ids = [x['auction_id'] for x in auctions]
+    
+        # iterate through each auction
+        for auction in auction_r['auctions']:
+    
+            # # check existence of auction
+            # if auction['id'] not in existing_auction_ids:
+    
+            # get unit prices
+            bid_unit_price = None if 'bid' not in auction else auction['bid'] / auction['quantity']
+            buyout_unit_price = None if 'buyout' not in auction else auction['buyout'] / auction['quantity']
+
+            # enqueue Auction object for loading 
+            obj = AuctionListing(
+                auction_listing_id='{}_{}_{}'.format(
+                    update_date.strftime('%Y%m%d'),
+                    update_hour, 
+                    auction['id']),
+                auction_id=auction['id'],
+                item_id=auction['item']['id'],
+                quantity=auction['quantity'],
+                bid_unit_price=bid_unit_price,
+                buyout_unit_price=buyout_unit_price,
+                time_left=self._get_auction_time_left(auction['time_left']),
+                update_time=update_time,
+                update_date=update_date,
+                update_hour=int(update_hour),
+                auction_house=AuctionHouse.objects.get(
+                    connected_realm_id=connected_realm_id, 
+                    faction_id=auction_house_faction_id),
+                name='Auction Listing - {}'.format(auction['id'])
+            )
+            self._obj_loader.add(obj) 
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()

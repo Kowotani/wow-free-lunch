@@ -663,9 +663,9 @@ class ReagentPrices(View) :
             JOIN expansion e ON pst.expansion_id = e.expansion_id
             JOIN recipe rec ON pst.skill_tier_id = rec.skill_tier_id
             JOIN reagent rea ON rec.recipe_id = rea.recipe_id
-            LEFT JOIN item i ON rea.item_id = i.item_id
-            LEFT JOIN item_class_hierarchy ich ON i.item_class_hierarchy_id = ich.item_class_hierarchy_id
-            LEFT JOIN item_data id ON i.classic_item_data_id = id.item_data_id
+            JOIN item i ON rea.item_id = i.item_id
+            JOIN item_class_hierarchy ich ON i.item_class_hierarchy_id = ich.item_class_hierarchy_id
+            JOIN item_data id ON i.classic_item_data_id = id.item_data_id
             LEFT JOIN 
             (
             	SELECT 
@@ -897,7 +897,7 @@ class AllFreeLunches(View) :
             WHERE 
             	p.is_crafting
             	AND e.is_classic
-            GROUP BY 1, 2, 3, 4, 5, 6
+            GROUP BY 1, 2, 3, 4, 5, 6, 7
             HAVING 
             	MAX(ap.min_price IS NULL) = False
             	AND cid.sell_price > SUM(rea.item_quantity * ap.min_price)

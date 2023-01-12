@@ -201,7 +201,8 @@ class Auction(CommonData):
     class Meta:
         db_table = 'auction'
         indexes = [
-            models.Index(fields=['auction_house', 'update_date'])
+            models.Index(fields=['auction_house', 'update_date']),
+            models.Index(fields=['update_date', 'update_time']),
             ]
 
         

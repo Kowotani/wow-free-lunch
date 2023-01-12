@@ -3,6 +3,8 @@ import {
   Box,
   Button, 
   ButtonGroup,
+  Icon,
+  IconButton,
   Image,
   Menu,
   MenuButton,
@@ -14,6 +16,7 @@ import {
 import { CSSTransition } from 'react-transition-group'
 
 import logo from '../assets/logo.png';
+import { AllianceIcon, HordeIcon } from '../assets/Icons'
 
 import { useWindowDimensions } from '../hooks/WindowDimensions';
 
@@ -23,6 +26,13 @@ import { Profession, ProfessionContext } from '../state/ProfessionContext';
 import { RealmContext } from '../state/RealmContext';
 
 import '../styles.css';
+
+
+// =========
+// Constants
+// =========
+
+const REALM_SELECTOR_BREAKPOINT = 525
 
 
 // ===========
@@ -57,8 +67,8 @@ const NavButton = (props) => {
         onClick={() => {setNav(props.navkey)}}
         borderBottomRightRadius='0px'
         borderBottomLeftRadius='0px'
-        borderTopLeftRadius='10px'
-        borderTopRightRadius='10px'
+        borderTopLeftRadius='12px'
+        borderTopRightRadius='12px'
       >
         {props.name}
       </Button>
@@ -91,12 +101,29 @@ const RealmSelector = () => {
   const { realm, setRealm } = useContext(RealmContext);
   const { faction, setFaction } = useContext(FactionContext);
   
+  const { width } = useWindowDimensions();
+  
   const factionColorScheme = (faction.name === Faction.HORDE ? "red" : "blue");
   
   return (
     <>
       <Menu>
-        <MenuButton as={Button} colorScheme="blackAlpha">
+        <MenuButton 
+          as={Button} 
+          colorScheme="blackAlpha"
+          borderBottomRightRadius='0px'
+          borderBottomLeftRadius={
+            width < REALM_SELECTOR_BREAKPOINT
+              ? '12px'
+              : '0px'
+          }
+          borderTopLeftRadius={
+            width < REALM_SELECTOR_BREAKPOINT
+              ? '0px'
+              : '12px'
+          }
+          borderTopRightRadius='0px'
+        >
           {realm.name}
         </MenuButton>
         <MenuList>
@@ -105,12 +132,46 @@ const RealmSelector = () => {
         </MenuList>
       </Menu>
       <Menu>
-        <MenuButton as={Button} colorScheme={factionColorScheme}>
+        <MenuButton 
+          as={IconButton} 
+          colorScheme={factionColorScheme}
+          icon={
+            <Icon as={faction.name === Faction.HORDE
+              ? HordeIcon 
+              : AllianceIcon
+            } 
+              boxSize='30px' 
+              color='white'
+            />
+          }
+          borderBottomRightRadius={
+            width < REALM_SELECTOR_BREAKPOINT
+              ? '12px'
+              : '0px'
+          }
+          borderBottomLeftRadius='0px'
+          borderTopLeftRadius='0px'
+          borderTopRightRadius={
+            width < REALM_SELECTOR_BREAKPOINT
+              ? '0px'
+              : '12px'
+          }
+        >
           {faction.name}
         </MenuButton>
         <MenuList>
-          <MenuItem onClick={() => {setFaction({name: Faction.ALLIANCE})}}>Alliance</MenuItem>
-          <MenuItem onClick={() => {setFaction({name: Faction.HORDE})}}>Horde</MenuItem>
+          <MenuItem
+            icon={<AllianceIcon boxSize='30px' color='blue.500'/>}
+            onClick={() => {setFaction({name: Faction.ALLIANCE})}}
+          >
+            Alliance
+          </MenuItem>
+          <MenuItem 
+            icon={<HordeIcon boxSize='30px' color='red'/>}
+            onClick={() => {setFaction({name: Faction.HORDE})}}
+          >
+            Horde
+          </MenuItem>
         </MenuList>
       </Menu>
     </>
@@ -256,7 +317,7 @@ export const Header = () => {
   const { width } = useWindowDimensions();
   
   useEffect(() => {
-    setRealmSelectorLocation(width < 525 ? 'top' : 'bottom')
+    setRealmSelectorLocation(width < REALM_SELECTOR_BREAKPOINT ? 'top' : 'bottom')
   }, [width])
   
   

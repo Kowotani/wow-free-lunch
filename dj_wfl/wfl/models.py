@@ -241,6 +241,37 @@ class AuctionListing(CommonData):
     def __str__(self):
         return CommonData.__str__(self)
 
+
+'''
+DESC
+    Dim table for Auction Summary
+    Summarizes auction prices for each snapshot
+'''
+
+class AuctionSummary(CommonData):
+    auction_summary_id = models.CharField('concat auction house / item / date / hour as dummy PK', max_length=256, primary_key=True)
+    auction_house = models.ForeignKey(AuctionHouse, on_delete=models.CASCADE)
+    item_id = models.IntegerField('item ID of the auctioned item', default=0)
+    quantity = models.SmallIntegerField('quantity of auction item', default=1)
+    vwap = models.IntegerField('VWAP per auction item', null=True)
+    min_quantity = models.SmallIntegerField('quantity of auction item at the min_price', default=1)
+    min_price = models.IntegerField('buyout price per auction item', null=True)
+    update_time =  models.DateTimeField('datetime the auction summary was loaded', default=timezone.now)
+    update_date = models.DateField('date the auction summary was loaded', default=date.today)
+    update_hour = models.IntegerField('hour bucket the auction summary was loaded', default=0)
+    
+
+    class Meta:
+        db_table = 'auction_summary'
+        indexes = [
+            models.Index(fields=['auction_house', 'update_date', 'update_hour']),
+            models.Index(fields=['update_date', 'update_hour']),
+            ]
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
 '''
 =================
 Profession Models

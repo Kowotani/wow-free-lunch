@@ -120,9 +120,9 @@ export const DataTable = (
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
                   isNumeric={meta?.isNumeric}
-                  p='8px 6px'
+                  p='14px'
                 >
-                  <Box display='flex' alignItems='center'>
+                  <Box display='flex' alignItems='center' justifyContent={meta?.isNumeric ? 'flex-end': 'flex-begin'}>
                     <Box>
                       {header.column.getIsSorted() && meta?.isNumeric ? (
                           header.column.getIsSorted() === "asc" 
@@ -163,7 +163,7 @@ export const DataTable = (
                   // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                   const meta = cell.column.columnDef.meta
                   return (
-                    <Td key={cell.id} isNumeric={meta?.isNumeric} p={4}>
+                    <Td key={cell.id} isNumeric={meta?.isNumeric} p='14px'>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </Td>
                   )

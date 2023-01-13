@@ -36,8 +36,8 @@ const ProfessionAccordion = (props) => {
       defaultIndex={data.length > 0 ? 0 : null} 
       p='10px'
     >
-      <AccordionItem>
-        <AccordionButton bg='green.100' color='gray.400' _expanded={{bg: 'green.200', color: 'black'}}>
+      <AccordionItem border='0px'>
+        <AccordionButton bg='gray.200' color='gray.400' _expanded={{bg: 'green.400', color: 'white'}} borderRadius='12px'>
           <Box flex='1' textAlign='left'>
             {props.profession}
           </Box>
@@ -152,7 +152,7 @@ export const AllFreeLunches = () => {
   
   return (
     <>
-      <Box display='block' bg='cyan.300' p='10px 14px' m='10px 0px'>
+      <Box display='block' bg='teal.500' color='white' fontWeight='medium' p='10px 14px' m='10px 0px 6px 0px'>
         Free Lunches
       </Box>
       {allFreeLunches['is_loading'] && 

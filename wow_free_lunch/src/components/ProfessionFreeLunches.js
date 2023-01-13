@@ -212,7 +212,7 @@ export const ProfessionFreeLunches = () => {
   
   return (
     <>
-      <Box display='block' bg='cyan.300' p='10px 14px'>
+      <Box display='block' bg='teal.500' color='white' fontWeight='medium' p='10px 14px'>
         Free Lunches
       </Box>
       <Box display='flex' alignItems='center' flexWrap='wrap'>

@@ -65,14 +65,14 @@ const ItemClassAccordion = (props) => {
   
   return (
     <Accordion allowMultiple>
-      <AccordionItem>
-        <AccordionButton bg='orange.200' _expanded={{ bg: 'orange.100', color: 'gray.400' }}>
+      <AccordionItem border='0px'>
+        <AccordionButton bg='yellow.400' color='white' _expanded={{ bg: 'yellow.300', color: 'gray.400' }} borderRadius='12px'>
           <Box flex='1' textAlign='left'>
             {props.itemClass}
           </Box>
           <AccordionIcon />
         </AccordionButton>
-        <AccordionPanel>
+        <AccordionPanel paddingBottom='8px'>
           <Box justifyContent='center'>
               {
                 Object.keys(reagentPrices['by_item_class'][props.itemClass])
@@ -105,14 +105,14 @@ const ItemSubclassAccordion = (props) => {
 
   return (
     <Accordion allowMultiple>
-      <AccordionItem>
-        <AccordionButton bg='blue.200' _expanded={{ bg: 'blue.100', color: 'gray.400' }}>
+      <AccordionItem border='0px'>
+        <AccordionButton bg='purple.300' color='white' _expanded={{ bg: 'purple.200', color: 'gray.100' }} borderRadius='12px'>
           <Box flex='1' textAlign='left'>
             {props.itemSubclass}
           </Box>
           <AccordionIcon />
         </AccordionButton>
-        <AccordionPanel>
+        <AccordionPanel paddingBottom='8px'>
           <Box display='flex' gap='8px' justifyContent='flex-start' flexWrap='wrap'>
               {
                 reagentPrices['by_item_class'][props.itemClass][props.itemSubclass]
@@ -260,14 +260,14 @@ export const ReagentPrices = () => {
     <>
       <Box display='block' p='10px 0px 10px 0px'>
         <Accordion allowMultiple>
-          <AccordionItem>
-            <AccordionButton bg='purple.200' _expanded={{ bg: 'purple.100', color: 'gray.400' }}>
+          <AccordionItem border='0px'>
+            <AccordionButton bg='blue.500' color='white' _expanded={{ bg: 'blue.300', color: 'gray.100' }} borderRadius='12px'>
               <Box flex='1' textAlign='left'>
                 Reagent Prices
               </Box>
               <AccordionIcon />
             </AccordionButton>
-            <AccordionPanel>
+            <AccordionPanel paddingBottom='8px'>
                 {
                   Object.keys(reagentPrices['by_item_class'])
                   .sort()

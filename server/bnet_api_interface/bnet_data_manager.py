@@ -7,14 +7,14 @@ import datetime as dt
 from enum import Enum
 from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
-from wfl.models import (Auction, AuctionHouse, AuctionListing, ConnectedRealm, 
-    Expansion, Item, ItemClass, ItemClassHierarchy, ItemData, Profession, 
-    ProfessionSkillTier, Reagent, Realm, RealmConnection, Recipe, Region, 
-    StgRecipeItem)
+from wfl.models import (Auction, AuctionHouse, AuctionListing, AuctionSummary, 
+    ConnectedRealm,  Expansion, Item, ItemClass, ItemClassHierarchy, ItemData, 
+    Profession, ProfessionSkillTier, Reagent, Realm, RealmConnection, Recipe, 
+    Region, StgRecipeItem)
 # enums
 from wfl.utils import (AuctionHouseFaction, AuctionTimeLeft, Faction, 
-    GameVersion, ItemQuality, NamespaceType, RealmCategory, RealmPopulation, 
-    RealmStatus, RealmType)
+    GameVersion, ItemQuality, NamespaceType, QueryManager, RealmCategory, 
+    RealmPopulation, RealmStatus, RealmType)
 
 
 '''
@@ -1937,19 +1937,9 @@ class AuctionDataManager:
         update_date = update_time.date()
         update_hour = update_time.strftime('%H')
     
-        
-        # # get list of existing auction ids
-        # earliest_auction_date = update_date - dt.timedelta(days=2)  # 48 hour auctions
-        # auctions = Auction.objects.filter(
-        #     update_date__gte=earliest_auction_date).values('auction_id')
-        # existing_auction_ids = [x['auction_id'] for x in auctions]
-    
         # iterate through each auction
         for auction in auction_r['auctions']:
-    
-            # # check existence of auction
-            # if auction['id'] not in existing_auction_ids:
-    
+
             # get unit prices
             bid_unit_price = None if 'bid' not in auction else auction['bid'] / auction['quantity']
             buyout_unit_price = None if 'buyout' not in auction else auction['buyout'] / auction['quantity']
@@ -1973,6 +1963,104 @@ class AuctionDataManager:
                     connected_realm_id=connected_realm_id, 
                     faction_id=auction_house_faction_id),
                 name='Auction Listing - {}'.format(auction['id'])
+            )
+            self._obj_loader.add(obj) 
+
+        # load any remaining objects
+        self._obj_loader.commit_remaining()
+        
+
+    '''
+    DESC
+        Loads the `auction_summary` table
+        Summarizes the hourly scrapes of auction_listing to get the
+            - quantity / vwap
+            - min_quantity / min_price
+        
+    INPUT
+        - update_date ('YYYY-MM-DD')
+        - update_hour (0-23)
+        
+    RETURN
+    '''    
+    def load_auction_summary(self, update_date, update_hour):
+        
+        # set the load timestamps
+        update_time = dt.datetime.now()
+    
+        qm = QueryManager()
+
+        # check for existing data
+        if AuctionSummary.objects.filter(
+                update_date=update_date,
+                update_hour=update_hour
+            ).exists():
+                raise Exception('Error: Auction Summary for (update_date={}, update_hour{}) already exists'.format(
+                    update_date, update_hour))
+            
+        # query data
+        sql = '''
+            SELECT
+            	auction_house_id,
+            	item_id,
+            	SUM(quantity) AS quantity,
+            	1.0 * SUM(buyout_unit_price * quantity) / SUM(quantity) AS vwap,
+            	SUM(CASE WHEN rnk = 1 THEN quantity END) AS min_quantity,
+            	MIN(CASE WHEN rnk = 1 THEN buyout_unit_price END) AS min_price
+            FROM
+            (
+            	SELECT
+            		auction_house_id,
+            		item_id,
+            		buyout_unit_price,
+            		quantity,
+            		RANK() OVER (PARTITION BY auction_house_id, item_id ORDER BY buyout_unit_price) AS rnk
+            	FROM
+            	(
+            		SELECT
+            			a.auction_house_id,
+            			a.item_id,
+            			a.buyout_unit_price,
+            			SUM(a.quantity) AS quantity
+            		FROM auction_listing a
+            		JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
+            		JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
+            		JOIN realm r ON rc.realm_id = r.realm_id
+            		WHERE
+            			a.update_date = %s
+            			AND HOUR(a.update_time) = %s
+            			AND a.buyout_unit_price > 0
+            		GROUP BY 1, 2, 3
+            	) z
+            ) y
+            GROUP BY 1, 2;
+        '''
+        params = [update_date, update_hour]
+        res = qm.query(sql, params)
+        
+        # enqueue objects for loading
+        for r in res:
+            obj = AuctionSummary(
+                auction_summary_id='{}_{}_{}_{}'.format(
+            		r['auction_house_id'],
+            		r['item_id'],
+            		update_date.replace('-',''),
+            		update_hour),
+            	auction_house=AuctionHouse.objects.get(
+                    auction_house_id=r['auction_house_id']),
+                item_id=r['item_id'],
+                quantity=r['quantity'],
+                vwap=r['vwap'],
+                min_quantity=r['min_quantity'],
+                min_price=r['min_price'],
+                update_time=update_time,
+                update_date=dt.datetime.strptime(update_date, '%Y-%m-%d').date(),
+                update_hour=update_hour,
+                name='Auction Summary - {}_{}_{}_{}'.format(
+            		r['auction_house_id'],
+            		r['item_id'],
+            		update_date.replace('-',''),
+            		update_hour)
             )
             self._obj_loader.add(obj) 
 

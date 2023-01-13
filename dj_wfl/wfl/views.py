@@ -633,8 +633,10 @@ class ReagentPrices(View) :
         # get latest update_data if required
         if date == 'latest':
             sql = '''
-				SELECT MAX(update_date) AS update_date
-				FROM auction a
+				SELECT 
+				    DATE(MAX(update_time)) AS update_date, 
+                    HOUR(MAX(update_time)) AS update_hour
+				FROM auction_summary a
 				JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
 				JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
 				JOIN realm r ON rc.realm_id = r.realm_id
@@ -644,55 +646,69 @@ class ReagentPrices(View) :
             '''
             params = [realm, faction]
             res = qm.query(sql, params)
-            date = res[0]['update_date'].strftime('%Y-%m-%d')
+            date = res[0]['update_date']
+            hour = res[0]['update_hour']
         
         # query data
         sql = '''
-            SELECT DISTINCT
-            	ich.class_name,
-            	ich.subclass_name,
+            SELECT 
+            	i.class_name,
+            	i.subclass_name,
             	i.item_id,
             	i.name,
-            	id.level,
-            	id.quality,
-            	id.media_url,
-            	CAST(COALESCE(ap.quantity, 0)  AS UNSIGNED) AS quantity,
-            	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, ap.min_price), 0) AS UNSIGNED) AS min_price
-            FROM profession p
-            JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
-            JOIN expansion e ON pst.expansion_id = e.expansion_id
-            JOIN recipe rec ON pst.skill_tier_id = rec.skill_tier_id
-            JOIN reagent rea ON rec.recipe_id = rea.recipe_id
-            JOIN item i ON rea.item_id = i.item_id
-            JOIN item_class_hierarchy ich ON i.item_class_hierarchy_id = ich.item_class_hierarchy_id
-            JOIN item_data id ON i.classic_item_data_id = id.item_data_id
+            	i.level,
+            	i.quality,
+            	i.media_url,
+            	CAST(COALESCE(a.min_quantity, 0)  AS UNSIGNED) AS quantity,
+            	CAST(COALESCE(IF(i.is_vendor_item, i.purchase_price, a.min_price), 0) AS UNSIGNED) AS min_price
+            FROM 
+            (
+            	SELECT DISTINCT
+            		ich.class_name,
+            		ich.subclass_name,
+            		i.item_id,
+            		i.name,
+            		id.level,
+            		id.quality,
+            		id.media_url,
+            		id.is_vendor_item,
+            		id.purchase_price	
+            	FROM profession p
+            	JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
+            	JOIN expansion e ON pst.expansion_id = e.expansion_id
+            	JOIN recipe rec ON pst.skill_tier_id = rec.skill_tier_id
+            	JOIN reagent rea ON rec.recipe_id = rea.recipe_id
+            	JOIN item i ON rea.item_id = i.item_id
+            	JOIN item_class_hierarchy ich ON i.item_class_hierarchy_id = ich.item_class_hierarchy_id
+            	JOIN item_data id ON i.classic_item_data_id = id.item_data_id
+            	WHERE 
+            		p.name = %s
+            		AND e.is_classic
+            		AND id.level IS NOT NULL
+            ) i
             LEFT JOIN 
             (
-            	SELECT 
-            		a.item_id,
-            		SUM(a.quantity) AS quantity,
-            		MIN(CASE WHEN a.buyout_unit_price > 0 THEN a.buyout_unit_price END) AS min_price
-            	FROM auction a 
-            	JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
+            	SELECT
+            		item_id,
+            		min_quantity,
+            		min_price
+            	FROM auction_summary a
+            	JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id 
             	JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
             	JOIN realm r ON rc.realm_id = r.realm_id
-            	WHERE 
+            	WHERE
             		r.name = %s
             		AND ah.faction = %s
             		AND a.update_date = %s
-            	GROUP BY 1
-            ) ap ON i.item_id = ap.item_id
-            WHERE 
-            	p.name = %s
-            	AND e.is_classic
-            	AND id.level IS NOT NULL
+            		AND a.update_hour = %s
+            ) a ON i.item_id = a.item_id
             ORDER BY
-            	ich.class_name,
-            	ich.subclass_name,
-            	id.level,
-            	i.item_id;            
+            	i.class_name,
+            	i.subclass_name,
+            	i.level,
+            	i.item_id;             
         '''
-        params = [realm, faction, date, profession]
+        params = [profession, realm, faction, date, hour]
         res = qm.query(sql, params)
 
         # format data

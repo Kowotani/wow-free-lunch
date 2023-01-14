@@ -152,13 +152,13 @@ const ItemSubclassAccordion = (props) => {
 const ReagentPriceBox = (props) => {
 
   return (
-    <Box display='flex' height='60px' width='250px' bg={props.price === 0 ? 'gray.100' : 'green.100'}>
-      <Box display='flex' width='60px' alignItems='center' justifyContent='center'>
+    <Box display='flex' height='65px' width='250px' bg={props.price === 0 ? 'gray.100' : 'green.100'} borderRadius='12px'>
+      <Box display='flex' width='65px' alignItems='center' justifyContent='center'>
          <Link href={getWowHeadUrl(props.itemId)} isExternal>
           <Image src={props.mediaUrl} height='48px' width='48px' border='2px solid white' borderRadius='10px' outline='2px solid black'/>
         </Link>
       </Box>
-      <Box width='190px'>
+      <Box width='185px'>
         <Box display='flex' alignItems='flex-end' fontWeight='semibold' padding='4px 4px 0px 4px' noOfLines={1} color={getItemQualityColor(props.quality)}>
           <Tooltip label={props.name} placement='top'>
             <Link href={getWowHeadUrl(props.itemId)} isExternal>
@@ -170,7 +170,7 @@ const ReagentPriceBox = (props) => {
           <Box p='4px 4px 4px 0px'>
             {props.price === 0 
               ? (
-                <Box>No data</Box>
+                <Box p='0px 8px'>No data</Box>
               ) : (
                 <PriceBox price={props.price}/>
               )

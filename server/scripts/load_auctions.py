@@ -1,4 +1,5 @@
 # setup Django for standalone use
+# also set DJANGO_SETTINGS_MODULE='dj_wfl.settings' in ~/.bashrc
 import django
 django.setup()
 

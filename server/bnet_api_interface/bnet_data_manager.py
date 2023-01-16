@@ -1,4 +1,4 @@
-from bnet_api_utils import BNetAPIUtil, GameVersion
+from .bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 from dataclasses import dataclass
 from django.apps import apps
@@ -6,7 +6,7 @@ from django.db.models import Q
 import datetime as dt
 from enum import Enum
 from urllib.parse import urlparse
-# add '/home/ec2-user/environment/wow-free-lunch/dj_wfl/wfl to PYTHONPATH
+# add '/home/ec2-user/environment/wow-free-lunch/dj_wfl' to PYTHONPATH
 from wfl.models import (Auction, AuctionHouse, AuctionSummary, 
     ConnectedRealm,  Expansion, Item, ItemClass, ItemClassHierarchy, ItemData, 
     Profession, ProfessionSkillTier, Reagent, Realm, RealmConnection, Recipe, 

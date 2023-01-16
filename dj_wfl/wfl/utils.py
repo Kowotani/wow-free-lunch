@@ -197,21 +197,3 @@ class RealmType(Enum):
     @classmethod
     def choices(cls):
         return [(key.value, key.name) for key in cls]
-        
-        
-'''
-This enum represents the realms for which to populate auction_listing
-'''
-class AuctionListingRealm(Enum):
-    # CLASSIC
-    ANGERFORGE = 'Angerforge'
-    BENEDICTION = 'Benediction'
-    SKYFURY = 'Skyfury'
-    
-
-'''
-This enum represents the factions for which to populate auction_listing
-'''
-class AuctionListingFaction(Enum):
-    ALLIANCE = 'Alliance'
-    HORDE = 'Horde'

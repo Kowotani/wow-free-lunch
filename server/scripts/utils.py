@@ -6,7 +6,6 @@ This enum represents the realms for which to load auctions
 '''
 class AuctionRealm(Enum):
     # CLASSIC
-    ANGERFORGE = 4795
     BENEDICTION = 4728
     SKYFURY = 4725
     

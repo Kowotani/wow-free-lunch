@@ -127,7 +127,7 @@ const RealmSelector = () => {
           {realm.name}
         </MenuButton>
         <MenuList>
-          <MenuItem onClick={() => {setRealm({name: "Angerforge"})}}>Angerforge</MenuItem>
+          <MenuItem onClick={() => {setRealm({name: "Benediction"})}}>Benediction</MenuItem>
           <MenuItem onClick={() => {setRealm({name: "Skyfury"})}}>Skyfury</MenuItem>
         </MenuList>
       </Menu>

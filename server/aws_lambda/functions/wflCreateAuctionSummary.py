@@ -60,7 +60,7 @@ def lambda_handler(event, context):
             raise Exception('Instance in state {} after 2m'.format(
                 instance.state['Name']))
     
-    # get shm client
+    # get ssh client
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     privkey = paramiko.RSAKey.from_private_key_file(PEM_FILE)

@@ -91,7 +91,7 @@ class BulkObjectLoader:
         
     RETURN
     '''
-    def add(self, obj, auto_commit=True, force_add=False, ignore_conflicts=False) -> None:
+    def add(self, obj, auto_commit=True, force_add=False, ignore_conflicts=False, suppress_logging=False) -> None:
         
         model_class = type(obj)
         model_key = model_class._meta.label
@@ -103,7 +103,8 @@ class BulkObjectLoader:
         
         # add to respective queue
         self._create_queues[model_key].append(obj)
-        print('{} queue - added pk={}'.format(model_key, obj.pk))
+        if not suppress_logging:
+            print('{} queue - added pk={}'.format(model_key, obj.pk))
     
         # bulk create if threshold has been met and auto_commit enabled
         if (len(self._create_queues[model_key]) >= self.chunk_size
@@ -1899,7 +1900,7 @@ class AuctionDataManager:
                     faction_id=auction_house_faction_id),
                 name='Auction - {}'.format(auction['id'])
             )
-            self._obj_loader.add(obj) 
+            self._obj_loader.add(obj, suppress_logging=True) 
 
         # load any remaining objects
         self._obj_loader.commit_remaining()

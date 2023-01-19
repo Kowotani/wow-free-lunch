@@ -32,7 +32,10 @@ import '../styles.css';
 // Constants
 // =========
 
-const REALM_SELECTOR_BREAKPOINT = 525
+const REALM_SELECTOR_BREAKPOINT = 525   // RealmSelector on top or bottom
+const PROFESSION_BAR_TWO_BREAKPOINT = 845   // ProfessionBar has 2 lines
+const PROFESSION_BAR_THREE_BREAKPOINT = 450   // ProfessionBar has 3 lines
+const PROFESSION_BAR_TRANSITION_TIME = 500
 
 
 // ===========
@@ -281,9 +284,9 @@ const ProfessionBarManager = () => {
   useEffect(() => {
     
     // set the CSS height property for the ProfessionBar
-    if (width < 450) {
+    if (width < PROFESSION_BAR_THREE_BREAKPOINT) {
       nodeRef.current?.style?.setProperty('--h', '112px');
-    } else if (width < 845) {
+    } else if (width < PROFESSION_BAR_TWO_BREAKPOINT) {
       nodeRef.current?.style?.setProperty('--h', '80px');
     }
   }, [nav])
@@ -293,7 +296,7 @@ const ProfessionBarManager = () => {
     <>
       <CSSTransition 
         nodeRef={nodeRef}
-        timeout={500}
+        timeout={PROFESSION_BAR_TRANSITION_TIME}
         in={isProfessionNav}
         classNames='professionbar'
       >

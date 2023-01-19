@@ -265,7 +265,7 @@ export const ReagentPrices = () => {
               _expanded={{ bg: 'blue.300', color: 'gray.100' }} 
               height='48px'
             >
-              <Box flex='1' textAlign='left'>
+              <Box flex='1' textAlign='left' fontWeight='medium'>
                 Reagent Prices
               </Box>
               <AccordionIcon />

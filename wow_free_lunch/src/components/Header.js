@@ -239,14 +239,18 @@ const ProfessionBar = forwardRef((props, ref) => {
         justifyContent='center' 
         flexWrap='wrap'
       >
-        <ProfessionButton name='Alchemy' profession={Profession.ALCHEMY}/>
-        <ProfessionButton name='Blacksmithing' profession={Profession.BLACKSMITHING}/>
-        <ProfessionButton name='Cooking' profession={Profession.COOKING}/>
-        <ProfessionButton name='Engineering' profession={Profession.ENGINEERING}/>
-        <ProfessionButton name='Inscription' profession={Profession.INSCRIPTION}/>
-        <ProfessionButton name='Jewelcrafting' profession={Profession.JEWELCRAFTING}/>
-        <ProfessionButton name='Leatherworking' profession={Profession.LEATHERWORKING}/>
-        <ProfessionButton name='Tailoring' profession={Profession.TAILORING}/>
+        {Object.values(Profession)
+          .map((profession) => {
+            return (
+              <ProfessionButton 
+                key={profession} 
+                name={profession} 
+                profession={profession}
+              />
+            )
+          })
+          .sort()
+        }
       </ButtonGroup>
     </Box>
   )

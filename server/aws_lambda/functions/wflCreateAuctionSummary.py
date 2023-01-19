@@ -67,7 +67,7 @@ def lambda_handler(event, context):
     
     print('Connect SSH')
     ssh.connect(
-        hostname=instance.public_dns_name,
+        hostname=instance.private_dns_name,
         username=USER, 
         pkey=privkey
     )

@@ -15,6 +15,7 @@ import Cookies from 'js-cookie'
 
 import { FaSearch } from 'react-icons/fa'
 
+import { CalendarPopover } from './CalendarPopover';
 import { FreeLunch, FreeLunchTable, Reagent } from './FreeLunchTable';
 
 import { CraftedItemRecipesContext } from '../state/CraftedItemRecipesContext';
@@ -212,8 +213,11 @@ export const ProfessionFreeLunches = () => {
   
   return (
     <>
-      <Box display='block' bg='teal.500' color='white' fontWeight='medium' p='10px 14px'>
-        Free Lunches
+      <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='10px 14px'>
+        <Box>
+          Free Lunches
+        </Box>
+        <CalendarPopover color='gray.600' label='As of Jan 1, 12:00 PM'/>
       </Box>
       <Box display='flex' alignItems='center' flexWrap='wrap'>
         <ButtonGroup colorScheme='pink' p='14px' spacing='8px'>

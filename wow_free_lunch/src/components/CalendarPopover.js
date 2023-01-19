@@ -23,14 +23,16 @@ export const CalendarPopover = (props) => {
     <Popover placement='left' arrowShadowColor={props.color}>
       <PopoverTrigger display='flex' alignItems='center'>
         <IconButton 
+          size='sm'
           colorScheme='teal' 
-          icon={<Icon as={CgCalendar} boxSize='24px' />} 
+          icon={<Icon as={CgCalendar} boxSize='24px' />}
+          isDisabled={props.isDisabled}
         />
       </PopoverTrigger>
-      <PopoverContent width='200px' bg={props.color} borderColor={props.color}>
-        <PopoverArrow bg='gray.600'/>
+      <PopoverContent width='150px' height='34px' bg={props.color} borderColor={props.color}>
+        <PopoverArrow bg={props.color}/>
         <PopoverBody>
-          <Box textAlign='center'>
+          <Box textAlign='center' fontSize='sm'>
             {props.label}
           </Box>
         </PopoverBody>

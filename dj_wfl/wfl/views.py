@@ -712,13 +712,16 @@ class ReagentPrices(View) :
         res = qm.query(sql, params)
 
         # format data
-        d = {}
+        d = {
+            'update_time': '{}T{}:00:00+00:00'.format(date, str(hour).zfill(2)),
+            'data': {}
+        }
         for class_name in {(x['class_name']) for x in res}:
-            d[class_name] = {}
+            d['data'][class_name] = {}
         for (class_name, subclass_name) in {(x['class_name'], x['subclass_name']) for x in res}:
-            d[class_name][subclass_name] = []
+            d['data'][class_name][subclass_name] = []
         for r in res:
-            d[r['class_name']][r['subclass_name']].append(
+            d['data'][r['class_name']][r['subclass_name']].append(
                 {
                     'name': r['name'],
                     'item_id': r['item_id'],
@@ -946,11 +949,14 @@ class AllFreeLunches(View) :
         res = qm.query(sql, params)
 
         # format data
-        d = {}
+        d = {
+            'update_time': '{}T{}:00:00+00:00'.format(date, str(hour).zfill(2)),
+            'data': {}
+        }
         for profession in CraftingProfession:
-            d[profession.value] = []
+            d['data'][profession.value] = []
         for r in res:
-            d[r['profession']].append(
+            d['data'][r['profession']].append(
                 {
                     'name': r['name'],
                     'item_id': r['item_id'],

@@ -11,7 +11,8 @@ export const ReagentPricesProvider = ({children}) => {
   const [reagentPrices, setReagentPrices] = useState({
     is_loading: false,
     by_item_class: {},
-    by_item_id: {}
+    by_item_id: {},
+    update_time: null,
   });
 
   const value = {reagentPrices, setReagentPrices};

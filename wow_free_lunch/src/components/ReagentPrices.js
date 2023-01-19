@@ -5,14 +5,9 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Button,
-  ButtonGroup,
   Box,
   Image,
-  Input,
-  InputGroup,
   Link,
-  Spacer,
   Tooltip,
 } from '@chakra-ui/react';
 // import { SearchIcon } from '@chakra-ui/icons'
@@ -204,7 +199,8 @@ export const ReagentPrices = () => {
       const loadingReagentPricesState = {
         is_loading: true,
         by_item_class: reagentPrices['by_item_class'],
-        by_item_id: reagentPrices['by_item_id']
+        by_item_id: reagentPrices['by_item_id'],
+        update_time: reagentPrices['update_time'],
       };
       setReagentPrices(loadingReagentPricesState);
 
@@ -229,7 +225,8 @@ export const ReagentPrices = () => {
       const res = await fetch(url, config)
       
       // convert to json
-      const data = await res.json();
+      const resJson = await res.json();
+      const data = resJson['data']
       
       // create item_id indexed price dict
       const dataItemId = {};
@@ -245,7 +242,8 @@ export const ReagentPrices = () => {
       const loadedReagentPricesState = {
         is_loading: false,
         by_item_class: data,
-        by_item_id: dataItemId
+        by_item_id: dataItemId,
+        update_time: resJson['update_time'],
       }
       setReagentPrices(loadedReagentPricesState);
     };
@@ -261,7 +259,12 @@ export const ReagentPrices = () => {
       <Box display='block' p='10px 0px 10px 0px'>
         <Accordion allowMultiple>
           <AccordionItem border='0px'>
-            <AccordionButton bg='blue.500' color='white' _expanded={{ bg: 'blue.300', color: 'gray.100' }} borderRadius='12px'>
+            <AccordionButton 
+              bg='blue.500' 
+              color='white' 
+              _expanded={{ bg: 'blue.300', color: 'gray.100' }} 
+              height='48px'
+            >
               <Box flex='1' textAlign='left'>
                 Reagent Prices
               </Box>

@@ -17,6 +17,7 @@ import { FreeLunch, FreeLunchTable } from './FreeLunchTable';
 import { AllFreeLunchesContext } from '../state/AllFreeLunchesContext';
 import { FactionContext } from '../state/FactionContext';
 import { RealmContext } from '../state/RealmContext';
+import { getFormattedDate } from '../utils';
 
 
 // ====================
@@ -78,7 +79,8 @@ export const AllFreeLunches = () => {
       
       const loadingState = {
         is_loading: true,
-        free_lunches: allFreeLunches['free_lunches']
+        free_lunches: allFreeLunches['free_lunches'],
+        update_time: allFreeLunches['update_time'],
       };
       setAllFreeLunches(loadingState);
       
@@ -102,7 +104,8 @@ export const AllFreeLunches = () => {
       const res = await fetch(url, config)
       
       // convert to json
-      const data = await res.json();
+      const resJson = await res.json();
+      const data = resJson['data']
       
       // format data
       const free_lunches = {}
@@ -129,7 +132,8 @@ export const AllFreeLunches = () => {
       // update state
       const loadedState = {
         is_loading: false,
-        free_lunches: free_lunches
+        free_lunches: free_lunches,
+        update_time: resJson['update_time'],
       };
       setAllFreeLunches(loadedState);      
     };
@@ -153,11 +157,15 @@ export const AllFreeLunches = () => {
   
   return (
     <>
-      <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='10px 14px' m='10px 0px 6px 0px'>
+      <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='8px 14px' m='10px 0px 6px 0px'>
         <Box>
           Free Lunches
         </Box>
-        <CalendarPopover color='gray.600' label='As of Jan 1, 12:00 PM'/>
+        <CalendarPopover 
+          color='gray.600' 
+          label={'As of ' + getFormattedDate(new Date(allFreeLunches['update_time']))}
+          isDisabled={allFreeLunches['is_loading']}
+        />
       </Box>
       {allFreeLunches['is_loading'] && 
         <Box display='block' alignItems='center'>

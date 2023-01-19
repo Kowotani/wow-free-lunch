@@ -22,7 +22,7 @@ import { CraftedItemRecipesContext } from '../state/CraftedItemRecipesContext';
 import { FreeLunchesContext } from '../state/FreeLunchesContext';
 import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext } from '../state/ReagentPricesContext';
-
+import { getFormattedDate } from '../utils';
 
 // ==============
 // Main Component
@@ -72,7 +72,7 @@ export const ProfessionFreeLunches = () => {
       const res = await fetch(url, config)
       
       // convert to json
-      const data = await res.json();
+      const data = await res.json()
 
       // update state
       const loadedCraftedItemRecipesState = {
@@ -95,7 +95,8 @@ export const ProfessionFreeLunches = () => {
 
     const loadingFreeLunchesState = {
       is_loading: true,
-      free_lunches: freeLunches['free_lunches']
+      free_lunches: freeLunches['free_lunches'],
+      update_time: freeLunches['update_time'],
     };
     setFreeLunches(loadingFreeLunchesState);
 
@@ -147,7 +148,8 @@ export const ProfessionFreeLunches = () => {
     // update state
     const loadedFreeLunchesState = {
       is_loading: false,
-      free_lunches: freeLunchData
+      free_lunches: freeLunchData,
+      update_time: reagentPrices['update_time'],
     };
     setFreeLunches(loadedFreeLunchesState);      
 
@@ -213,11 +215,15 @@ export const ProfessionFreeLunches = () => {
   
   return (
     <>
-      <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='10px 14px'>
+      <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='8px 14px'>
         <Box>
           Free Lunches
         </Box>
-        <CalendarPopover color='gray.600' label='As of Jan 1, 12:00 PM'/>
+        <CalendarPopover 
+          color='gray.600' 
+          label={'As of ' + getFormattedDate(new Date(freeLunches['update_time']))}
+          isDisabled={reagentPrices['is_loading'] || freeLunches['is_loading']}
+        />
       </Box>
       <Box display='flex' alignItems='center' flexWrap='wrap'>
         <ButtonGroup colorScheme='pink' p='14px' spacing='8px'>

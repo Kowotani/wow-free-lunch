@@ -24,3 +24,15 @@ export function getItemQualityColor(quality) {
       return 'black'
   }
 }
+
+// return the date formatted as `MMM [D]D, HH:00 [AA]`
+export function getFormattedDate(input_date) {
+  
+  const date = input_date.toLocaleDateString(
+    'en-us', {month: 'short', day: 'numeric'})
+    
+  const time = input_date.toLocaleTimeString(
+    'en-us', {hour: 'numeric'})
+  
+  return `${date}, ${time}`
+}

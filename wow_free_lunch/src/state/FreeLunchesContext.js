@@ -10,7 +10,8 @@ export const FreeLunchesProvider = ({children}) => {
   
   const [freeLunches, setFreeLunches] = useState({
     is_loading: false,
-    free_lunches: []
+    free_lunches: [],
+    update_time: null,
   });
 
   const value = {freeLunches, setFreeLunches};

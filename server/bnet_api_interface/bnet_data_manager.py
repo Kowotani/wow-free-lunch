@@ -1680,7 +1680,7 @@ class AuctionDataManager:
     
     _bnet_api_util = None
     _obj_loader = None
-    chunk_size = 1000
+    chunk_size = 5000
 
     
     '''
@@ -1998,7 +1998,7 @@ class AuctionDataManager:
             		update_date.replace('-',''),
             		update_hour)
             )
-            self._obj_loader.add(obj) 
+            self._obj_loader.add(obj, suppress_logging=True) 
 
         # load any remaining objects
         self._obj_loader.commit_remaining()

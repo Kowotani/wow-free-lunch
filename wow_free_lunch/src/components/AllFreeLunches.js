@@ -11,6 +11,7 @@ import {
 
 import Cookies from 'js-cookie'
 
+import { CalendarPopover } from './CalendarPopover';
 import { FreeLunch, FreeLunchTable } from './FreeLunchTable';
 
 import { AllFreeLunchesContext } from '../state/AllFreeLunchesContext';
@@ -152,8 +153,11 @@ export const AllFreeLunches = () => {
   
   return (
     <>
-      <Box display='block' bg='teal.500' color='white' fontWeight='medium' p='10px 14px' m='10px 0px 6px 0px'>
-        Free Lunches
+      <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='10px 14px' m='10px 0px 6px 0px'>
+        <Box>
+          Free Lunches
+        </Box>
+        <CalendarPopover color='gray.600' label='As of Jan 1, 12:00 PM'/>
       </Box>
       {allFreeLunches['is_loading'] && 
         <Box display='block' alignItems='center'>

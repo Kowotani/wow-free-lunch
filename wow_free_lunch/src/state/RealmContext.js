@@ -4,6 +4,7 @@ import { useState, createContext } from 'react';
 export const SupportedRealm = {
     BENEDICTION: 'Benediction',
     ERANIKUS: 'Eranikus',
+    MYZRAEL: 'Myzrael',
     SKYFURY: 'Skyfury',
 }
 

@@ -123,11 +123,11 @@ export const DataTable = (
                   p='14px'
                 >
                   <Box display='flex' alignItems='center' justifyContent={meta?.isNumeric ? 'flex-end': 'flex-begin'}>
-                    <Box>
+                    <Box height='16px'>
                       {header.column.getIsSorted() && meta?.isNumeric ? (
                           header.column.getIsSorted() === "asc" 
-                            ? <Icon as={TiArrowSortedUp} boxSize='20px' color='gray.500'/> 
-                            : <Icon as={TiArrowSortedDown} boxSize='20px' color='gray.500'/> 
+                            ? <Icon as={TiArrowSortedUp} boxSize='16px' color='gray.500'/> 
+                            : <Icon as={TiArrowSortedDown} boxSize='16px' color='gray.500'/> 
                         ) : null
                       }
                     </Box>
@@ -140,11 +140,11 @@ export const DataTable = (
                     )}*/
                     }
                     </Box>
-                    <Box>
+                    <Box height='16px'>
                       {header.column.getIsSorted() && !meta?.isNumeric ? (
                           header.column.getIsSorted() === "asc" 
-                            ? <Icon as={TiArrowSortedUp} boxSize='20px' color='gray.500'/>
-                            : <Icon as={TiArrowSortedDown} boxSize='20px' color='gray.500'/>
+                            ? <Icon as={TiArrowSortedUp} boxSize='16px' color='gray.500'/>
+                            : <Icon as={TiArrowSortedDown} boxSize='16px' color='gray.500'/>
                         ) : null
                       }
                     </Box>

@@ -29,7 +29,7 @@ export const CalendarPopover = (props) => {
           isDisabled={props.isDisabled}
         />
       </PopoverTrigger>
-      <PopoverContent width='150px' height='34px' bg={props.color} borderColor={props.color}>
+      <PopoverContent width='150px' height='36px' bg={props.color} borderColor={props.color}>
         <PopoverArrow bg={props.color}/>
         <PopoverBody>
           <Box textAlign='center' fontSize='sm'>

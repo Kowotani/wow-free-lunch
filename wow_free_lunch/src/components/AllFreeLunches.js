@@ -4,12 +4,13 @@ import {
   AccordionItem,
   AccordionButton,
   AccordionPanel,
-  AccordionIcon,  
   Box,
+  Icon,
   Progress, 
 } from '@chakra-ui/react';
 
 import Cookies from 'js-cookie'
+import { FiPlusCircle, FiMinusCircle } from 'react-icons/fi'
 
 import { CalendarPopover } from './CalendarPopover';
 import { FreeLunch, FreeLunchTable } from './FreeLunchTable';
@@ -39,18 +40,26 @@ const ProfessionAccordion = (props) => {
       p='10px'
     >
       <AccordionItem border='0px'>
-        <AccordionButton bg='gray.200' color='gray.400' _expanded={{bg: 'green.400', color: 'white'}} borderRadius='12px'>
-          <Box flex='1' textAlign='left'>
-            {props.profession}
-          </Box>
-          <AccordionIcon />
-        </AccordionButton>
-        <AccordionPanel p={0}>
-          <FreeLunchTable
-            data={data}
-            enableShowAllMessage={false}
-          />
-        </AccordionPanel>
+        {({ isExpanded }) => (
+          <>
+            <AccordionButton bg='gray.200' color='gray.400' _expanded={{bg: 'green.400', color: 'white'}} borderRadius='12px'>
+              <Box flex='1' textAlign='left'>
+                {props.profession}
+              </Box>
+              {isExpanded ? (
+                <Icon as={FiMinusCircle} boxSize='22px' />
+              ) : (
+                <Icon as={FiPlusCircle} boxSize='22px' />
+              )}
+            </AccordionButton>
+            <AccordionPanel p={0}>
+              <FreeLunchTable
+                data={data}
+                enableShowAllMessage={false}
+              />
+            </AccordionPanel>
+          </>
+        )}
       </AccordionItem>
     </Accordion>
   )

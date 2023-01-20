@@ -4,16 +4,17 @@ import {
   AccordionItem,
   AccordionButton,
   AccordionPanel,
-  AccordionIcon,
   Box,
   Image,
+  Icon,
   Link,
   Tooltip,
 } from '@chakra-ui/react';
-// import { SearchIcon } from '@chakra-ui/icons'
 
 import Cookies from 'js-cookie'
+import { FiPlusCircle, FiMinusCircle } from 'react-icons/fi'
 import { firstBy } from 'thenby'
+
 
 import { FactionContext } from '../state/FactionContext';
 import { ProfessionContext } from '../state/ProfessionContext';
@@ -61,32 +62,40 @@ const ItemClassAccordion = (props) => {
   return (
     <Accordion allowMultiple>
       <AccordionItem border='0px'>
-        <AccordionButton bg='yellow.400' color='white' _expanded={{ bg: 'yellow.300', color: 'gray.400' }} borderRadius='12px'>
-          <Box flex='1' textAlign='left'>
-            {props.itemClass}
-          </Box>
-          <AccordionIcon />
-        </AccordionButton>
-        <AccordionPanel paddingBottom='8px'>
-          <Box justifyContent='center'>
-              {
-                Object.keys(reagentPrices['by_item_class'][props.itemClass])
-                .sort()
-                .map( 
-                  itemSubclass => {
-                    return (
-                      <Box key={itemSubclass} display='block' padding='8px'>
-                        <ItemSubclassAccordion 
-                          itemClass={props.itemClass} 
-                          itemSubclass={itemSubclass} 
-                        />
-                      </Box>
-                    )
-                  }
-                )
-              }
-          </Box>
-        </AccordionPanel>
+      {({ isExpanded }) => (
+        <>
+          <AccordionButton bg='yellow.400' color='white' _expanded={{ bg: 'yellow.300', color: 'gray.400' }} borderRadius='12px'>
+            <Box flex='1' textAlign='left'>
+              {props.itemClass}
+            </Box>
+              {isExpanded ? (
+                <Icon as={FiMinusCircle} boxSize='22px' />
+              ) : (
+                <Icon as={FiPlusCircle} boxSize='22px' />
+              )}
+          </AccordionButton>
+          <AccordionPanel paddingBottom='8px'>
+            <Box justifyContent='center'>
+                {
+                  Object.keys(reagentPrices['by_item_class'][props.itemClass])
+                  .sort()
+                  .map( 
+                    itemSubclass => {
+                      return (
+                        <Box key={itemSubclass} display='block' padding='8px'>
+                          <ItemSubclassAccordion 
+                            itemClass={props.itemClass} 
+                            itemSubclass={itemSubclass} 
+                          />
+                        </Box>
+                      )
+                    }
+                  )
+                }
+            </Box>
+          </AccordionPanel>
+        </>
+      )}
       </AccordionItem>
     </Accordion>
   )
@@ -101,38 +110,46 @@ const ItemSubclassAccordion = (props) => {
   return (
     <Accordion allowMultiple>
       <AccordionItem border='0px'>
-        <AccordionButton bg='purple.300' color='white' _expanded={{ bg: 'purple.200', color: 'gray.100' }} borderRadius='12px'>
-          <Box flex='1' textAlign='left'>
-            {props.itemSubclass}
-          </Box>
-          <AccordionIcon />
-        </AccordionButton>
-        <AccordionPanel paddingBottom='8px'>
-          <Box display='flex' gap='8px' justifyContent='flex-start' flexWrap='wrap'>
-              {
-                reagentPrices['by_item_class'][props.itemClass][props.itemSubclass]
-                .sort(
-                  firstBy(function (a, b) { return a.level - b.level})
-                  .thenBy(function (a, b) { return a.item_id - b.item_id})
-                )
-                .map(
-                  reagent => {
-                    return (
-                      <Box key={reagent.item_id} display='block' padding='8px'>
-                        <ReagentPriceBox
-                          itemId={reagent.item_id}
-                          name={reagent.name} 
-                          price={reagent.min_price}
-                          quality={reagent.quality}
-                          mediaUrl={reagent.media_url}
-                        />
-                      </Box>
+        {({ isExpanded }) => (
+          <>
+            <AccordionButton bg='purple.300' color='white' _expanded={{ bg: 'purple.200', color: 'gray.100' }} borderRadius='12px'>
+              <Box flex='1' textAlign='left'>
+                {props.itemSubclass}
+              </Box>
+                {isExpanded ? (
+                  <Icon as={FiMinusCircle} boxSize='22px'/>
+                ) : (
+                  <Icon as={FiPlusCircle} boxSize='22px'/>
+                )}
+            </AccordionButton>
+            <AccordionPanel paddingBottom='8px'>
+              <Box display='flex' gap='8px' justifyContent='center' flexWrap='wrap'>
+                  {
+                    reagentPrices['by_item_class'][props.itemClass][props.itemSubclass]
+                    .sort(
+                      firstBy(function (a, b) { return a.level - b.level})
+                      .thenBy(function (a, b) { return a.item_id - b.item_id})
+                    )
+                    .map(
+                      reagent => {
+                        return (
+                          <Box key={reagent.item_id} display='block' padding='8px'>
+                            <ReagentPriceBox
+                              itemId={reagent.item_id}
+                              name={reagent.name} 
+                              price={reagent.min_price}
+                              quality={reagent.quality}
+                              mediaUrl={reagent.media_url}
+                            />
+                          </Box>
+                        )
+                      }
                     )
                   }
-                )
-              }
-          </Box>
-        </AccordionPanel>
+              </Box>
+            </AccordionPanel>
+          </>
+        )}
       </AccordionItem>
     </Accordion>
   )
@@ -259,32 +276,40 @@ export const ReagentPrices = () => {
       <Box display='block' p='10px 0px 10px 0px'>
         <Accordion allowMultiple>
           <AccordionItem border='0px'>
-            <AccordionButton 
-              bg='blue.500' 
-              color='white' 
-              _expanded={{ bg: 'blue.300', color: 'gray.100' }} 
-              height='48px'
-            >
-              <Box flex='1' textAlign='left' fontWeight='medium'>
-                Reagent Prices
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel paddingBottom='8px'>
-                {
-                  Object.keys(reagentPrices['by_item_class'])
-                  .sort()
-                  .map( 
-                    itemClass => {
-                      return (
-                        <Box key={itemClass} display='block' padding='8px'>
-                          <ItemClassAccordion itemClass={itemClass} />
-                        </Box>
-                      )
-                    }
-                  )
-                }
-            </AccordionPanel>          
+          {({ isExpanded }) => (
+            <>
+              <AccordionButton 
+                bg='blue.500' 
+                color='white' 
+                _expanded={{ bg: 'blue.300', color: 'gray.100' }} 
+                height='48px'
+              >
+                <Box flex='1' textAlign='left' fontWeight='medium'>
+                  Reagent Prices
+                </Box>
+                {isExpanded ? (
+                  <Icon as={FiMinusCircle} boxSize='22px' m='0px 2px'/>
+                ) : (
+                  <Icon as={FiPlusCircle} boxSize='22px' m='0px 2px'/>
+                )}
+              </AccordionButton>
+              <AccordionPanel paddingBottom='8px'>
+                  {
+                    Object.keys(reagentPrices['by_item_class'])
+                    .sort()
+                    .map( 
+                      itemClass => {
+                        return (
+                          <Box key={itemClass} display='block' padding='8px'>
+                            <ItemClassAccordion itemClass={itemClass} />
+                          </Box>
+                        )
+                      }
+                    )
+                  }
+              </AccordionPanel>   
+              </>
+            )}
           </AccordionItem>
         </Accordion>
       </Box>

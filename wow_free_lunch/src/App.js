@@ -12,6 +12,7 @@ import {
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 
+import { About } from './components/About'
 import { AllFreeLunches } from './components/AllFreeLunches'
 import { Header } from './components/Header'
 import { ReagentPrices } from './components/ReagentPrices'
@@ -45,7 +46,7 @@ const MainContent = () => {
         <ProfessionFreeLunches/>
       </>
     )}
-    {nav === Nav.ABOUT && <Box>About Content</Box>} 
+    {nav === Nav.ABOUT && <About />} 
     </>
   )
 }

@@ -34,7 +34,9 @@ import '../styles.css';
 
 const REALM_SELECTOR_BREAKPOINT = 525   // RealmSelector on top or bottom
 const PROFESSION_BAR_TWO_BREAKPOINT = 845   // ProfessionBar has 2 lines
+const PROFESSION_BAR_TWO_HEIGHT = 88  // ProfessionBar 2 line height
 const PROFESSION_BAR_THREE_BREAKPOINT = 450   // ProfessionBar has 3 lines
+const PROFESSION_BAR_THREE_HEIGHT = 132  // ProfessionBar 3 line height
 const PROFESSION_BAR_TRANSITION_TIME = 500
 
 
@@ -102,7 +104,8 @@ const RealmSelector = () => {
           <Menu>
             <MenuButton 
               as={Button} 
-              colorScheme="blackAlpha"
+              bg='gray.600'
+              color='white'
               borderBottomRightRadius='0px'
               borderBottomLeftRadius={
                 width < REALM_SELECTOR_BREAKPOINT
@@ -221,7 +224,6 @@ const ProfessionButton = (props) => {
 }
 
 // component for Profession Bar
-// TODO: change this to a map function
 const ProfessionBar = forwardRef((props, ref) => {
 
   return (
@@ -279,7 +281,8 @@ const ProfessionBarManager = () => {
     
     // set the CSS height property for the ProfessionBar
     if (nodeRef.current?.offsetHeight !== undefined) {
-      nodeRef.current?.style?.setProperty('--h', nodeRef.current?.offsetHeight + 'px');
+      nodeRef.current?.style?.setProperty(
+        '--h', nodeRef.current?.offsetHeight + 'px');
     }
   }, [width])
 
@@ -288,9 +291,11 @@ const ProfessionBarManager = () => {
     
     // set the CSS height property for the ProfessionBar
     if (width < PROFESSION_BAR_THREE_BREAKPOINT) {
-      nodeRef.current?.style?.setProperty('--h', '112px');
+      nodeRef.current?.style?.setProperty(
+        '--h', PROFESSION_BAR_THREE_HEIGHT + 'px');
     } else if (width < PROFESSION_BAR_TWO_BREAKPOINT) {
-      nodeRef.current?.style?.setProperty('--h', '80px');
+      nodeRef.current?.style?.setProperty(
+        '--h', PROFESSION_BAR_TWO_HEIGHT + 'px');
     }
   }, [nav])
 

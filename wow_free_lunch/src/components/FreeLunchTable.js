@@ -253,7 +253,7 @@ export const FreeLunchTable = (props) => {
         return (
           <>
             {!props.row.getValue('insufficient_data') &&
-              <Box color={props.getValue() < 0 ? 'red' : 'black'}>
+              <Box color={props.getValue() < 0 ? 'red.600' : 'black'}>
                 {isNaN(props.getValue()) 
                   ? null 
                   : (props.getValue() * 100).toFixed(width < 650 ? 0 : 2) + '%'

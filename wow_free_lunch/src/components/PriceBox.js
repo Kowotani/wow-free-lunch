@@ -48,7 +48,7 @@ export const CurrencyBox = (props) => {
       padding='0px 4px'
       alignItems='center' 
       justifyContent='flex-end' 
-      color={props.isNegative ? 'red' : 'black'} 
+      color={props.isNegative ? 'red.600' : 'black'} 
     >
       {props.hasNegativeSign ? <Box color='red'>-</Box>: null}
       <Box padding={coin === goldCoin ? '0px 2px 0px 0px' : '0px 2px 0px 2px'}>{props.zeroPad ? '0' : null}{props.amount}</Box>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { 
-  chakra,
   Box,
   Icon,
   ScaleFade,
@@ -168,7 +167,7 @@ export const DataTable = (
                     </Td>
                   )
                 })}
-              </Tr> 
+              </Tr>
             )
           )
         }

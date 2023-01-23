@@ -15,7 +15,7 @@ import {
 
 import { CSSTransition } from 'react-transition-group'
 
-import logo from '../assets/logo.png';
+import logo from '../assets/wfl_logo.png';
 import { AllianceIcon, HordeIcon } from '../assets/Icons'
 
 import { useWindowDimensions } from '../hooks/WindowDimensions';
@@ -166,7 +166,7 @@ const RealmSelector = () => {
             </MenuButton>
             <MenuList>
               <MenuItem
-                icon={<AllianceIcon boxSize='30px' color='blue'/>}
+                icon={<AllianceIcon boxSize='30px' color='blue.500'/>}
                 onClick={() => {setFaction({name: Faction.ALLIANCE})}}
               >
                 Alliance
@@ -337,7 +337,7 @@ export const Header = () => {
   return (
     <>
       <Box display='flex' bg='gray.300' flexWrap='wrap' borderBottom='4px' borderColor='teal.500'>
-        <Image src={logo} h='70px' borderRadius='10px' m='10px'/>
+        <Image src={logo} h='90px' border='5px #CBD5E0 solid' borderRadius='12px' />
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
           <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end'>

@@ -15,6 +15,7 @@ import {
 import { BiChevronRight } from 'react-icons/bi'
 import { SiGithub, SiGmail, SiLinkedin, SiInstagram, } from 'react-icons/si'
 
+import { DiscordIcon } from '../assets/Icons'
 import { useWindowDimensions } from '../hooks/WindowDimensions'
 
 // ==================
@@ -194,7 +195,7 @@ const ButtonLink = (props) => {
         <Button 
           bg={props.bgColor} 
           _hover={{bg: props.hoverColor}} 
-          leftIcon={<Icon as={props.icon}/>}
+          leftIcon={<Icon as={props.icon} boxSize='16px'/>}
         >
           {props.label}
         </Button>
@@ -205,10 +206,11 @@ const ButtonLink = (props) => {
 
 const Contact = () => {
   
+  const urlDiscord = 'https://discord.com/users/283464182253355008'
   const urlEmail = 'mailto:wowfreelunch@gmail.com'
-  const urlLinkedIn = 'https://www.linkedin.com/in/jckyoung/'
-  const urlInstagram = 'https://www.instagram.com/kowotani/'
   const urlGithub = 'https://github.com/Kowotani'
+  const urlInstagram = 'https://www.instagram.com/kowotani/'
+  const urlLinkedIn = 'https://www.linkedin.com/in/jckyoung/'
   
   return (
     <Box m='10px 0px'>
@@ -228,6 +230,7 @@ const Contact = () => {
         >
           <ButtonLink label='Email' url={urlEmail} bgColor='#DB4437' hoverColor='#AD332E' icon={SiGmail}/>
           <ButtonLink label='LinkedIn' url={urlLinkedIn} bgColor='#0077B5' hoverColor='#005682' icon={SiLinkedin}/>
+          <ButtonLink label='Discord' url={urlDiscord} bgColor='#7289da' hoverColor='#687DC4' icon={DiscordIcon}/>
           <ButtonLink label='Instagram' url={urlInstagram} bgColor='#833AB4' hoverColor='#612C87' icon={SiInstagram}/>
           <ButtonLink label='GitHub' url={urlGithub} bgColor='#333' hoverColor='#545454' icon={SiGithub}/>
         </ButtonGroup>

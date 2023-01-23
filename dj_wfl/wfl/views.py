@@ -842,6 +842,8 @@ class AllFreeLunches(View) :
         if date == 'latest':
             sql = '''
 				SELECT 
+				    r.realm_id,
+				    ah.faction_id,
 				    DATE(MAX(update_time)) AS update_date, 
                     HOUR(MAX(update_time)) AS update_hour
 				FROM auction_summary a
@@ -850,10 +852,12 @@ class AllFreeLunches(View) :
 				JOIN realm r ON rc.realm_id = r.realm_id
 				WHERE 
 					r.name = %s
-					AND ah.faction = %s
+					AND ah.faction = %s;
             '''
             params = [realm, faction]
             res = qm.query(sql, params)
+            realm_id = res[0]['realm_id']
+            faction_id = res[0]['faction_id']
             date = res[0]['update_date']
             hour = res[0]['update_hour']
         
@@ -869,8 +873,7 @@ class AllFreeLunches(View) :
             	i.vendor_price,
             	i.quality,
             	-- profitability
-            	i.reagents,
-            	CAST(SUM(i.reagent_quantity * a.min_price) AS UNSIGNED) AS cost
+            	CAST(SUM(i.reagent_quantity * i.min_price) AS UNSIGNED) AS cost
             FROM 
             (
             	SELECT
@@ -885,7 +888,10 @@ class AllFreeLunches(View) :
             		-- reagent item
             		rea.item_quantity AS reagent_quantity,
             		ri.item_id AS reagent_item_id,
-            		COUNT(ri.item_id) OVER (PARTITION BY ci.item_id) AS reagents
+            		COUNT(ri.item_id) OVER (PARTITION BY ci.item_id) AS num_reagents,
+            		-- auctions
+            		a.min_price,
+            		COUNT(a.item_id) OVER (PARTITION BY ci.item_id) AS num_prices
             	FROM profession p
             	JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             	JOIN expansion e ON pst.expansion_id = e.expansion_id
@@ -896,35 +902,25 @@ class AllFreeLunches(View) :
             	-- reagents
             	JOIN reagent rea ON rec.recipe_id = rea.recipe_id
             	JOIN item ri ON rea.item_id = ri.item_id
+            	-- auctions
+            	JOIN auction_summary a ON ri.item_id = a.item_id
             	WHERE 
             		p.is_crafting
             		AND e.is_classic
+	            	AND a.auction_house_id = %s
+                	AND a.update_date = %s 
+                	AND a.update_hour = %s
             ) i
-            JOIN 
-            (
-            	SELECT
-            		item_id,
-            		min_price
-            	FROM auction_summary a
-            	JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id 
-            	JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
-            	JOIN realm r ON rc.realm_id = r.realm_id
-            	WHERE
-            		r.name = %s
-            		AND ah.faction = %s
-            		AND a.update_date = %s
-            		AND a.update_hour = %s
-            ) a ON i.reagent_item_id = a.item_id
-            GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+            WHERE i.num_reagents = i.num_prices 
+            GROUP BY 1, 2, 3, 4, 5, 6, 7
             HAVING 
-            	i.reagents = COUNT(a.item_id)
-            	AND i.vendor_price > SUM(i.reagent_quantity * a.min_price)
+            	i.vendor_price > SUM(i.reagent_quantity * i.min_price)
             ORDER BY
                 i.name,
             	i.level,
             	i.item_id;
         '''
-        params = [realm, faction, date, hour]
+        params = ['{}_{}'.format(realm_id, faction_id), date, hour]
         res = qm.query(sql, params)
 
         # format data

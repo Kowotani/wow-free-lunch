@@ -64,7 +64,7 @@ const ItemClassAccordion = (props) => {
       <AccordionItem border='0px'>
       {({ isExpanded }) => (
         <>
-          <AccordionButton bg='yellow.400' color='white' _expanded={{ bg: 'yellow.300', color: 'gray.400' }} borderRadius='12px'>
+          <AccordionButton bg='yellow.400' color='white' _hover={{bg: 'yellow.300'}} _expanded={{ bg: 'yellow.200', color: 'gray.500' }} borderRadius='12px'>
             <Box flex='1' textAlign='left'>
               {props.itemClass}
             </Box>
@@ -112,7 +112,7 @@ const ItemSubclassAccordion = (props) => {
       <AccordionItem border='0px'>
         {({ isExpanded }) => (
           <>
-            <AccordionButton bg='purple.300' color='white' _expanded={{ bg: 'purple.200', color: 'gray.100' }} borderRadius='12px'>
+            <AccordionButton bg='purple.400' color='white' _hover={{bg: 'purple.300'}} _expanded={{ bg: 'purple.200', color: 'gray.500' }} borderRadius='12px'>
               <Box flex='1' textAlign='left'>
                 {props.itemSubclass}
               </Box>
@@ -280,7 +280,8 @@ export const ReagentPrices = () => {
             <>
               <AccordionButton 
                 bg='blue.500' 
-                color='white' 
+                color='white'
+                _hover={{bg: 'blue.400'}}
                 _expanded={{ bg: 'blue.300', color: 'gray.100' }} 
                 height='48px'
               >

@@ -2,8 +2,6 @@ import { useState, createContext } from 'react';
 
 // Realm enum
 export const SupportedRealm = {
-    BENEDICTION: 'Benediction',
-    ERANIKUS: 'Eranikus',
     MYZRAEL: 'Myzrael',
     SKYFURY: 'Skyfury',
 }

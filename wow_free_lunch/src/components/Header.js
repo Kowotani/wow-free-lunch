@@ -105,6 +105,8 @@ const RealmSelector = () => {
             <MenuButton 
               as={Button} 
               bg='gray.600'
+              _hover={{bg: '#3B4451'}}
+              _active={{bg: 'gray.700'}}
               color='white'
               borderBottomRightRadius='0px'
               borderBottomLeftRadius={
@@ -335,7 +337,7 @@ export const Header = () => {
   return (
     <>
       <Box display='flex' bg='gray.300' flexWrap='wrap' borderBottom='4px' borderColor='teal.500'>
-        <Image src={logo} h='100'/>
+        <Image src={logo} h='70px' borderRadius='10px' m='10px'/>
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
           <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end'>

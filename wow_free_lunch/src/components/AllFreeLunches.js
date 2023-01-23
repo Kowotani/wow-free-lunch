@@ -42,7 +42,7 @@ const ProfessionAccordion = (props) => {
       <AccordionItem border='0px'>
         {({ isExpanded }) => (
           <>
-            <AccordionButton bg='gray.200' color='gray.400' _expanded={{bg: 'green.400', color: 'white'}} borderRadius='12px'>
+            <AccordionButton bg='gray.200' color='gray.500' _hover={{bg: 'gray.300'}} _expanded={{bg: 'green.400', color: 'white'}} borderRadius='12px'>
               <Box flex='1' textAlign='left'>
                 {props.profession}
               </Box>

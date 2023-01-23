@@ -9,13 +9,19 @@ import {
   List,
   ListIcon,
   ListItem,
+  Popover,
+  PopoverArrow,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,  
   Text,
 } from '@chakra-ui/react';
 
 import { BiChevronRight } from 'react-icons/bi'
+import { CgCheckO } from 'react-icons/cg'
 import { SiGithub, SiGmail, SiLinkedin, SiInstagram, } from 'react-icons/si'
 
-import { DiscordIcon } from '../assets/Icons'
+import { BattleDotNetIcon, DiscordIcon } from '../assets/Icons'
 import { useWindowDimensions } from '../hooks/WindowDimensions'
 
 // ==================
@@ -204,6 +210,45 @@ const ButtonLink = (props) => {
   )
 }
 
+
+const copyBattleTagToClipboard = async () => {
+
+  const battleTag = 'Kowotani#1229'
+    
+  await navigator.clipboard.writeText(battleTag)
+}
+
+
+const ButtonCopyToClipboard = (props) => {
+  return (
+    
+    <Box p='6px 0px'>
+      <Popover gutter={12}>
+        <PopoverTrigger>
+          <Button 
+            bg={props.bgColor} 
+            _hover={{bg: props.hoverColor}} 
+            leftIcon={<Icon as={props.icon} boxSize='16px'/>}
+            onClick={props.onClick}
+          >
+            {props.label}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent h='40px' w='190px' borderRadius='20px' bg='green.400' borderColor='green.400' color='white'>
+          <PopoverArrow bg='green.400'/>
+          <PopoverBody display='flex' alignItems='center' justifyContent='center'>
+            <Icon as={CgCheckO} boxSize='20px' p='0px 4px 0px 0px'/>
+            <Box>
+              Copied to Clipboard
+            </Box>
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
+    </Box>
+  )
+}
+
+
 const Contact = () => {
   
   const urlDiscord = 'https://discord.com/users/283464182253355008'
@@ -231,6 +276,7 @@ const Contact = () => {
           <ButtonLink label='Email' url={urlEmail} bgColor='#DB4437' hoverColor='#AD332E' icon={SiGmail}/>
           <ButtonLink label='LinkedIn' url={urlLinkedIn} bgColor='#0077B5' hoverColor='#005682' icon={SiLinkedin}/>
           <ButtonLink label='Discord' url={urlDiscord} bgColor='#7289da' hoverColor='#687DC4' icon={DiscordIcon}/>
+          <ButtonCopyToClipboard label='Battle.net' onClick={copyBattleTagToClipboard} bgColor='#148EFF' hoverColor='#0F71C6' icon={BattleDotNetIcon}/>
           <ButtonLink label='Instagram' url={urlInstagram} bgColor='#833AB4' hoverColor='#612C87' icon={SiInstagram}/>
           <ButtonLink label='GitHub' url={urlGithub} bgColor='#333' hoverColor='#545454' icon={SiGithub}/>
         </ButtonGroup>

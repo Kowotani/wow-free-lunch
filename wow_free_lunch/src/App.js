@@ -1,4 +1,4 @@
-import { useContext, React } from 'react';
+import { useContext } from 'react';
 import {
   ChakraProvider,
   Box,

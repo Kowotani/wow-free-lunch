@@ -18,11 +18,21 @@ import { FaSearch } from 'react-icons/fa'
 import { CalendarPopover } from './CalendarPopover';
 import { FreeLunch, FreeLunchTable, Reagent } from './FreeLunchTable';
 
+import { useWindowDimensions } from '../hooks/WindowDimensions';
+
 import { CraftedItemRecipesContext } from '../state/CraftedItemRecipesContext';
 import { FreeLunchesContext } from '../state/FreeLunchesContext';
 import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext } from '../state/ReagentPricesContext';
 import { getFormattedDate } from '../utils';
+
+
+// =========
+// Constants
+// =========
+
+const FREE_LUNCHES_FILTER_BREAKPOINT = 525   // Vertical or horizontal filters
+
 
 // ==============
 // Main Component
@@ -40,6 +50,7 @@ export const ProfessionFreeLunches = () => {
   const [ columnFilters, setColumnFilters ] = useState([]);
   const [ searchValue, setSearchValue ] = useState('');
   
+  const { width } = useWindowDimensions();
   
   useEffect(() => {
   
@@ -212,7 +223,7 @@ export const ProfessionFreeLunches = () => {
     />    
   ), [freeLunches['free_lunches'], columnFilters])
   
-  
+
   return (
     <>
       <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='8px 14px'>
@@ -225,8 +236,8 @@ export const ProfessionFreeLunches = () => {
           isDisabled={reagentPrices['is_loading'] || freeLunches['is_loading']}
         />
       </Box>
-      <Box display='flex' alignItems='center' flexWrap='wrap'>
-        <ButtonGroup colorScheme='pink' p='14px' spacing='8px'>
+      <Box display='flex' alignItems='center' justifyContent={width < FREE_LUNCHES_FILTER_BREAKPOINT ? 'center' : 'space-between'} flexWrap='wrap' p='14px'>
+        <ButtonGroup colorScheme='pink' spacing='8px'>
           <Button onClick={() => {showAllFreeLunches()}}>
             Show All
           </Button>
@@ -236,11 +247,15 @@ export const ProfessionFreeLunches = () => {
             Show Profitable
           </Button>
         </ButtonGroup>
-        <Spacer />
-        <InputGroup display='flex' width='250px' p='14px 14px' alignItems='center'>
-          <InputLeftElement display='flex' alignItems='flex-end' justifyContent='flex-end'
+        <InputGroup 
+          display='flex' 
+          width={width < FREE_LUNCHES_FILTER_BREAKPOINT ? '250px'  : '215px'} 
+          alignItems='center'
+          m={width < FREE_LUNCHES_FILTER_BREAKPOINT ? '10px 0px 0px' : '0px'}
+        >
+          <InputLeftElement 
             pointerEvents='none'
-            children={<Icon as={FaSearch} color='gray.500'/>}
+            children={<Icon as={FaSearch} color='gray.500' boxSize='18px'/>}
           />
           <Input 
             value={searchValue}

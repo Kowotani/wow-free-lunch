@@ -8,7 +8,6 @@ import {
   InputGroup,
   InputLeftElement,
   Progress, 
-  Spacer,
 } from '@chakra-ui/react';
 
 import Cookies from 'js-cookie'
@@ -128,7 +127,7 @@ export const ProfessionFreeLunches = () => {
         return Reagent.create({
           name: reagent.name,
           item_id: reagent.item_id,
-          media_url: reagent.media_url,
+          media_url: null,
           quantity: reagent.quantity,
           price: reagentPrices['by_item_id'][reagent.item_id]
         })
@@ -145,7 +144,7 @@ export const ProfessionFreeLunches = () => {
         item_id: item.item_id,
         quality: item.quality,
         media_url: item.media_url,
-        reagents: reagents,
+        reagents: null,
         vendor_price: item.vendor_price,
         cost: cost,
         unit_profit: insufficientData ? 0 : item.vendor_price - cost,

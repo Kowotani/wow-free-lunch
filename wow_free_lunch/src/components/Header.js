@@ -201,6 +201,8 @@ const ProfessionButton = (props) => {
   
   const variant = (profession.name === props.profession ? "solid" : "ghost");
   
+  const nodeRef = createRef();
+  
   useEffect(() => {
     
     // transition requires a toggle switching from false -> true
@@ -209,12 +211,14 @@ const ProfessionButton = (props) => {
 
   return (
       <CSSTransition
+        nodeRef={nodeRef}
         timeout={PROFESSION_BAR_TRANSITION_TIME}
         in={isProfessionNav}
         classNames='professionbarbutton'
         unmountOnExit={true}
       >
-        <Button 
+        <Button
+          ref={nodeRef}
           variant={variant}
           onClick={() => {setProfession({name: props.profession})}}
           m='6px'

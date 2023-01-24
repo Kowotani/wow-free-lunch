@@ -215,9 +215,12 @@ export const ReagentPrices = () => {
       
       const loadingReagentPricesState = {
         is_loading: true,
-        by_item_class: reagentPrices['by_item_class'],
-        by_item_id: reagentPrices['by_item_id'],
-        update_time: reagentPrices['update_time'],
+        // by_item_class: reagentPrices['by_item_class'],
+        // by_item_id: reagentPrices['by_item_id'],
+        // update_time: reagentPrices['update_time'],
+        by_item_class: {},
+        by_item_id: {},
+        update_time: null,
       };
       setReagentPrices(loadingReagentPricesState);
 
@@ -269,7 +272,7 @@ export const ReagentPrices = () => {
     fetchData()
       .catch(console.error);
       
-  }, [profession, realm, faction, setReagentPrices]);
+  }, [faction, profession, realm, setReagentPrices]);
 
   return (
     <>

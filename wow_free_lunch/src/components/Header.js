@@ -290,7 +290,7 @@ const ProfessionBarManager = () => {
       nodeRef.current?.style?.setProperty(
         '--h', nodeRef.current?.offsetHeight + 'px');
     }
-  }, [width])
+  }, [nodeRef, width])
 
 
   useEffect(() => {
@@ -303,7 +303,7 @@ const ProfessionBarManager = () => {
       nodeRef.current?.style?.setProperty(
         '--h', PROFESSION_BAR_TWO_HEIGHT + 'px');
     }
-  }, [nav])
+  }, [nodeRef, nav, width])
 
 
   return (

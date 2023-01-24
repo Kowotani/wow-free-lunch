@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Box,
@@ -17,6 +17,14 @@ import { PriceBox } from './PriceBox';
 import { useWindowDimensions } from '../hooks/WindowDimensions';
 
 import { getWowHeadUrl, getItemQualityColor } from '../utils';
+
+
+// =========
+// Constants
+// =========
+
+const FREE_LUNCHES_HIDDEN_COLUMN_BREAKPOINT = 600
+const FREE_LUNCHES_PROFIT_MARGIN_FORMAT_BREAKPOINT = 650
 
 
 // =======
@@ -77,22 +85,22 @@ const TableSpinner = () => {
 export const FreeLunchTable = (props) => {
   
   
-  const defaultHiddenColumns = ['item_id', 'insufficient_data', 'quality'];
+  const defaultHiddenColumns = useMemo(() => (
+    ['item_id', 'insufficient_data', 'quality'])
+  , []); 
   const [ hiddenColumns, setHiddenColumns ] = useState(defaultHiddenColumns);
   const { width } = useWindowDimensions();
   
   useEffect(() => {
     
     // hide columns if window becomes too narrow 
-    if (width < 600 ) {
+    if (width < FREE_LUNCHES_HIDDEN_COLUMN_BREAKPOINT ) {
       setHiddenColumns([...defaultHiddenColumns, 'vendor_price', 'cost'])
-      // setHiddenColumns(['item_id', 'insufficient_data', 'quality', 'vendor"price', 'cost']);
     } else {
       setHiddenColumns(defaultHiddenColumns)
-      // setHiddenColumns(['item_id', 'insufficient_data', 'quality']);
     }
     
-  }, [width]) 
+  }, [defaultHiddenColumns, width]) 
   
   // Define columns
   const columnHelper = createColumnHelper();
@@ -256,7 +264,7 @@ export const FreeLunchTable = (props) => {
               <Box color={props.getValue() < 0 ? 'red.600' : 'black'}>
                 {isNaN(props.getValue()) 
                   ? null 
-                  : (props.getValue() * 100).toFixed(width < 650 ? 0 : 2) + '%'
+                  : (props.getValue() * 100).toFixed(width < FREE_LUNCHES_PROFIT_MARGIN_FORMAT_BREAKPOINT ? 0 : 2) + '%'
                 }
               </Box>
             }

@@ -1,6 +1,7 @@
 import datetime as dt
 from enum import Enum
 import json
+import os
 import requests
 from requests.auth import HTTPBasicAuth
 from wfl.utils import GameVersion, NamespaceType
@@ -28,8 +29,8 @@ class BNetAPIUtil:
     '''
     Battle.net API access keys
     '''
-    _CLIENT_ID = '4e41cbadc23f466ea64c61e382c08bd1'
-    _CLIENT_SECRET = '1f768iHJc3bPjS6D8j4zXO1nLvYFXE5l'
+    _CLIENT_ID = os.getenv('BNET_API_CLIENT_ID')
+    _CLIENT_SECRET = os.getenv('BNET_API_CLIENT_SECRET')
     
     
     '''

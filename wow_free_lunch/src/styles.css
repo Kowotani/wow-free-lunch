@@ -1,37 +1,37 @@
-/* 
-ProfessionBar
-*/
+:root {
+  --transitionDelay: 500ms;
+  --professionBarHeight: 48px;
+}
 
+/* ProfessionBar */
 .professionbar-enter {
   height: 0px;
 }
 .professionbar-enter-active {
-  --h: 48px;
+  --h: var(--professionBarHeight);
   
   height: var(--h);
-  transition: all 500ms ease-in-out;
+  transition: all var(--transitionDelay) ease-in-out;
 }
 .professionbar-exit {
-  --h: 48px;
+  --h: var(--professionBarHeight);
   
   height: var(--h);
 }
 .professionbar-exit-active {
   height: 0px;
-  transition: all 500ms ease-in-out;
+  transition: all var(--transitionDelay) ease-in-out;
 }
 
 
-/* 
-ProfessionBar buttons
-*/
+/* ProfessionBar buttons */
 .professionbarbutton-enter {
   opacity: 0;
   visibility: hidden;
 }
 .professionbarbutton-enter-active {
   opacity: 0;
-  transition: all 500ms;
+  transition: all var(--transitionDelay);
 }
 
 .professionbarbutton-exit {
@@ -40,5 +40,5 @@ ProfessionBar buttons
 }
 .professionbarbutton-exit-active {
   opacity: 0;
-  transition: all 50ms;
+  transition: all var(--transitionDelay);
 }

@@ -903,13 +903,13 @@ class AllFreeLunches(View) :
             	JOIN reagent rea ON rec.recipe_id = rea.recipe_id
             	JOIN item ri ON rea.item_id = ri.item_id
             	-- auctions
-            	JOIN auction_summary a ON ri.item_id = a.item_id
-            	WHERE 
-            		p.is_crafting
-            		AND e.is_classic
+            	LEFT JOIN auction_summary a ON ri.item_id = a.item_id
 	            	AND a.auction_house_id = %s
                 	AND a.update_date = %s 
                 	AND a.update_hour = %s
+            	WHERE 
+            		p.is_crafting
+            		AND e.is_classic
             ) i
             WHERE i.num_reagents = i.num_prices 
             GROUP BY 1, 2, 3, 4, 5, 6, 7

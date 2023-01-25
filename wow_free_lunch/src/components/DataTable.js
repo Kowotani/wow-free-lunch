@@ -178,7 +178,7 @@ export const DataTable = (
         <ScaleFade 
           initialScale={0.8} 
           in={true} 
-          delay={0.4}
+          delay={0.5}
           transition={{
             enter: { duration: 0.5 }
           }}

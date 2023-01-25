@@ -1,6 +1,6 @@
 :root {
-  --transitionDelay: 500ms;
   --professionBarHeight: 48px;
+  --transitionDelay: 500ms;
 }
 
 /* ProfessionBar */
@@ -41,4 +41,40 @@
 .professionbarbutton-exit-active {
   opacity: 0;
   transition: all var(--transitionDelay);
+}
+
+
+/* RealmSelector on Bottom*/
+.realmselectorbottom-enter {
+  top: 100%;
+}
+.realmselectorbottom-enter-active {
+  top: 0;
+  transition: all var(--transitionDelay) ease-in-out;
+}
+
+.realmselectorbottom-exit {
+  top: 0;
+}
+.realmselectorbottom-exit-active {
+  top: 100%;
+  transition: all var(--transitionDelay) ease-in-out;
+}
+
+
+/* RealmSelector on Top*/
+.realmselectortop-enter {
+  bottom: 100%;
+}
+.realmselectortop-enter-active {
+  bottom: 0;
+  transition: all var(--transitionDelay) ease-in-out;
+}
+
+.realmselectortop-exit {
+  bottom: 0;
+}
+.realmselectortop-exit-active {
+  bottom: 100%;
+  transition: all var(--transitionDelay) ease-in-out;
 }

@@ -32,12 +32,16 @@ import '../styles.css';
 // Constants
 // =========
 
-const REALM_SELECTOR_BREAKPOINT = 525   // RealmSelector on top or bottom
-const PROFESSION_BAR_TWO_BREAKPOINT = 845   // ProfessionBar has 2 lines
-const PROFESSION_BAR_TWO_HEIGHT = 88  // ProfessionBar 2 line height
-const PROFESSION_BAR_THREE_BREAKPOINT = 450   // ProfessionBar has 3 lines
-const PROFESSION_BAR_THREE_HEIGHT = 132  // ProfessionBar 3 line height
-const PROFESSION_BAR_TRANSITION_TIME = 500
+// ProfessionBar
+const PROFESSION_BAR_TWO_BREAKPOINT = 845   // 2 line display
+const PROFESSION_BAR_TWO_HEIGHT = 88  // 2 line display height
+const PROFESSION_BAR_THREE_BREAKPOINT = 450   // 3 line display
+const PROFESSION_BAR_THREE_HEIGHT = 132  // 3 line display height
+const PROFESSION_BAR_TRANSITION_TIME = 500  // transition delay
+
+// RealmSelector
+const REALM_SELECTOR_BREAKPOINT = 525   // Top or bottom display
+const REALM_SELECTOR_TRANSITION_TIME = 500   // transition delay
 
 
 // ===========
@@ -66,7 +70,6 @@ const NavButton = (props) => {
   const variant = (nav.name === props.name ? "solid" : "ghost");
   
   return (
-    
       <Button 
         variant={variant}
         onClick={() => {setNav(props.navkey)}}
@@ -77,7 +80,6 @@ const NavButton = (props) => {
       >
         {props.name}
       </Button>
-    
   )
 }
 
@@ -95,12 +97,32 @@ const RealmSelector = () => {
   
   const { width } = useWindowDimensions();
   
+  const [ isRealmSelectorNav, setIsRealmSelectorNav ] = useState(false);
+  
   const factionColorScheme = (faction.name === Faction.HORDE ? "red" : "blue");
+
+  const nodeRef = createRef();
+
+  useEffect(() => {
+    
+    // transition requires a toggle switching from false -> true
+    setIsRealmSelectorNav(nav.display_realm);
+  }, [nav])
+
 
   return (
     <>
-      {nav.display_realm && (
-        <>
+      <CSSTransition 
+        nodeRef={nodeRef}
+        timeout={REALM_SELECTOR_TRANSITION_TIME}
+        in={isRealmSelectorNav}
+        classNames={width < REALM_SELECTOR_BREAKPOINT 
+          ? 'realmselectortop'
+          : 'realmselectorbottom'
+        }
+        unmountOnExit={true}
+      >
+        <Box ref={nodeRef} position='absolute' height='100%'>
           <Menu>
             <MenuButton 
               as={Button} 
@@ -179,8 +201,8 @@ const RealmSelector = () => {
               </MenuItem>
             </MenuList>
           </Menu>
-        </>
-      )}
+        </Box>
+      </CSSTransition>
     </>
   )
 }
@@ -344,17 +366,17 @@ export const Header = () => {
         <Image src={logo} h='90px' border='5px #CBD5E0 solid' borderRadius='14px' />
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
-          <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end'>
+          <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end' position='relative' overflow='hidden'>
             <Spacer />
             {realmSelectorLocation === 'top' && <RealmSelector />}
           </Box>
           
           <Box display='flex'>
-            <Box display='flex' flexGrow={1} justifyContent='flex-start' alignItems='flex-end'>
+            <Box display='flex' justifyContent='flex-start' alignItems='flex-end'>
               <NavButtons />
             </Box>
-            <Spacer flexGrow={1} />
-            <Box display='flex' flexGrow={1} justifyContent='flex-end'>
+            <Spacer flexShrink />
+            <Box display='flex' flexGrow={4} justifyContent='flex-end' position='relative' overflow='hidden'>
               {realmSelectorLocation === 'bottom' && <RealmSelector />}
             </Box>
           </Box>

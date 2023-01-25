@@ -9,7 +9,6 @@ export const CraftedItemRecipesContext = createContext({});
 export const CraftedItemRecipesProvider = ({children}) => {
   
   const [craftedItemRecipes, setCraftedItemRecipes] = useState({
-    is_loading: false,
     recipes: []
   });
 

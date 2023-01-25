@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button, 
@@ -48,6 +48,8 @@ export const ProfessionFreeLunches = () => {
   
   const [ columnFilters, setColumnFilters ] = useState([]);
   const [ searchValue, setSearchValue ] = useState('');
+  const [ isLoadingRecipes, setIsLoadingRecipes ] = useState(false);
+  const [ isLoadingFreeLunches, setIsLoadingFreeLunches ] = useState(false);
   
   const { width } = useWindowDimensions();
   
@@ -58,11 +60,8 @@ export const ProfessionFreeLunches = () => {
     // async data fetch
     const fetchData = async() => {
       
-      const loadingCraftedItemRecipesState = {
-        is_loading: true,
-        recipes: craftedItemRecipes['recipes']
-      };
-      setCraftedItemRecipes(loadingCraftedItemRecipesState);
+      // update state
+      setIsLoadingRecipes(true);
 
       // prepare config
       const url = '/api/crafted_item_recipes';
@@ -85,34 +84,27 @@ export const ProfessionFreeLunches = () => {
       const data = await res.json()
 
       // update state
-      const loadedCraftedItemRecipesState = {
-        is_loading: false,
-        recipes: data['data']
-      };
-      setCraftedItemRecipes(loadedCraftedItemRecipesState);      
+      setIsLoadingRecipes(false);
+      setCraftedItemRecipes({recipes: data['data']});
     };
     
     // invoke function
     fetchData()
       .catch(console.error);
 
-  }, [profession]);
+  }, [profession, setCraftedItemRecipes]);
   
   
   useEffect(() => {
     
     // calculate Free Lunch data
 
-    const loadingFreeLunchesState = {
-      is_loading: true,
-      free_lunches: freeLunches['free_lunches'],
-      update_time: freeLunches['update_time'],
-    };
-    setFreeLunches(loadingFreeLunchesState);
+    // update state
+    setIsLoadingFreeLunches(true);
 
-    const freeLunchData = (craftedItemRecipes['recipes'].length > 0
-        && Object.keys(reagentPrices['by_item_id']).length > 0) 
-      ? craftedItemRecipes['recipes'].map((item) => {
+    const freeLunchData = (craftedItemRecipes.recipes.length > 0
+        && Object.keys(reagentPrices.by_item_id).length > 0) 
+      ? craftedItemRecipes.recipes.map((item) => {
       
       // identify cases where there is not enough price data
       let insufficientData = false;
@@ -120,7 +112,7 @@ export const ProfessionFreeLunches = () => {
       // construct Reagents param
       const reagents = item.reagents.map((reagent) => {
         
-        if (reagentPrices['by_item_id'][reagent.item_id] === 0) {
+        if (reagentPrices.by_item_id[reagent.item_id] === 0) {
           insufficientData = true;
         }
         
@@ -129,7 +121,7 @@ export const ProfessionFreeLunches = () => {
           item_id: reagent.item_id,
           media_url: null,
           quantity: reagent.quantity,
-          price: reagentPrices['by_item_id'][reagent.item_id]
+          price: reagentPrices.by_item_id[reagent.item_id]
         })
       })
       
@@ -156,32 +148,20 @@ export const ProfessionFreeLunches = () => {
     }) : []
 
     // update state
-    const loadedFreeLunchesState = {
-      is_loading: false,
+    setIsLoadingFreeLunches(false);
+    setFreeLunches({
       free_lunches: freeLunchData,
-      update_time: reagentPrices['update_time'],
-    };
-    setFreeLunches(loadedFreeLunchesState);      
+      update_time: reagentPrices.update_time,
+    });      
 
-  }, [craftedItemRecipes['recipes'], reagentPrices])
-
-
-  useEffect(() => {
-    
-    // debounce search value
-
-    const updateSearchValue = setTimeout(() => {
-      updateColumnFilters('name', searchValue)
-    }, 500)
-    
-    return () => clearTimeout(updateSearchValue)
-  }, [searchValue])
+  }, [craftedItemRecipes, reagentPrices, setFreeLunches])
 
 
-  // manage updating the FreeLunch table filters
+  // function to update the FreeLunch table filters
   // filterColumn === null -> remove all filters
   // filterValue === null -> remove that filterColumn
-  function updateColumnFilters(filterColumn = null, filterValue = null) {
+  // NOTE: wrapped in useCallback to prevent infinite re-render with useEffect
+  const updateColumnFilters = useCallback( (filterColumn = null, filterValue = null) => {
     
     const newColumnFilters = [];
     
@@ -204,7 +184,19 @@ export const ProfessionFreeLunches = () => {
     
     // update state
     setColumnFilters(newColumnFilters);
-  }
+  }, [])
+
+
+  useEffect(() => {
+    
+    // debounce search value
+
+    const updateSearchValue = setTimeout(() => {
+      updateColumnFilters('name', searchValue)
+    }, 500)
+    
+    return () => clearTimeout(updateSearchValue)
+  }, [searchValue, updateColumnFilters])
 
 
   // function to show all Free Lunches (eg. remove all filters)
@@ -216,11 +208,11 @@ export const ProfessionFreeLunches = () => {
   // prevent re-render of table when user is entering search input
   const freeLunchTable = useMemo(() => (
     <FreeLunchTable 
-      data={freeLunches['free_lunches']} 
+      data={freeLunches.free_lunches} 
       columnFilters={columnFilters}
       enableShowAllMessage={true}
     />    
-  ), [freeLunches['free_lunches'], columnFilters])
+  ), [freeLunches.free_lunches, columnFilters])
   
 
   return (
@@ -232,7 +224,7 @@ export const ProfessionFreeLunches = () => {
         <CalendarPopover 
           color='gray.600' 
           label={'As of ' + getFormattedDate(new Date(freeLunches['update_time']))}
-          isDisabled={reagentPrices['is_loading'] || freeLunches['is_loading']}
+          isDisabled={reagentPrices['is_loading'] || isLoadingFreeLunches}
         />
       </Box>
       <Box display='flex' alignItems='center' justifyContent={width < FREE_LUNCHES_FILTER_BREAKPOINT ? 'center' : 'space-between'} flexWrap='wrap' p='14px'>
@@ -264,12 +256,12 @@ export const ProfessionFreeLunches = () => {
           />
         </InputGroup>
       </Box>
-      {(reagentPrices['is_loading'] || craftedItemRecipes['is_loading'] || freeLunches['is_loading']) && 
+      {(reagentPrices['is_loading'] || isLoadingRecipes || isLoadingFreeLunches) && 
         <Box display='block' alignItems='center' flexWrap='wrap'>
           <Progress isIndeterminate />
         </Box>
       }
-      {!(reagentPrices['is_loading'] || craftedItemRecipes['is_loading'] || freeLunches['is_loading']) &&
+      {!(reagentPrices['is_loading'] || isLoadingRecipes || isLoadingFreeLunches) &&
         <Box display='block'>
           {freeLunchTable}
         </Box>

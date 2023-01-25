@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, } from 'react';
+import { useContext, useEffect, useMemo, useState, } from 'react';
 import {
   Accordion,
   AccordionItem,
@@ -78,6 +78,8 @@ export const AllFreeLunches = () => {
   const { faction } = useContext(FactionContext);
   const { realm } = useContext(RealmContext);
   
+  const [isLoading, setIsLoading] = useState(false);
+  
   
   useEffect(() => {
   
@@ -86,12 +88,8 @@ export const AllFreeLunches = () => {
     // async data fetch
     const fetchData = async() => {
       
-      const loadingState = {
-        is_loading: true,
-        free_lunches: allFreeLunches['free_lunches'],
-        update_time: allFreeLunches['update_time'],
-      };
-      setAllFreeLunches(loadingState);
+      // update state
+      setIsLoading(true);
       
       // prepare config
       const url = '/api/all_free_lunches';
@@ -139,29 +137,28 @@ export const AllFreeLunches = () => {
       }
 
       // update state
-      const loadedState = {
-        is_loading: false,
+      setIsLoading(false);
+      setAllFreeLunches({
         free_lunches: free_lunches,
         update_time: resJson['update_time'],
-      };
-      setAllFreeLunches(loadedState);      
+      });      
     };
     
     // invoke function
     fetchData()
       .catch(console.error);
 
-  }, [realm.name, faction]);
+  }, [realm.name, faction, setAllFreeLunches]);
 
 
   // prevent re-render of table when user is entering search input
   const freeLunchAccordions = useMemo(() => (
     <>
-      {Object.keys(allFreeLunches['free_lunches']).map((profession) => {
+      {Object.keys(allFreeLunches.free_lunches).map((profession) => {
         return <ProfessionAccordion key={profession} profession={profession} />
       })}  
     </>
-  ), [allFreeLunches['free_lunches']])
+  ), [allFreeLunches.free_lunches])
 
   
   return (
@@ -172,16 +169,16 @@ export const AllFreeLunches = () => {
         </Box>
         <CalendarPopover 
           color='gray.600' 
-          label={'As of ' + getFormattedDate(new Date(allFreeLunches['update_time']))}
-          isDisabled={allFreeLunches['is_loading']}
+          label={'As of ' + getFormattedDate(new Date(allFreeLunches.update_time))}
+          isDisabled={isLoading}
         />
       </Box>
-      {allFreeLunches['is_loading'] && 
+      {isLoading && 
         <Box display='block' alignItems='center'>
           <Progress isIndeterminate />
         </Box>
       }
-      {!allFreeLunches['is_loading'] &&
+      {!isLoading &&
         <Box display='block'>
           {freeLunchAccordions}
         </Box>

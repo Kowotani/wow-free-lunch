@@ -99,15 +99,24 @@ const RealmSelector = () => {
   
   const [ isRealmSelectorNav, setIsRealmSelectorNav ] = useState(false);
   
-  const factionColorScheme = (faction.name === Faction.HORDE ? "red" : "blue");
+  const factionColorScheme = (faction.name === Faction.HORDE ? 'red' : 'blue');
 
   const nodeRef = createRef();
+
 
   useEffect(() => {
     
     // transition requires a toggle switching from false -> true
     setIsRealmSelectorNav(nav.display_realm);
   }, [nav])
+
+
+  function updateRealm(name, isSelectorTransitioning) {
+    setRealm({
+      name: name,
+      isSelectorTransitioning: isSelectorTransitioning
+    })
+  }
 
 
   return (
@@ -120,7 +129,11 @@ const RealmSelector = () => {
           ? 'realmselectortop'
           : 'realmselectorbottom'
         }
+        appear={true}
         unmountOnExit={true}
+        onEnter={() => {updateRealm(realm.name, true)}}
+        onEntered={() => {updateRealm(realm.name, false)}}
+        onExit={() => {updateRealm(realm.name, true)}}
       >
         <Box ref={nodeRef} position='absolute' height='100%'>
           <Menu>
@@ -149,7 +162,10 @@ const RealmSelector = () => {
               {Object.values(SupportedRealm)
                 .map((realm) => {
                   return (
-                    <MenuItem key={realm} onClick={() => {setRealm({name: realm})}}>
+                    <MenuItem 
+                      key={realm} 
+                      onClick={() => {updateRealm(realm, false)}}
+                    >
                       {realm}
                     </MenuItem>
                   )
@@ -351,6 +367,8 @@ const ProfessionBarManager = () => {
 // Header content
 export const Header = () => {
   
+  const { realm } = useContext(RealmContext);
+  
   const [ realmSelectorLocation, setRealmSelectorLocation ] = useState('bottom');
   
   const { width } = useWindowDimensions();
@@ -366,7 +384,7 @@ export const Header = () => {
         <Image src={logo} h='90px' border='5px #CBD5E0 solid' borderRadius='14px' />
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
-          <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end' position='relative' overflow='hidden'>
+          <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end' position='relative' overflow={realm.isSelectorTransitioning ? 'hidden' : 'visible'}>
             <Spacer />
             {realmSelectorLocation === 'top' && <RealmSelector />}
           </Box>
@@ -376,7 +394,7 @@ export const Header = () => {
               <NavButtons />
             </Box>
             <Spacer flexShrink />
-            <Box display='flex' flexGrow={4} justifyContent='flex-end' position='relative' overflow='hidden'>
+            <Box display='flex' flexGrow={4} justifyContent='flex-end' position='relative' overflow={realm.isSelectorTransitioning ? 'hidden' : 'visible'}>
               {realmSelectorLocation === 'bottom' && <RealmSelector />}
             </Box>
           </Box>

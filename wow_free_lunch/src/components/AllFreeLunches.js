@@ -151,7 +151,7 @@ export const AllFreeLunches = () => {
     fetchData()
       .catch(console.error);
 
-  }, [realm, faction]);
+  }, [realm.name, faction]);
 
 
   // prevent re-render of table when user is entering search input

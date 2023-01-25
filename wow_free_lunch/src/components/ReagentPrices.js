@@ -272,7 +272,7 @@ export const ReagentPrices = () => {
     fetchData()
       .catch(console.error);
       
-  }, [faction, profession, realm, setReagentPrices]);
+  }, [faction, profession, realm.name, setReagentPrices]);
 
   return (
     <>

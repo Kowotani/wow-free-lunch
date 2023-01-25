@@ -8,16 +8,15 @@ export const SupportedRealm = {
 
 
 // create Context
-export const RealmContext = createContext({
-  name: 'Skyfury'
-});
+export const RealmContext = createContext({});
 
 
 // create Provider
 export const RealmProvider = ({children}) => {
   
   const [realm, setRealm] = useState({  
-    name: 'Skyfury'
+    name: 'Skyfury',
+    isSelectorTransitioning: false,
   });
   
   const value = {realm, setRealm};

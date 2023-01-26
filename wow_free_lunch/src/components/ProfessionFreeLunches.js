@@ -30,7 +30,8 @@ import { getFormattedDate } from '../utils';
 // Constants
 // =========
 
-const FREE_LUNCHES_FILTER_BREAKPOINT = 525   // Vertical or horizontal filters
+const FREE_LUNCHES_FILTER_BREAKPOINT = 525   // vertical or horizontal filters
+const SEARCH_DEBOUNCE_DELAY = 500   // debounce update on ItemNaame search
 
 
 // ==============
@@ -47,6 +48,9 @@ export const ProfessionFreeLunches = () => {
   const { reagentPrices } = useContext(ReagentPricesContext);
   
   const [ columnFilters, setColumnFilters ] = useState([]);
+  const [ unitProfitFilter, setUnitProfitFilter ] = useState({});
+  const [ nameFilter, setNameFilter ] = useState({});
+  
   const [ searchValue, setSearchValue ] = useState('');
   const [ isLoadingRecipes, setIsLoadingRecipes ] = useState(false);
   const [ isLoadingFreeLunches, setIsLoadingFreeLunches ] = useState(false);
@@ -157,52 +161,74 @@ export const ProfessionFreeLunches = () => {
   }, [craftedItemRecipes, reagentPrices, setFreeLunches])
 
 
-  // function to update the FreeLunch table filters
-  // filterColumn === null -> remove all filters
-  // filterValue === null -> remove that filterColumn
-  // NOTE: wrapped in useCallback to prevent infinite re-render with useEffect
-  const updateColumnFilters = useCallback( (filterColumn = null, filterValue = null) => {
+  useEffect(() => {
     
-    const newColumnFilters = [];
+    // update the columnFilters state
+    const filters = []
     
-    // modify a single column filter, otherwise reset all filters
-    if (filterColumn !== null) {
-    
-      // update 
-      for (const obj of columnFilters) {
-        if (obj.id !== filterColumn) {
-          newColumnFilters.push(obj)
-        }
-      }
-      if (filterValue !== null) {
-        newColumnFilters.push({
-          id: filterColumn, 
-          value: filterValue
-        });
-      }
+    if (Object.keys(nameFilter).length > 0) {
+      filters.push(nameFilter)
     }
     
-    // update state
-    setColumnFilters(newColumnFilters);
+    if (Object.keys(unitProfitFilter).length > 0) {
+      filters.push(unitProfitFilter)
+    }
+    
+    setColumnFilters(filters)
+  }, [nameFilter, unitProfitFilter])
+
+
+  // set the nameFilter state
+  // wrap in useCallback to avoid infinite loop in the debounce useEffect
+  const updateNameFilter = useCallback( (value = null) => {
+    const filter = (
+      value === null
+        ? {}
+        : {
+            id: 'name',
+            value: value
+        }
+    )
+    
+    setNameFilter(filter);
   }, [])
 
+
+  // set the unitProfitFilter state
+  function updateUnitProfitFilter(min_value = null, max_value = null) {
+    const filter = (
+      min_value === null
+        ? {}
+        : max_value === null
+          ? {
+            id: 'unit_profit',
+            value: [min_value, 999999]
+          } : {
+            id: 'unit_profit',
+            value: [min_value, max_value]
+          }
+    )
+    
+    setUnitProfitFilter(filter);
+  }
 
   useEffect(() => {
     
     // debounce search value
 
     const updateSearchValue = setTimeout(() => {
-      updateColumnFilters('name', searchValue)
-    }, 500)
+      updateNameFilter(searchValue)
+    }, SEARCH_DEBOUNCE_DELAY)
     
     return () => clearTimeout(updateSearchValue)
-  }, [searchValue, updateColumnFilters])
+  }, [searchValue, updateNameFilter])
 
 
   // function to show all Free Lunches (eg. remove all filters)
   function showAllFreeLunches() {
     setSearchValue('');
-    updateColumnFilters();
+    updateNameFilter();
+    updateUnitProfitFilter();
   }
   
   // prevent re-render of table when user is entering search input
@@ -223,8 +249,8 @@ export const ProfessionFreeLunches = () => {
         </Box>
         <CalendarPopover 
           color='gray.600' 
-          label={'As of ' + getFormattedDate(new Date(freeLunches['update_time']))}
-          isDisabled={reagentPrices['is_loading'] || isLoadingFreeLunches}
+          label={'As of ' + getFormattedDate(new Date(freeLunches.update_time))}
+          isDisabled={reagentPrices.is_loading || isLoadingFreeLunches}
         />
       </Box>
       <Box display='flex' alignItems='center' justifyContent={width < FREE_LUNCHES_FILTER_BREAKPOINT ? 'center' : 'space-between'} flexWrap='wrap' p='14px'>
@@ -233,7 +259,7 @@ export const ProfessionFreeLunches = () => {
             Show All
           </Button>
           <Button 
-            onClick={() => {updateColumnFilters('unit_profit', [1, 999999])}}
+            onClick={() => {updateUnitProfitFilter(1, 999999)}}
           >
             Show Profitable
           </Button>
@@ -256,12 +282,12 @@ export const ProfessionFreeLunches = () => {
           />
         </InputGroup>
       </Box>
-      {(reagentPrices['is_loading'] || isLoadingRecipes || isLoadingFreeLunches) && 
+      {(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) && 
         <Box display='block' alignItems='center' flexWrap='wrap'>
           <Progress isIndeterminate />
         </Box>
       }
-      {!(reagentPrices['is_loading'] || isLoadingRecipes || isLoadingFreeLunches) &&
+      {!(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) &&
         <Box display='block'>
           {freeLunchTable}
         </Box>

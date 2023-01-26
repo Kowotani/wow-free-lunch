@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import {
+  Box,
   ChakraProvider,
   theme,
 } from '@chakra-ui/react';
@@ -18,6 +19,13 @@ import { Nav, NavContext, NavProvider } from './state/NavContext';
 import { ProfessionProvider } from './state/ProfessionContext';
 import { ReagentPricesProvider } from './state/ReagentPricesContext';
 import { RealmProvider } from './state/RealmContext';
+
+
+// =========
+// Constants
+// =========
+
+const MIN_PAGE_WIDTH = 370
 
 
 //  ========
@@ -55,9 +63,11 @@ function App() {
                 <ProfessionProvider>
                   <RealmProvider>
                     <ReagentPricesProvider>
-                  
-                      <Header />
-                      <MainContent />
+                      
+                      <Box minWidth={MIN_PAGE_WIDTH}>
+                        <Header />
+                        <MainContent />
+                      </Box>
                       
                     </ReagentPricesProvider>
                   </RealmProvider>

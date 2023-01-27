@@ -118,8 +118,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'wow_free_lunch',
-        'USER': 'admin',
-        'PASSWORD': 'wowfreelunch2022',
+        'USER': os.getenv('MYSQL_USER'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD'),
         'HOST': 'wow-free-lunch.cb1mnxt26xwt.us-west-1.rds.amazonaws.com',
         'PORT': 3306,
         'OPTIONS': {

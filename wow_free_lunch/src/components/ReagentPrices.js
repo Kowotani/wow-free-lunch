@@ -23,7 +23,7 @@ import { RealmContext } from '../state/RealmContext';
 
 import { PriceBox } from './PriceBox'
 
-import { getWowHeadUrl, getItemQualityColor } from '../utils';
+import { DEV_BASE_URL, getWowHeadUrl, getItemQualityColor } from '../utils';
 
 
 // =======
@@ -222,7 +222,11 @@ export const ReagentPrices = () => {
       setReagentPrices(loadingReagentPricesState);
 
       // prepare config
-      const url = '/api/reagent_prices';
+      const base_url = (window.location.origin === DEV_BASE_URL 
+        ? DEV_BASE_URL
+        : window.location.origin
+      )
+      const url = base_url + '/api/reagent_prices';
 
       const config = {
         method: 'POST',

@@ -18,7 +18,7 @@ import { FreeLunch, FreeLunchTable } from './FreeLunchTable';
 import { AllFreeLunchesContext } from '../state/AllFreeLunchesContext';
 import { FactionContext } from '../state/FactionContext';
 import { RealmContext } from '../state/RealmContext';
-import { getFormattedDate } from '../utils';
+import { DEV_BASE_URL, getFormattedDate } from '../utils';
 
 
 // ====================
@@ -80,7 +80,6 @@ export const AllFreeLunches = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   
-  
   useEffect(() => {
   
     // query Free Lunches
@@ -92,7 +91,11 @@ export const AllFreeLunches = () => {
       setIsLoading(true);
       
       // prepare config
-      const url = '/api/all_free_lunches';
+      const base_url = (window.location.origin === DEV_BASE_URL 
+        ? DEV_BASE_URL
+        : window.location.origin
+      )
+      const url = base_url + '/api/all_free_lunches';
 
       const config = {
         method: 'POST',

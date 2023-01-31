@@ -1,3 +1,6 @@
+// dev origin (for API calls)
+export const DEV_BASE_URL = 'https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com'
+
 // return WoWHead url formatted with item_id
 export function getWowHeadUrl(item_id) {
   return `https://www.wowhead.com/wotlk/item=${item_id}/`

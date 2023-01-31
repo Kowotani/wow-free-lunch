@@ -23,7 +23,7 @@ import { CraftedItemRecipesContext } from '../state/CraftedItemRecipesContext';
 import { FreeLunchesContext } from '../state/FreeLunchesContext';
 import { ProfessionContext } from '../state/ProfessionContext';
 import { ReagentPricesContext } from '../state/ReagentPricesContext';
-import { getFormattedDate } from '../utils';
+import { DEV_BASE_URL, getFormattedDate } from '../utils';
 
 
 // =========
@@ -68,7 +68,11 @@ export const ProfessionFreeLunches = () => {
       setIsLoadingRecipes(true);
 
       // prepare config
-      const url = '/api/crafted_item_recipes';
+      const base_url = (window.location.origin === DEV_BASE_URL 
+        ? DEV_BASE_URL
+        : window.location.origin
+      )
+      const url = base_url + '/api/crafted_item_recipes';
 
       const config = {
         method: 'POST',
@@ -282,16 +286,17 @@ export const ProfessionFreeLunches = () => {
           />
         </InputGroup>
       </Box>
-      {(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) && 
-        <Box display='block' alignItems='center' flexWrap='wrap'>
-          <Progress isIndeterminate />
-        </Box>
-      }
-      {!(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) &&
-        <Box display='block'>
-          {freeLunchTable}
-        </Box>
-      }
+        {(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) && 
+          <Box display='block' alignItems='center' flexWrap='wrap'>
+            <Progress isIndeterminate />
+          </Box>
+        }
+        {!(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) &&
+          <Box display='block'>
+            {freeLunchTable}
+          </Box>
+        }
+      
     </>
   )
 }

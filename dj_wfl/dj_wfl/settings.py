@@ -13,21 +13,15 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 
+# =====================
+# Common - Env Agnostic
+# # ===================
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-d-25_$4sz7mi$ye_(sdtmel21ea-=ll13p@5fhxr+@^h&1ou&$'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com']
-
 
 # Application definition
 
@@ -58,15 +52,6 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny']
 }
-
-CORS_ALLOWED_ORIGINS = [
-    'https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com',
-    'https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com:8080',
-]
-
-# CORS_ORIGIN_ALLOW_ALL = True
-# CORS_ALLOW_CREDENTIALS = False
-# CORS_EXPOSE_HEADERS = ['foo', 'bar']
 
 ROOT_URLCONF = 'dj_wfl.urls'
 
@@ -154,21 +139,64 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # MySQL may not allow unique CharFields to have a max_length > 255
 SILENCED_SYSTEM_CHECKS = ['mysql.E001', 'mysql.W003']
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': 'debug.log',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#     },
-# }
+
+# =====================
+# Common - Env Specific
+# =====================
+
+DJANGO_ENV = 'DEV' if os.environ.get('DJANGO_DEV') != None else 'PROD'
+
+if DJANGO_ENV == 'DEV':
+    
+    # [security.W018] https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/#debug
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = True
+  
+    # [security.W009] https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/#secret-key  
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = 'django-insecure-d-25_$4sz7mi$ye_(sdtmel21ea-=ll13p@5fhxr+@^h&1ou&$'
+    
+    ALLOWED_HOSTS = ['0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com']
+    
+else:
+    
+    DEBUG = False
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+    ALLOWED_HOSTS = ['*']
+
+
+# ========
+# Dev Only
+# ========
+
+if DJANGO_ENV == 'DEV':
+    
+    CORS_ALLOWED_ORIGINS = [
+        'https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com',
+        'https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com:8080',
+    ]
+
+
+# =========
+# Prod Only
+# =========
+
+if DJANGO_ENV == 'PROD':
+    
+    # [security.W004] https://stackoverflow.com/questions/49166768/setting-secure-hsts-seconds-can-irreversibly-break-your-site
+    SECURE_HSTS_SECONDS = 60
+    
+    # [security.W005] https://www.stackhawk.com/blog/django-http-strict-transport-security-guide-what-it-is-and-how-to-enable-it/
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    
+    # [security.W008] https://www.cloudflare.com/learning/ssl/how-does-ssl-work/
+    SECURE_SSL_REDIRECT = True
+    
+    # [security.W012] https://docs.djangoproject.com/en/4.1/ref/settings/#session-cookie-secure
+    SESSION_COOKIE_SECURE = True
+    
+    # [security.W016] https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_COOKIE_SECURE
+    CSRF_COOKIE_SECURE = True
+    
+    # [security.W021] https://www.stackhawk.com/blog/django-http-strict-transport-security-guide-what-it-is-and-how-to-enable-it/
+    SECURE_HSTS_PRELOAD = True

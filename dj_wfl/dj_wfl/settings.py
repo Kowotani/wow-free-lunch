@@ -159,7 +159,10 @@ if DJANGO_ENV == 'DEV':
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY = 'django-insecure-d-25_$4sz7mi$ye_(sdtmel21ea-=ll13p@5fhxr+@^h&1ou&$'
     
-    ALLOWED_HOSTS = ['0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com']
+    ALLOWED_HOSTS = [
+        '0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com',
+        '0.0.0.0'
+    ]
     
 else:
     

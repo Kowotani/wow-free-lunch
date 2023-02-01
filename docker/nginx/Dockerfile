@@ -10,5 +10,5 @@ RUN npm run build
 
 # Copy React static files and start nginx
 FROM nginx:stable-alpine
-COPY --from=build /app/wow_free_lunch/build /usr/share/nginx/html
+COPY --from=build /app/frontend/build /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
     nginx: 
@@ -24,7 +24,16 @@ services:
         volumes:
             - static_volume:/app/backend/server/static
         expose:
-            - 8000        
+            - 8000
+        environment:
+            DJANGO_DEV: "true"
+            BNET_API_CLIENT_ID: ${BNET_API_CLIENT_ID}
+            BNET_API_CLIENT_SECRET: ${BNET_API_CLIENT_SECRET}
+            DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+            DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            PYTHONPATH: "${PYTHONPATH}:/app/backend/dj_wfl"
 
 volumes:
     static_volume: {}

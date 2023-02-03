@@ -161,7 +161,7 @@ if DJANGO_ENV == 'DEV':
     
     ALLOWED_HOSTS = [
         '0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com',
-        '0.0.0.0'
+        '*'
     ]
     
 else:

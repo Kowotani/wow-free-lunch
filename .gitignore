@@ -1,0 +1,5 @@
+# python
+.pyc
+
+# nginx certs
+docker/nginx/certbot/**

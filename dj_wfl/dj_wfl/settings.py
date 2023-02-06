@@ -13,9 +13,17 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 
+
+# =========
+# Constants
+# =========
+
+ec2_instance = '0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com'
+
+
 # =====================
 # Common - Env Agnostic
-# # ===================
+# =====================
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,10 +167,7 @@ if DJANGO_ENV == 'DEV':
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY = 'django-insecure-d-25_$4sz7mi$ye_(sdtmel21ea-=ll13p@5fhxr+@^h&1ou&$'
     
-    ALLOWED_HOSTS = [
-        '0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com',
-        '*'
-    ]
+    ALLOWED_HOSTS = [ec2_instance, '*']
     
 else:
     
@@ -178,8 +183,8 @@ else:
 if DJANGO_ENV == 'DEV':
     
     CORS_ALLOWED_ORIGINS = [
-        'https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com',
-        'https://0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com:8080',
+        'https://{}'.format(ec2_instance),
+        'https://{}:8080'.format(ec2_instance),
     ]
 
 
@@ -196,7 +201,8 @@ if DJANGO_ENV == 'PROD':
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     
     # [security.W008] https://www.cloudflare.com/learning/ssl/how-does-ssl-work/
-    SECURE_SSL_REDIRECT = True
+    # SSL redirect is handled by nginx
+    SECURE_SSL_REDIRECT = False
     
     # [security.W012] https://docs.djangoproject.com/en/4.1/ref/settings/#session-cookie-secure
     SESSION_COOKIE_SECURE = True

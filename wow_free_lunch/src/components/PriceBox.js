@@ -51,8 +51,13 @@ export const CurrencyBox = (props) => {
       color={props.isNegative ? 'red.600' : 'black'} 
     >
       {props.hasNegativeSign ? <Box color='red'>-</Box>: null}
-      <Box padding={coin === goldCoin ? '0px 2px 0px 0px' : '0px 2px 0px 2px'}>{props.zeroPad ? '0' : null}{props.amount}</Box>
-      <Image src={coin} />
+      <Box padding={coin === goldCoin 
+        ? '0px 2px 0px 0px' 
+        : '0px 2px 0px 2px'}
+      >
+        {props.zeroPad ? '0' : null}{props.amount}
+      </Box>
+      <Image src={coin} h='20px' w='20px'/>
     </Box>
   )
 }

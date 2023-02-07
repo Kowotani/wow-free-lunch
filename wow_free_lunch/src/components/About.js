@@ -24,6 +24,14 @@ import { SiGithub, SiGmail, SiLinkedin, SiInstagram, } from 'react-icons/si'
 import { BattleDotNetIcon, DiscordIcon } from '../assets/Icons'
 import { useWindowDimensions } from '../hooks/WindowDimensions'
 
+
+// =========
+// Constants
+// =========
+
+const FREE_LUNCH_QUOTE_BREAKPOINT = 500
+
+
 // ==================
 // Section Components
 // ==================
@@ -60,11 +68,11 @@ const WhatIs = () => {
         </Link>
         )" by crafting and selling items 
       </Text>
-      <Box bg='gray.200' borderRadius='12px' maxWidth='475px' m={width >= 500 ? 'auto' : '10px 14px'}>
+      <Box bg='gray.200' borderRadius='12px' maxWidth='475px' m={width >= FREE_LUNCH_QUOTE_BREAKPOINT ? 'auto' : '10px 14px'}>
         <Text p='10px' fontStyle='italic' fontSize='2xl' color='teal' textAlign='center'>
           "There's no such thing as a free lunch"
           <br/>
-          ...except in Azeroth
+          But in Azeroth, there is
         </Text>
       </Box>
       <Text p='10px 14px' textAlign='center'>

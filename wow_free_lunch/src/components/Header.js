@@ -381,7 +381,7 @@ export const Header = () => {
   return (
     <>
       <Box display='flex' bg='gray.300' flexWrap='wrap' borderBottom='4px' borderColor='teal.500'>
-        <Image src={logo} h='90px' border='5px #CBD5E0 solid' borderRadius='15px' />
+        <Image src={logo} w='100px' m='0px 8px 0px 0px'/>
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
           <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end' position='relative' overflow={realm.isSelectorTransitioning ? 'hidden' : 'visible'}>

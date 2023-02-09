@@ -136,7 +136,7 @@ const RealmSelector = () => {
         onExit={() => {updateRealm(realm.name, true)}}
       >
         <Box ref={nodeRef} position='absolute' height='100%'>
-          <Menu>
+          <Menu isLazy={true}>
             <MenuButton 
               as={Button} 
               bg='gray.600'
@@ -158,7 +158,7 @@ const RealmSelector = () => {
             >
               {realm.name}
             </MenuButton>
-            <MenuList>
+            <MenuList minWidth={0}>
               {Object.values(SupportedRealm)
                 .map((realm) => {
                   return (
@@ -174,7 +174,7 @@ const RealmSelector = () => {
               }
             </MenuList>
           </Menu>
-          <Menu>
+          <Menu isLazy={true}>
             <MenuButton 
               as={IconButton} 
               colorScheme={factionColorScheme}
@@ -202,7 +202,7 @@ const RealmSelector = () => {
             >
               {faction.name}
             </MenuButton>
-            <MenuList>
+            <MenuList minWidth={0}>
               <MenuItem
                 icon={<AllianceIcon boxSize='30px' color='blue.500'/>}
                 onClick={() => {setFaction({name: Faction.ALLIANCE})}}
@@ -380,11 +380,24 @@ export const Header = () => {
   
   return (
     <>
-      <Box display='flex' bg='gray.300' flexWrap='wrap' borderBottom='4px' borderColor='teal.500'>
+      <Box 
+        display='flex' 
+        bg='gray.300' 
+        flexWrap='wrap' 
+        borderBottom='4px' 
+        borderColor='teal.500'
+      >
         <Image src={logo} w='100px' m='0px 8px 0px 0px'/>
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
-          <Box display='flex' width='100%' flexGrow={1} justifyContent='flex-end' position='relative' overflow={realm.isSelectorTransitioning ? 'hidden' : 'visible'}>
+          <Box 
+            display='flex' 
+            width='100%' 
+            flexGrow={1} 
+            justifyContent='flex-end' 
+            position='relative' 
+            overflow={realm.isSelectorTransitioning ? 'hidden' : 'visible'}
+          >
             <Spacer />
             {realmSelectorLocation === 'top' && <RealmSelector />}
           </Box>
@@ -394,7 +407,13 @@ export const Header = () => {
               <NavButtons />
             </Box>
             <Spacer flexShrink />
-            <Box display='flex' flexGrow={4} justifyContent='flex-end' position='relative' overflow={realm.isSelectorTransitioning ? 'hidden' : 'visible'}>
+            <Box 
+              display='flex' 
+              flexGrow={4} 
+              justifyContent='flex-end' 
+              position='relative' 
+              overflow={realm.isSelectorTransitioning ? 'hidden' : 'visible'}
+            >
               {realmSelectorLocation === 'bottom' && <RealmSelector />}
             </Box>
           </Box>

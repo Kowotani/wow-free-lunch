@@ -25,7 +25,7 @@ import { RealmProvider } from './state/RealmContext';
 // Constants
 // =========
 
-const MIN_PAGE_WIDTH = 360
+const MIN_PAGE_WIDTH = 370
 
 
 //  ========

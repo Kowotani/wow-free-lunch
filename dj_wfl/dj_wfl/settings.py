@@ -179,7 +179,7 @@ else:
     
     DEBUG = True
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-    ALLOWED_HOSTS = ['www.wowfreelunch.net']
+    ALLOWED_HOSTS = ['wowfreelunch.net', 'www.wowfreelunch.net']
 
 
 # ========

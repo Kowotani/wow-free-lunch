@@ -56,6 +56,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    }
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny']
@@ -171,7 +177,7 @@ if DJANGO_ENV == 'DEV':
     
 else:
     
-    DEBUG = False
+    DEBUG = True
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
     ALLOWED_HOSTS = ['www.wowfreelunch.net']
 

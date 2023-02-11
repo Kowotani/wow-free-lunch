@@ -1,4 +1,6 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
+
 from wfl.views import (
     
     # Metadata
@@ -141,7 +143,7 @@ urlpatterns = [
     # FE API Endpoints
     # ================
     
-    path('api/reagent_prices', ReagentPrices.as_view()),
-    path('api/crafted_item_recipes', CraftedItemRecipes.as_view()),
-    path('api/all_free_lunches', AllFreeLunches.as_view()),
+    path('api/reagent_prices', cache_page(60 * 60 * 3)(ReagentPrices.as_view())),
+    path('api/crafted_item_recipes', cache_page(60 * 60 * 3)(CraftedItemRecipes.as_view())),
+    path('api/all_free_lunches', cache_page(60 * 60 * 3)(AllFreeLunches.as_view())),
 ]

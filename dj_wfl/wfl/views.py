@@ -24,6 +24,27 @@ import json
 
 '''
 ================
+Helper Functions
+================
+'''
+
+'''
+    DESC
+        Parses a query param string and returns a dict
+        
+    INPUT
+        Query string to parse
+        
+        
+    RETURN
+        Returns a dictionary of query params mapped to values
+'''
+def parse_query_params(params):
+    return {x.split('=')[0]: x.split('=')[1] for x in params.split('&')}
+
+
+'''
+================
 Profession Views
 ================
 '''
@@ -616,19 +637,19 @@ class ReagentPrices(View) :
     - realm
     - faction
     - date (date or latest)
-    Supported methods: POST
+    Supported methods: GET
     '''
-    def post(self, request):
+    def get(self, request):
     
         response_data = {}
         qm = QueryManager()
         
         # parse inputs
-        data = json.loads(request.body)
-        profession = data.get('profession')
-        realm = data.get('realm')
-        faction = data.get('faction')
-        date = data.get('date')
+        params = parse_query_params(request.META['QUERY_STRING'])
+        profession = params['profession']
+        realm = params['realm']
+        faction = params['faction']
+        date = params['date']
         
         # get latest update_data if required
         if date == 'latest':
@@ -724,16 +745,16 @@ class CraftedItemRecipes(View) :
     '''
     Retrieve Crafted Item Recipes for the given inputs
     - profession
-    Supported methods: POST
+    Supported methods: GET
     '''
-    def post(self, request):
+    def get(self, request):
     
         response_data = {}
         qm = QueryManager()
         
         # parse inputs
-        data = json.loads(request.body)
-        profession = data.get('profession')
+        params = parse_query_params(request.META['QUERY_STRING'])
+        profession = params['profession']
         
         # query data
         sql = '''
@@ -825,18 +846,18 @@ class AllFreeLunches(View) :
     - realm
     - faction
     - date (date or latest)
-    Supported methods: POST
+    Supported methods: GET
     '''
-    def post(self, request):
+    def get(self, request):
     
         response_data = {}
         qm = QueryManager()
         
         # parse inputs
-        data = json.loads(request.body)
-        realm = data.get('realm')
-        faction = data.get('faction')
-        date = data.get('date')
+        params = parse_query_params(request.META['QUERY_STRING'])
+        realm = params['realm']
+        faction = params['faction']
+        date = params['date']
         
         # get latest update_data if required
         if date == 'latest':

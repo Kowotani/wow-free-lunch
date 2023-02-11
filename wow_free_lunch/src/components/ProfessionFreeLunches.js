@@ -10,8 +10,6 @@ import {
   Progress, 
 } from '@chakra-ui/react';
 
-import Cookies from 'js-cookie'
-
 import { FaSearch } from 'react-icons/fa'
 
 import { CalendarPopover } from './CalendarPopover';
@@ -72,21 +70,13 @@ export const ProfessionFreeLunches = () => {
         ? DEV_BASE_URL
         : window.location.origin
       )
-      const url = base_url + '/api/crafted_item_recipes';
-
-      const config = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': Cookies.get('csrftoken'),
-        },
-        body: JSON.stringify({
-          profession: profession.name
-        })
-      };
+      const params = new URLSearchParams({
+        profession: profession.name,
+      }).toString();      
+      const url = base_url + '/api/crafted_item_recipes?' + params;
       
       // get response
-      const res = await fetch(url, config)
+      const res = await fetch(url)
       
       // convert to json
       const data = await res.json()

@@ -9,7 +9,6 @@ import {
   Progress, 
 } from '@chakra-ui/react';
 
-import Cookies from 'js-cookie'
 import { FiPlusCircle, FiMinusCircle } from 'react-icons/fi'
 
 import { CalendarPopover } from './CalendarPopover';
@@ -95,23 +94,15 @@ export const AllFreeLunches = () => {
         ? DEV_BASE_URL
         : window.location.origin
       )
-      const url = base_url + '/api/all_free_lunches';
-
-      const config = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': Cookies.get('csrftoken'),
-        },
-        body: JSON.stringify({
-          realm: realm.name,
-          faction: faction.name, 
-          date: 'latest'          
-        })
-      };
+      const params = new URLSearchParams({
+        realm: realm.name,
+        faction: faction.name,
+        date: 'latest',
+      }).toString();
+      const url = base_url + '/api/all_free_lunches?' + params;
       
       // get response
-      const res = await fetch(url, config)
+      const res = await fetch(url)
       
       // convert to json
       const resJson = await res.json();

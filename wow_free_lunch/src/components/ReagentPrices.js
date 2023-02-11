@@ -11,7 +11,6 @@ import {
   Tooltip,
 } from '@chakra-ui/react';
 
-import Cookies from 'js-cookie'
 import { FiPlusCircle, FiMinusCircle } from 'react-icons/fi'
 import { firstBy } from 'thenby'
 
@@ -24,30 +23,6 @@ import { RealmContext } from '../state/RealmContext';
 import { PriceBox } from './PriceBox'
 
 import { DEV_BASE_URL, getWowHeadUrl, getItemQualityColor } from '../utils';
-
-
-// =======
-// Filters 
-// =======
-
-// component for Reagent Price Box filters
-// const ReagentFilters = () => {
-  
-//   // const { priceType, setPriceType } = useContext(PriceTypeContext);
-  
-//   return (
-//     <Box display='flex' alignItems='center' flexWrap='wrap'>
-//       <ButtonGroup colorScheme='pink' spacing='2'>
-//         <Button>Expand All</Button>
-//         <Button>Collapse All</Button>
-//       </ButtonGroup>
-//       <Spacer />
-//       <InputGroup width='200px' p='8px'>
-//         <Input type='search' placeholder='Reagent name' />
-//       </InputGroup>
-//     </Box>
-//   )
-// }
 
 
 // ====================
@@ -226,24 +201,16 @@ export const ReagentPrices = () => {
         ? DEV_BASE_URL
         : window.location.origin
       )
-      const url = base_url + '/api/reagent_prices';
-
-      const config = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': Cookies.get('csrftoken'),
-        },
-        body: JSON.stringify({
-          profession: profession.name,
-          realm: realm.name,
-          faction: faction.name, 
-          date: 'latest'
-        })
-      };
+      const params = new URLSearchParams({
+        profession: profession.name,
+        realm: realm.name,
+        faction: faction.name,
+        date: 'latest',
+      }).toString();
+      const url = base_url + '/api/reagent_prices?' + params;
       
       // get response
-      const res = await fetch(url, config)
+      const res = await fetch(url)
       
       // convert to json
       const resJson = await res.json();

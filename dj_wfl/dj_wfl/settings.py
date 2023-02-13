@@ -18,7 +18,7 @@ import os
 # Constants
 # =========
 
-ec2_instance = '0983fcdb7462476a98cf4fcf96f8e461.vfs.cloud9.us-west-1.amazonaws.com'
+ec2_instance = '2850c297c1cc49c29ff6892403f73662.vfs.cloud9.us-west-1.amazonaws.com'
 
 
 # =====================
@@ -177,9 +177,9 @@ if DJANGO_ENV == 'DEV':
     
 else:
     
-    DEBUG = True
+    DEBUG = False
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-    ALLOWED_HOSTS = ['wowfreelunch.net', 'www.wowfreelunch.net']
+    ALLOWED_HOSTS = ['wowfreelunch.net', 'www.wowfreelunch.net', '*']
 
 
 # ========

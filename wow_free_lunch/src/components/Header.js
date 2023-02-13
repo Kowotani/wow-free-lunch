@@ -67,11 +67,10 @@ const NavButton = (props) => {
   
   const { nav, setNav } = useContext(NavContext);
   
-  const variant = (nav.name === props.name ? "solid" : "ghost");
-  
   return (
       <Button 
-        variant={variant}
+        variant={nav.name === props.name ? 'solid' : 'ghost'}
+        p='8px 14px'
         onClick={() => {setNav(props.navkey)}}
         borderBottomRightRadius='0px'
         borderBottomLeftRadius='0px'
@@ -145,14 +144,10 @@ const RealmSelector = () => {
               color='white'
               borderBottomRightRadius='0px'
               borderBottomLeftRadius={
-                width < REALM_SELECTOR_BREAKPOINT
-                  ? '12px'
-                  : '0px'
+                width < REALM_SELECTOR_BREAKPOINT ? '12px' : '0px'
               }
               borderTopLeftRadius={
-                width < REALM_SELECTOR_BREAKPOINT
-                  ? '0px'
-                  : '12px'
+                width < REALM_SELECTOR_BREAKPOINT ? '0px' : '12px'
               }
               borderTopRightRadius='0px'
             >
@@ -188,16 +183,12 @@ const RealmSelector = () => {
                 />
               }
               borderBottomRightRadius={
-                width < REALM_SELECTOR_BREAKPOINT
-                  ? '12px'
-                  : '0px'
+                width < REALM_SELECTOR_BREAKPOINT ? '12px' : '0px'
               }
               borderBottomLeftRadius='0px'
               borderTopLeftRadius='0px'
               borderTopRightRadius={
-                width < REALM_SELECTOR_BREAKPOINT
-                  ? '0px'
-                  : '12px'
+                width < REALM_SELECTOR_BREAKPOINT ? '0px' : '12px'
               }
             >
               {faction.name}
@@ -387,7 +378,7 @@ export const Header = () => {
         borderBottom='4px' 
         borderColor='teal.500'
       >
-        <Image src={logo} w='100px' m='0px 8px 0px 0px'/>
+        <Image src={logo} w='95px' m='0px 8px 0px 0px'/>
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
           <Box 

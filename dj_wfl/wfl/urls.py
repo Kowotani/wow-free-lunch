@@ -41,6 +41,14 @@ from wfl.views import (
     AllFreeLunches, CraftedItemRecipes, ReagentPrices,
 )
 
+
+# =========
+# Constants
+# =========
+
+CACHE_DURATION = 60 * 60    # 1 hour
+
+
 urlpatterns = [
     
     # ===========
@@ -143,7 +151,7 @@ urlpatterns = [
     # FE API Endpoints
     # ================
     
-    path('api/reagent_prices', cache_page(60 * 60 * 3)(ReagentPrices.as_view())),
-    path('api/crafted_item_recipes', cache_page(60 * 60 * 3)(CraftedItemRecipes.as_view())),
-    path('api/all_free_lunches', cache_page(60 * 60 * 3)(AllFreeLunches.as_view())),
+    path('api/reagent_prices', cache_page(CACHE_DURATION)(ReagentPrices.as_view())),
+    path('api/crafted_item_recipes', cache_page(CACHE_DURATION)(CraftedItemRecipes.as_view())),
+    path('api/all_free_lunches', cache_page(CACHE_DURATION)(AllFreeLunches.as_view())),
 ]

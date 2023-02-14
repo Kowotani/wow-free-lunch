@@ -293,7 +293,7 @@ const ProfessionBar = forwardRef((props, ref) => {
   )
 })
 
-// manager displaying the Realm Selector
+// manager displaying the Profession Bar
 const ProfessionBarManager = () => {
   
   const { nav } = useContext(NavContext);

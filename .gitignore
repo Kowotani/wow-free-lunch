@@ -1,4 +1,5 @@
 # python
+dj_wfl/wfl/.*.py
 .pyc
 **/__pycache__/**
 

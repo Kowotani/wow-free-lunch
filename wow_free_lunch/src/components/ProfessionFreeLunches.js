@@ -278,7 +278,7 @@ export const ProfessionFreeLunches = () => {
       </Box>
         {(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) && 
           <Box display='block' alignItems='center' flexWrap='wrap'>
-            <Progress isIndeterminate />
+            <Progress size='lg' isIndeterminate />
           </Box>
         }
         {!(reagentPrices.is_loading || isLoadingRecipes || isLoadingFreeLunches) &&

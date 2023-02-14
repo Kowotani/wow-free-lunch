@@ -24,7 +24,7 @@ import { DEV_BASE_URL, getFormattedDate, getRandomInt } from '../utils';
 // Constants
 // =========
 
-const LOAD_TIME_LOWER = 650    // lower bound on randomized load time
+const LOAD_TIME_LOWER = 750    // lower bound on randomized load time
 const LOAD_TIME_UPPER = 1250   // upper bound on randomized load time
 
 
@@ -184,7 +184,7 @@ export const AllFreeLunches = () => {
         color='white' 
         fontWeight='medium' 
         p='8px 14px' 
-        m='10px 0px 6px 0px'
+        m='10px 0px'
       >
         <Box>
           Free Lunches
@@ -198,7 +198,7 @@ export const AllFreeLunches = () => {
       </Box>
       {isLoading && 
         <Box display='block' alignItems='center'>
-          <Progress isIndeterminate />
+          <Progress size='lg' isIndeterminate />
         </Box>
       }
       {!isLoading &&

@@ -34,8 +34,8 @@ import {
 // Constants
 // =========
 
-const LOAD_TIME_LOWER = 1000    // lower bound on randomized load time
-const LOAD_TIME_UPPER = 1500   // upper bound on randomized load time
+const LOAD_TIME_LOWER = 1250    // lower bound on randomized load time
+const LOAD_TIME_UPPER = 1750   // upper bound on randomized load time
 
 
 // ====================
@@ -231,7 +231,7 @@ const ReagentPriceBox = (props) => {
 
 // Reagent Prices
 export const ReagentPrices = () => {
-  
+
   const { faction } = useContext(FactionContext);
   const { profession } = useContext(ProfessionContext);
   const { reagentPrices, setReagentPrices } = useContext(ReagentPricesContext);
@@ -284,7 +284,7 @@ export const ReagentPrices = () => {
       // update state after min time has elapsed
       const minLoadingTime = getRandomInt(LOAD_TIME_LOWER, LOAD_TIME_UPPER);
       const endTime = new Date();
-      const delay = Math.max(minLoadingTime - (endTime - startTime), 0);      
+      const delay = Math.max(minLoadingTime - (endTime - startTime), 0);
       const loadedReagentPricesState = {
         is_loading: false,
         by_item_class: data,

@@ -228,7 +228,7 @@ const ProfessionButton = (props) => {
   
   const [ isProfessionNav, setIsProfessionNav ] = useState(false);
   
-  const variant = (profession.name === props.profession ? "solid" : "ghost");
+  const variant = (profession.name === props.profession ? 'solid' : 'ghost');
   
   const nodeRef = createRef();
   
@@ -378,7 +378,7 @@ export const Header = () => {
         borderBottom='4px' 
         borderColor='teal.500'
       >
-        <Image src={logo} w='95px' m='0px 8px 0px 0px'/>
+        <Image src={logo} h='86px' w='95px' m='0px 8px 0px 0px'/>
         <Box display='flex' flexGrow={1} flexDirection='column'>
         
           <Box 

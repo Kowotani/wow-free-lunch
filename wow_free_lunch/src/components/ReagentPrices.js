@@ -22,7 +22,20 @@ import { RealmContext } from '../state/RealmContext';
 
 import { PriceBox } from './PriceBox'
 
-import { DEV_BASE_URL, getWowHeadUrl, getItemQualityColor } from '../utils';
+import { 
+  DEV_BASE_URL, 
+  getItemQualityColor, 
+  getRandomInt, 
+  getWowHeadUrl 
+} from '../utils';
+
+
+// =========
+// Constants
+// =========
+
+const LOAD_TIME_LOWER = 1000    // lower bound on randomized load time
+const LOAD_TIME_UPPER = 1500   // upper bound on randomized load time
 
 
 // ====================
@@ -39,15 +52,20 @@ const ItemClassAccordion = (props) => {
       <AccordionItem border='0px'>
       {({ isExpanded }) => (
         <>
-          <AccordionButton bg='yellow.400' color='white' _hover={{bg: 'yellow.300'}} _expanded={{ bg: 'yellow.200', color: 'gray.500' }} borderRadius='12px'>
+          <AccordionButton 
+            bg='yellow.400' 
+            color='white'
+            _hover={{bg: 'yellow.300'}} 
+            _expanded={{ bg: 'yellow.200', color: 'gray.500' }} 
+            borderRadius='12px'
+          >
             <Box flex='1' textAlign='left'>
               {props.itemClass}
             </Box>
-              {isExpanded ? (
-                <Icon as={FiMinusCircle} boxSize='22px' />
-              ) : (
-                <Icon as={FiPlusCircle} boxSize='22px' />
-              )}
+              {isExpanded
+                ? <Icon as={FiMinusCircle} boxSize='22px'/>
+                : <Icon as={FiPlusCircle} boxSize='22px'/>
+              }
           </AccordionButton>
           <AccordionPanel paddingBottom='8px'>
             <Box justifyContent='center'>
@@ -87,18 +105,28 @@ const ItemSubclassAccordion = (props) => {
       <AccordionItem border='0px'>
         {({ isExpanded }) => (
           <>
-            <AccordionButton bg='purple.400' color='white' _hover={{bg: 'purple.300'}} _expanded={{ bg: 'purple.200', color: 'gray.500' }} borderRadius='12px'>
+            <AccordionButton 
+              bg='purple.400' 
+              color='white' 
+              _hover={{bg: 'purple.300'}}
+              _expanded={{ bg: 'purple.200', color: 'gray.500' }} 
+              borderRadius='12px'
+            >
               <Box flex='1' textAlign='left'>
                 {props.itemSubclass}
               </Box>
-                {isExpanded ? (
-                  <Icon as={FiMinusCircle} boxSize='22px'/>
-                ) : (
-                  <Icon as={FiPlusCircle} boxSize='22px'/>
-                )}
+                {isExpanded 
+                  ? <Icon as={FiMinusCircle} boxSize='22px'/>
+                  : <Icon as={FiPlusCircle} boxSize='22px'/>
+                }
             </AccordionButton>
             <AccordionPanel paddingBottom='8px'>
-              <Box display='flex' gap='8px' justifyContent='center' flexWrap='wrap'>
+              <Box 
+                display='flex' 
+                gap='8px' 
+                justifyContent='center' 
+                flexWrap='wrap'
+              >
                   {
                     reagentPrices['by_item_class'][props.itemClass][props.itemSubclass]
                     .sort(
@@ -108,7 +136,11 @@ const ItemSubclassAccordion = (props) => {
                     .map(
                       reagent => {
                         return (
-                          <Box key={reagent.item_id} display='block' padding='8px'>
+                          <Box 
+                            key={reagent.item_id} 
+                            display='block' 
+                            padding='8px'
+                          >
                             <ReagentPriceBox
                               itemId={reagent.item_id}
                               name={reagent.name} 
@@ -139,14 +171,39 @@ const ItemSubclassAccordion = (props) => {
 const ReagentPriceBox = (props) => {
 
   return (
-    <Box display='flex' height='65px' width='250px' bg={props.price === 0 ? 'gray.100' : 'green.100'} borderRadius='12px'>
-      <Box display='flex' width='65px' alignItems='center' justifyContent='center'>
+    <Box 
+      display='flex' 
+      height='65px' 
+      width='250px' 
+      bg={props.price === 0 ? 'gray.100' : 'green.100'} 
+      borderRadius='12px'
+    >
+      <Box 
+        display='flex' 
+        width='65px' 
+        alignItems='center' 
+        justifyContent='center'
+      >
          <Link href={getWowHeadUrl(props.itemId)} isExternal>
-          <Image src={props.mediaUrl} height='48px' width='48px' border='2px solid white' borderRadius='10px' outline='2px solid black'/>
+          <Image 
+            src={props.mediaUrl} 
+            height='48px' 
+            width='48px' 
+            border='2px solid white' 
+            borderRadius='10px' 
+            outline='2px solid black'
+          />
         </Link>
       </Box>
       <Box width='185px'>
-        <Box display='flex' alignItems='flex-end' fontWeight='semibold' padding='4px 4px 0px 4px' noOfLines={1} color={getItemQualityColor(props.quality)}>
+        <Box 
+          display='flex' 
+          alignItems='flex-end' 
+          fontWeight='semibold' 
+          padding='4px 4px 0px 4px' 
+          noOfLines={1} 
+          color={getItemQualityColor(props.quality)}
+        >
           <Tooltip label={props.name} placement='top'>
             <Link href={getWowHeadUrl(props.itemId)} isExternal>
               {props.name}
@@ -156,11 +213,8 @@ const ReagentPriceBox = (props) => {
         <Box display='flex' justifyContent='flex-end'>
           <Box p='4px 4px 4px 0px'>
             {props.price === 0 
-              ? (
-                <Box p='0px 8px'>No data</Box>
-              ) : (
-                <PriceBox price={props.price}/>
-              )
+              ? <Box p='0px 8px'>No data</Box>
+              : <PriceBox price={props.price}/>  
             }
           </Box>
         </Box>
@@ -195,6 +249,7 @@ export const ReagentPrices = () => {
         update_time: null,
       };
       setReagentPrices(loadingReagentPricesState);
+      const startTime = new Date();
 
       // prepare config
       const base_url = (window.location.origin === DEV_BASE_URL 
@@ -226,14 +281,19 @@ export const ReagentPrices = () => {
         }
       }
       
-      // update state
+      // update state after min time has elapsed
+      const minLoadingTime = getRandomInt(LOAD_TIME_LOWER, LOAD_TIME_UPPER);
+      const endTime = new Date();
+      const delay = Math.max(minLoadingTime - (endTime - startTime), 0);      
       const loadedReagentPricesState = {
         is_loading: false,
         by_item_class: data,
         by_item_id: dataItemId,
         update_time: resJson['update_time'],
       }
-      setReagentPrices(loadedReagentPricesState);
+      setTimeout(() => {
+        setReagentPrices(loadedReagentPricesState);
+      }, delay);
     };
     
     // invoke function

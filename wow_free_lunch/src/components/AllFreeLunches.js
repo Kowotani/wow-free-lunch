@@ -17,7 +17,15 @@ import { FreeLunch, FreeLunchTable } from './FreeLunchTable';
 import { AllFreeLunchesContext } from '../state/AllFreeLunchesContext';
 import { FactionContext } from '../state/FactionContext';
 import { RealmContext } from '../state/RealmContext';
-import { DEV_BASE_URL, getFormattedDate } from '../utils';
+import { DEV_BASE_URL, getFormattedDate, getRandomInt } from '../utils';
+
+
+// =========
+// Constants
+// =========
+
+const LOAD_TIME_LOWER = 650    // lower bound on randomized load time
+const LOAD_TIME_UPPER = 1250   // upper bound on randomized load time
 
 
 // ====================
@@ -41,15 +49,20 @@ const ProfessionAccordion = (props) => {
       <AccordionItem border='0px'>
         {({ isExpanded }) => (
           <>
-            <AccordionButton bg='gray.200' color='gray.500' _hover={{bg: 'gray.300'}} _expanded={{bg: 'green.400', color: 'white'}} borderRadius='12px'>
+            <AccordionButton 
+              bg='gray.200' 
+              color='gray.500' 
+              _hover={{bg: 'gray.300'}} 
+              _expanded={{bg: 'green.400', color: 'white'}} 
+              borderRadius='12px'
+            >
               <Box flex='1' textAlign='left'>
                 {props.profession}
               </Box>
-              {isExpanded ? (
-                <Icon as={FiMinusCircle} boxSize='22px' />
-              ) : (
-                <Icon as={FiPlusCircle} boxSize='22px' />
-              )}
+              {isExpanded 
+                ? <Icon as={FiMinusCircle} boxSize='22px' />
+                : <Icon as={FiPlusCircle} boxSize='22px' />
+              }
             </AccordionButton>
             <AccordionPanel p={0}>
               <FreeLunchTable
@@ -88,9 +101,10 @@ export const AllFreeLunches = () => {
       
       // update state
       setIsLoading(true);
+      const startTime = new Date();
       
       // prepare config
-      const base_url = (window.location.origin === DEV_BASE_URL 
+      const baseUrl = (window.location.origin === DEV_BASE_URL 
         ? DEV_BASE_URL
         : window.location.origin
       )
@@ -99,7 +113,7 @@ export const AllFreeLunches = () => {
         faction: faction.name,
         date: 'latest',
       }).toString();
-      const url = base_url + '/api/all_free_lunches?' + params;
+      const url = baseUrl + '/api/all_free_lunches?' + params;
       
       // get response
       const res = await fetch(url)
@@ -130,12 +144,17 @@ export const AllFreeLunches = () => {
         })
       }
 
-      // update state
-      setIsLoading(false);
-      setAllFreeLunches({
-        free_lunches: free_lunches,
-        update_time: resJson['update_time'],
-      });      
+      // update state after min time has elapsed
+      const minLoadingTime = getRandomInt(LOAD_TIME_LOWER, LOAD_TIME_UPPER);
+      const endTime = new Date();
+      const delay = Math.max(minLoadingTime - (endTime - startTime), 0);
+      setTimeout(() => {
+        setIsLoading(false);
+        setAllFreeLunches({
+          free_lunches: free_lunches,
+          update_time: resJson['update_time'],
+        }); 
+      }, delay);
     };
     
     // invoke function
@@ -157,13 +176,23 @@ export const AllFreeLunches = () => {
   
   return (
     <>
-      <Box display='flex' alignItems='center' justifyContent='space-between' bg='teal.500' color='white' fontWeight='medium' p='8px 14px' m='10px 0px 6px 0px'>
+      <Box 
+        display='flex' 
+        alignItems='center' 
+        justifyContent='space-between' 
+        bg='teal.500' 
+        color='white' 
+        fontWeight='medium' 
+        p='8px 14px' 
+        m='10px 0px 6px 0px'
+      >
         <Box>
           Free Lunches
         </Box>
         <CalendarPopover 
           color='gray.600' 
-          label={'As of ' + getFormattedDate(new Date(allFreeLunches.update_time))}
+          label={'As of ' + getFormattedDate(
+            new Date(allFreeLunches.update_time))}
           isDisabled={isLoading}
         />
       </Box>

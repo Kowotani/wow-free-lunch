@@ -56,17 +56,22 @@ const WhatIs = () => {
   
   const freeLunchWiki = 'https://en.wikipedia.org/wiki/There_ain%27t_no_such_thing_as_a_free_lunch'
   const npcWiki = 'https://en.wikipedia.org/wiki/Non-player_character'
+  const wowOfficial = 'https://www.worldofwarcraft.com'
   
   return (
     <Box m='10px 0px'>
       <SectionHeader content='What is WoW Free Lunch?' />
       <Text p='10px 14px' textAlign='center'>
-        WoW Free Lunch helps players identify opportunities to 
+        WoW Free Lunch helps{' '} 
+        <Link fontWeight='medium' color='teal' href={wowOfficial} isExternal>
+           World of Warcraft 
+        </Link>
+        {' '}players identify opportunities to 
         earn risk-free, in-game gold (ie. a "
         <Link fontWeight='medium' color='teal' href={freeLunchWiki} isExternal>
           Free Lunch
         </Link>
-        )" by crafting and selling items 
+        ") by crafting and selling items 
       </Text>
       <Box bg='gray.200' borderRadius='12px' maxWidth='475px' m={width >= FREE_LUNCH_QUOTE_BREAKPOINT ? 'auto' : '10px 14px'}>
         <Text p='10px' fontStyle='italic' fontSize='2xl' color='teal' textAlign='center'>
@@ -76,9 +81,11 @@ const WhatIs = () => {
         </Text>
       </Box>
       <Text p='10px 14px' textAlign='center'>
-        The idea is to use reagent prices from the auction house to identify craftable 
-        items using those reagents that can be sold profitably to{' '}
-        <Link href={npcWiki} isExternal>NPCs</Link> 
+        The idea is to identify which reagents to buy from the auction house to 
+        craft items that can be sold profitably to{' '}
+        <Link fontWeight='medium' color='teal' href={npcWiki} isExternal>
+          Non-Player Characters
+        </Link> 
       </Text>
     </Box>
   )
@@ -184,7 +191,7 @@ const Accuracy = () => {
         />
         <ListBlurb 
           content='Simplifying calculations by using only the lowest prices 
-          instead of the "order book"'
+          instead of the full range of prices'
         />
         <ListBlurb 
           content='Using API data with known issues'

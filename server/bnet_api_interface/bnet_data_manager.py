@@ -3,6 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from django.apps import apps
 from django.db.models import Q
+from django.utils import timezone
 import datetime as dt
 from enum import Enum
 from urllib.parse import urlparse
@@ -1869,7 +1870,7 @@ class AuctionDataManager:
             raise Exception('Error: get_auctions() in bnet_data_loader.load_auction()')
        
         # set the load timestamps
-        update_time = dt.datetime.now()
+        update_time = timezone.now()
         update_date = update_time.date()
         update_hour = update_time.strftime('%H')
     
@@ -1922,7 +1923,7 @@ class AuctionDataManager:
     def load_auction_summary(self, update_date, update_hour):
         
         # set the load timestamps
-        update_time = dt.datetime.now()
+        update_time = timezone.now()
     
         qm = QueryManager()
 

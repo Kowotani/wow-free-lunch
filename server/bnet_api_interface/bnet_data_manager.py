@@ -1,4 +1,4 @@
-from .bnet_api_utils import BNetAPIUtil, GameVersion
+from bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 from dataclasses import dataclass
 from django.apps import apps
@@ -74,8 +74,11 @@ class BulkObjectLoader:
         model_key = model_class._meta.label
         model_class.objects.bulk_create(
             self._create_queues[model_key], ignore_conflicts=ignore_conflicts)
-        print('{} model - created {} objects'.format(
-            model_key, len(self._create_queues[model_key])))
+        print('[{}] - {} model - created {} objects'.format(
+            dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            model_key, 
+            len(self._create_queues[model_key])
+            ))
         self._create_queues[model_key].clear()
         
     

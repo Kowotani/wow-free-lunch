@@ -911,8 +911,9 @@ class AllFreeLunches(View) :
             		ri.item_id AS reagent_item_id,
             		COUNT(ri.item_id) OVER (PARTITION BY ci.item_id) AS num_reagents,
             		-- auctions
-            		a.min_price,
-            		COUNT(a.item_id) OVER (PARTITION BY ci.item_id) AS num_prices
+                    IF(rid.is_vendor_item, rid.purchase_price, a.min_price) AS min_price,
+                    COUNT(IF(rid.is_vendor_item, ri.item_id, a.item_id))
+                        OVER (PARTITION BY ci.item_id) AS num_prices
             	FROM profession p
             	JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             	JOIN expansion e ON pst.expansion_id = e.expansion_id
@@ -923,6 +924,7 @@ class AllFreeLunches(View) :
             	-- reagents
             	JOIN reagent rea ON rec.recipe_id = rea.recipe_id
             	JOIN item ri ON rea.item_id = ri.item_id
+            	JOIN item_data rid ON ri.classic_item_data_id = rid.item_data_id
             	-- auctions
             	LEFT JOIN auction_summary a ON ri.item_id = a.item_id
 	            	AND a.auction_house_id = %s

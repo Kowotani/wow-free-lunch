@@ -1,4 +1,4 @@
-from bnet_api_utils import BNetAPIUtil, GameVersion
+from .bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 from dataclasses import dataclass
 from django.apps import apps

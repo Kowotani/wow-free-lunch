@@ -4,7 +4,6 @@ import { useState, createContext } from 'react';
 export const SupportedRealm = {
     ARUGAL: 'Argual',
     BENEDICTION: 'Benediction',
-    SKYFURY: 'Skyfury',
     FAERLINA: 'Faerlina',
     GROBBULUS: 'Grobbulus',
     MANKRIK: 'Mankrik',

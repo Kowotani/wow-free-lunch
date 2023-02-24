@@ -1984,27 +1984,47 @@ class AuctionDataManager:
     def load_auction_summary(self, update_date, update_hour):
         
         # set the load timestamps
-        update_time = timezone.now()
-    
+        update_time = timezone.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        
         qm = QueryManager()
 
-        # check for existing data
+        # delete existing data
         if AuctionSummary.objects.filter(
                 update_date=update_date,
-                update_hour=update_hour
+                update_hour=update_hour            
             ).exists():
-                raise Exception('Error: Auction Summary for (update_date={}, update_hour{}) already exists'.format(
-                    update_date, update_hour))
+                print('Deleting AuctionSummary for update_date={}, update_hour={}'.format(
+                    update_date, update_hour
+                    ))
+                AuctionSummary.objects.filter(
+                        update_date=update_date,
+                        update_hour=update_hour            
+                    ).delete()
             
-        # query data
+        # insert data
         sql = '''
+            INSERT INTO auction_summary
             SELECT
-            	auction_house_id,
+            	CONCAT(
+            		'Auction Summary - ', 
+            		auction_house_id, 
+            		'_', item_id,
+            		'_', %s,
+            		'_', %s) AS name,
+            	CONCAT(
+            		auction_house_id, 
+            		'_', item_id,
+            		'_', %s,
+            		'_', %s) AS auction_summary_id,
             	item_id,
             	SUM(quantity) AS quantity,
             	1.0 * SUM(buyout_unit_price * quantity) / SUM(quantity) AS vwap,
             	SUM(CASE WHEN rnk = 1 THEN quantity END) AS min_quantity,
-            	MIN(CASE WHEN rnk = 1 THEN buyout_unit_price END) AS min_price
+            	MIN(CASE WHEN rnk = 1 THEN buyout_unit_price END) AS min_price,
+            	%s AS update_time,
+            	%s AS update_date,
+            	%s AS update_hour,
+            	auction_house_id
             FROM
             (
             	SELECT
@@ -2031,36 +2051,18 @@ class AuctionDataManager:
             		GROUP BY 1, 2, 3
             	) z
             ) y
-            GROUP BY 1, 2;
+            GROUP BY 1, 2, 3, 8, 9, 10;
         '''
-        params = [update_date, update_hour]
-        res = qm.query(sql, params)
-        
-        # enqueue objects for loading
-        for r in res:
-            obj = AuctionSummary(
-                auction_summary_id='{}_{}_{}_{}'.format(
-            		r['auction_house_id'],
-            		r['item_id'],
-            		update_date.replace('-',''),
-            		update_hour),
-            	auction_house=AuctionHouse.objects.get(
-                    auction_house_id=r['auction_house_id']),
-                item_id=r['item_id'],
-                quantity=r['quantity'],
-                vwap=r['vwap'],
-                min_quantity=r['min_quantity'],
-                min_price=r['min_price'],
-                update_time=update_time,
-                update_date=dt.datetime.strptime(update_date, '%Y-%m-%d').date(),
-                update_hour=update_hour,
-                name='Auction Summary - {}_{}_{}_{}'.format(
-            		r['auction_house_id'],
-            		r['item_id'],
-            		update_date.replace('-',''),
-            		update_hour)
-            )
-            self._obj_loader.add(obj, suppress_logging=True) 
-
-        # load any remaining objects
-        self._obj_loader.commit_remaining()
+        params = [
+            update_date.replace('-', ''),   # name
+            update_hour,    # name
+            update_date.replace('-', ''),   # auction_summary_id
+            update_hour,    # auction_summary_id,
+            update_time,    # outer query
+            update_date,    # outer query
+            update_hour,    # outer query
+            update_date,    # subquery
+            update_hour     # subquery
+        ]
+        res = qm.query(sql, params, row_count=True)
+        print('Loaded {} rows'.format(res))

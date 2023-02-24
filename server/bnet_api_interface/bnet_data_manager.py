@@ -1,11 +1,13 @@
 from .bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
+import csv
 from dataclasses import dataclass
 from django.apps import apps
 from django.db.models import Q
 from django.utils import timezone
 import datetime as dt
 from enum import Enum
+import sys
 from urllib.parse import urlparse
 # add '/home/ec2-user/environment/wow-free-lunch/dj_wfl' to PYTHONPATH
 from wfl.models import (Auction, AuctionHouse, AuctionSummary, 
@@ -1874,41 +1876,97 @@ class AuctionDataManager:
        
         # set the load timestamps
         update_time = timezone.now()
-        update_date = update_time.date()
-        update_hour = update_time.strftime('%H')
-    
-        # iterate through each auction
-        for auction in auction_r['auctions']:
+        update_date = update_time.date().strftime('%Y-%m-%d')
+        update_hour = update_time.hour
+        update_time = update_time.strftime('%Y-%m-%d %H:%M:%S.%f')
 
-            # get unit prices
-            bid_unit_price = None if 'bid' not in auction else auction['bid'] / auction['quantity']
-            buyout_unit_price = None if 'buyout' not in auction else auction['buyout'] / auction['quantity']
-
-            # enqueue Auction object for loading 
-            obj = Auction(
-                auction_listing_id='{}_{}_{}'.format(
-                    update_date.strftime('%Y%m%d'),
-                    update_hour, 
-                    auction['id']),
-                auction_id=auction['id'],
-                item_id=auction['item']['id'],
-                quantity=auction['quantity'],
-                bid_unit_price=bid_unit_price,
-                buyout_unit_price=buyout_unit_price,
-                time_left=self._get_auction_time_left(auction['time_left']),
-                update_time=update_time,
-                update_date=update_date,
-                update_hour=int(update_hour),
-                auction_house=AuctionHouse.objects.get(
-                    connected_realm_id=connected_realm_id, 
-                    faction_id=auction_house_faction_id),
-                name='Auction - {}'.format(auction['id'])
-            )
-            self._obj_loader.add(obj, suppress_logging=True) 
-
-        # load any remaining objects
-        self._obj_loader.commit_remaining()
+        # prepare file for writing
+        file_name = '/tmp/wfl/{}_{}.tsv'.format(
+            connected_realm_id, 
+            auction_house_faction_id)
+            
+        total_rows = 0
+        row_buffer = []
+        row_buffer_size = 100000
+        row_counter = 0
         
+        with open(file_name, 'w', newline='') as outfile:
+            writer = csv.writer(outfile, delimiter='\t', lineterminator='\n')
+            
+            # iterate through each auction
+            for auction in auction_r['auctions']:
+    
+                # set params
+                name = 'Auction - {}'.format(auction['id'])
+                auction_listing_id = '{}_{}_{}'.format(
+                    update_date.replace('-', ''),
+                    update_hour, 
+                    auction['id'])
+                auction_id = auction['id']
+                item_id = auction['item']['id']
+                quantity = auction['quantity']
+                bid_unit_price = 0 if 'bid' not in auction else int(auction['bid'] / auction['quantity'])
+                buyout_unit_price = 0 if 'buyout' not in auction else int(auction['buyout'] / auction['quantity'])
+                time_left = self._get_auction_time_left(auction['time_left'])
+                auction_house_id = '{}_{}'.format(
+                    connected_realm_id, 
+                    auction_house_faction_id)
+
+                # add to buffer
+                row_buffer.append([
+                    name,
+                    auction_listing_id,
+                    auction_id,
+                    item_id,
+                    quantity,
+                    bid_unit_price,
+                    buyout_unit_price,
+                    time_left,
+                    update_time,
+                    update_date,
+                    update_hour,
+                    auction_house_id
+                ])
+                
+                row_counter += 1
+                total_rows += 1
+                
+                # write to file
+                if row_counter == row_buffer_size:
+                    writer.writerows(row_buffer)
+                    row_buffer = []
+                    row_counter = 0
+                    print('[{}] - wrote {} rows to {}'.format(
+                        dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        row_buffer_size,
+                        file_name
+                    ))
+                    
+            # write remaining contents
+            if row_counter > 0:
+                writer.writerows(row_buffer)
+                print('[{}] - wrote {} rows to {}'.format(
+                    dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    len(row_buffer),
+                    file_name
+                ))                
+
+        # load to database
+        qm = QueryManager()
+        
+        sql = "LOAD DATA LOCAL INFILE %s INTO TABLE auction;"
+        params = [file_name]
+        
+        res = qm.query(sql, params, row_count=True)
+        print('Loaded {} rows'.format(res))
+        
+        # warn if more than 1% of rows were not loaded
+        if res / total_rows < 0.99:
+            msg = 'Loading {} loss (total rows: {}, missing rows: {})'.format(
+                file_name,
+                total_rows,
+                total_rows - res)
+            print(msg, file=sys.stderr)
 
     '''
     DESC

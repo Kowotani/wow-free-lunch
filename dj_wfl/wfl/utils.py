@@ -18,7 +18,7 @@ class QueryManager:
     RETURN
         List of dicts where each dict is a row of the queryset
     '''   
-    def query(self, sql, params=[]):
+    def query(self, sql, params=[], row_count=False):
         
         # establish connection
         with connection.cursor() as cursor:
@@ -29,10 +29,16 @@ class QueryManager:
             else:
                 cursor.execute(sql)
             
-            # get column names
-            columns = [col[0] for col in cursor.description]
+            # row count
+            if row_count:
+                res = cursor.rowcount
             
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+            # formatted query results
+            else:
+                columns = [col[0] for col in cursor.description]
+                res = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
+            return res
             
         raise Exception('Error in query: {} with params: {}'.format(sql, params))
 

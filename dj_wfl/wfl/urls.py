@@ -46,7 +46,8 @@ from wfl.views import (
 # Constants
 # =========
 
-CACHE_DURATION = 60 * 60    # 1 hour
+DYNAMIC_CACHE_DURATION = 60 * 60 * 1   # 1 hour
+STATIC_CACHE_DURATION = 60 * 60 * 24   # 24 hours
 
 
 urlpatterns = [
@@ -130,9 +131,12 @@ urlpatterns = [
     path('connected_realm/all', ConnectedRealmList.as_view()),
     path('connected_realm/<pk>', ConnectedRealmDetail.as_view()),
     
-    path('connected_realm/realm_connection/create', RealmConnectionCreate.as_view()),
-    path('connected_realm/realm_connection/all', RealmConnectionList.as_view()),
-    path('connected_realm/realm_connection/<pk>', RealmConnectionDetail.as_view()),
+    path('connected_realm/realm_connection/create', 
+        RealmConnectionCreate.as_view()),
+    path('connected_realm/realm_connection/all', 
+        RealmConnectionList.as_view()),
+    path('connected_realm/realm_connection/<pk>', 
+        RealmConnectionDetail.as_view()),
     
     # --------
     # Auctions
@@ -151,7 +155,10 @@ urlpatterns = [
     # FE API Endpoints
     # ================
     
-    path('api/reagent_prices', cache_page(CACHE_DURATION)(ReagentPrices.as_view())),
-    path('api/crafted_item_recipes', cache_page(CACHE_DURATION)(CraftedItemRecipes.as_view())),
-    path('api/all_free_lunches', cache_page(CACHE_DURATION)(AllFreeLunches.as_view())),
+    path('api/reagent_prices', 
+        cache_page(DYNAMIC_CACHE_DURATION)(ReagentPrices.as_view())),
+    path('api/crafted_item_recipes', 
+        cache_page(STATIC_CACHE_DURATION)(CraftedItemRecipes.as_view())),
+    path('api/all_free_lunches', 
+        cache_page(DYNAMIC_CACHE_DURATION)(AllFreeLunches.as_view())),
 ]

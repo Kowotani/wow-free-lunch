@@ -1993,9 +1993,8 @@ class AuctionDataManager:
                 update_date=update_date,
                 update_hour=update_hour            
             ).exists():
-                print('Deleting AuctionSummary for update_date={}, update_hour={}'.format(
-                    update_date, update_hour
-                    ))
+                print('Deleting AuctionSummary ({}, {})'.format(
+                    update_date, update_hour))
                 AuctionSummary.objects.filter(
                         update_date=update_date,
                         update_hour=update_hour            

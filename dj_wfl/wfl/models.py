@@ -186,36 +186,6 @@ DESC
     Mostly maps to /connected-realm/{connectedRealmId}/auctions/{auctionHouseId} endpoint
 '''
 
-# class Auction(CommonData):
-#     auction_id = models.IntegerField('auction ID', primary_key=True)
-#     auction_house = models.ForeignKey(AuctionHouse, on_delete=models.CASCADE)
-#     item_id = models.IntegerField('item ID of the auctioned item', default=0)
-#     quantity = models.SmallIntegerField('quantity of auction item', default=1)
-#     bid_unit_price = models.IntegerField('bid price per auction item', null=True)
-#     buyout_unit_price = models.IntegerField('buyout price per auction item', null=True)
-#     time_left = models.CharField('SHORT / MEDIUM / LONG / VERY_LONG', max_length=256, choices=AuctionTimeLeft.choices(), default=AuctionTimeLeft.LONG)
-#     update_time =  models.DateTimeField('datetime the auction was loaded', default=timezone.now)
-#     update_date = models.DateField('date the auction was loaded', default=date.today)
-    
-
-#     class Meta:
-#         db_table = 'auction'
-#         indexes = [
-#             models.Index(fields=['auction_house', 'update_date']),
-#             models.Index(fields=['update_date', 'update_time']),
-#             ]
-
-        
-#     def __str__(self):
-#         return CommonData.__str__(self)
-
-
-# '''
-# DESC
-#     Dim table for Auction Listing
-#     Mostly maps to /connected-realm/{connectedRealmId}/auctions/{auctionHouseId} endpoint
-# '''
-
 class Auction(CommonData):
     auction_listing_id = models.CharField('concat date / hour / auction_id as dummy PK', max_length=256, primary_key=True)
     auction_id = models.IntegerField('auction ID', default=0)
@@ -272,6 +242,35 @@ class AuctionSummary(CommonData):
         
     def __str__(self):
         return CommonData.__str__(self)
+
+
+'''
+DESC
+    Dim table for the latest Auction Summary
+    Summarizes auction prices for the latest snapshot
+'''
+
+class AuctionSummaryLatest(CommonData):
+    auction_summary_id = models.CharField('concat auction house / item / date / hour as dummy PK', max_length=256, primary_key=True)
+    auction_house = models.ForeignKey(AuctionHouse, on_delete=models.CASCADE)
+    item_id = models.IntegerField('item ID of the auctioned item', default=0)
+    quantity = models.IntegerField('quantity of auction item', default=1)
+    vwap = models.IntegerField('VWAP per auction item', null=True)
+    min_quantity = models.IntegerField('quantity of auction item at the min_price', default=1)
+    min_price = models.IntegerField('buyout price per auction item', null=True)
+    update_time =  models.DateTimeField('datetime the auction summary was loaded', default=timezone.now)
+    update_date = models.DateField('date the auction summary was loaded', default=date.today)
+    update_hour = models.IntegerField('hour bucket the auction summary was loaded', default=0)
+    
+
+    class Meta:
+        db_table = 'auction_summary_latest'
+        indexes = [models.Index(fields=['auction_house', 'item_id'])]
+
+        
+    def __str__(self):
+        return CommonData.__str__(self)
+
 
 '''
 =================

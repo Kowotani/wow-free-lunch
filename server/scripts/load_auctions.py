@@ -29,10 +29,15 @@ def main():
             adm.load_auction(GameVersion.CLASSIC, 
                 realm.value, faction.value)
     
-    # load the auction_summary
-    print('Creating auction summary for {}_{}'.format(
+    # load auction_summary
+    print('Updating auction_summary for {}_{}'.format(
         date, hour))
     adm.load_auction_summary(date, hour)
+    
+    # load auction_summary_latest
+    print('Updating auction_summary_latest for {}_{}'.format(
+        date, hour))
+    adm.load_auction_summary_latest(date, hour)
 
 if __name__ == "__main__":
     main()

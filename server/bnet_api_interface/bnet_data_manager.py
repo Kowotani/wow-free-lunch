@@ -2065,3 +2065,59 @@ class AuctionDataManager:
         ]
         res = qm.query(sql, params, row_count=True)
         print('Loaded {} rows'.format(res))
+        
+        
+    '''
+    DESC
+        Loads the `auction_summary_latest` table
+        Update the table for all auction houses with auction_summary data for
+        the given inputs
+        
+    INPUT
+        - update_date ('YYYY-MM-DD')
+        - update_hour (0-23)
+        
+    RETURN
+    '''    
+    def load_auction_summary_latest(self, update_date, update_hour):
+        
+        qm = QueryManager()
+
+        # delete existing data
+        print('Deleting auction_summary_latest')
+        sql = '''
+            DELETE
+            FROM auction_summary_latest
+            WHERE auction_house_id IN (
+                SELECT DISTINCT auction_house_id
+                FROM auction_summary
+                WHERE update_date = %s
+                    AND update_hour = %s
+            )
+        '''
+        params = [update_date, update_hour]
+        res = qm.query(sql, params, row_count=True)
+        print('Deleted {} rows'.format(res))
+            
+        # insert data
+        sql = '''
+            INSERT INTO auction_summary_latest
+            SELECT
+            	name,
+                auction_summary_id,
+                item_id, 
+                quantity,
+                vwap,
+                min_quantity,
+                min_price,
+                update_time,
+                update_date,
+                update_hour,
+                auction_house_id            
+            FROM auction_summary
+            WHERE update_date = %s
+                AND update_hour = %s
+        '''
+        params = [update_date, update_hour]
+        res = qm.query(sql, params, row_count=True)
+        print('Loaded {} rows'.format(res))

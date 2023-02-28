@@ -620,6 +620,50 @@ FE API Endpoints
 ================
 '''
 
+
+'''
+Helper Functions
+'''
+
+'''
+DESC
+    Get the query parameters for auction_summary_ tables
+    
+INPUT
+    - realm name
+    - faction name
+    
+RETURN
+    Dictionary with the following keys
+    - realm_id
+    - faction_id
+'''
+def get_auction_summary_params(realm, faction):
+    
+    qm = QueryManager()
+
+    # get latest data
+    sql = '''
+        SELECT 
+            r.realm_id,
+            ah.faction_id
+        FROM auction_house ah
+        JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
+        JOIN realm r ON rc.realm_id = r.realm_id
+		WHERE 
+			r.name = %s
+			AND ah.faction = %s;
+    '''        
+    
+    params = [realm, faction]
+    res = qm.query(sql, params)
+    
+    return {
+        'realm_id': res[0]['realm_id'],
+        'faction_id': res[0]['faction_id']
+    }
+    
+    
 '''
 --------------
 Profession Nav
@@ -651,28 +695,8 @@ class ReagentPrices(View) :
         faction = params['faction']
         date = params['date']
         
-        # get latest update_data if required
-        if date == 'latest':
-            sql = '''
-				SELECT 
-				    r.realm_id,
-				    ah.faction_id,
-				    DATE(MAX(update_time)) AS update_date, 
-                    HOUR(MAX(update_time)) AS update_hour
-				FROM auction_summary a
-				JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
-				JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
-				JOIN realm r ON rc.realm_id = r.realm_id
-				WHERE 
-					r.name = %s
-					AND ah.faction = %s;
-            '''
-            params = [realm, faction]
-            res = qm.query(sql, params)
-            realm_id = res[0]['realm_id']
-            faction_id = res[0]['faction_id']
-            date = res[0]['update_date']
-            hour = res[0]['update_hour']
+        # get query params
+        query_params = get_auction_summary_params(realm, faction)
         
         # query data
         sql = '''
@@ -685,7 +709,9 @@ class ReagentPrices(View) :
             	id.quality,
             	id.media_url,
             	CAST(COALESCE(a.min_quantity, 0)  AS UNSIGNED) AS quantity,
-            	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, a.min_price), 0) AS UNSIGNED) AS min_price
+            	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, a.min_price), 0) AS UNSIGNED) AS min_price,
+            	a.update_date,
+            	a.update_hour
             FROM profession p
             JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             JOIN expansion e ON pst.expansion_id = e.expansion_id 
@@ -694,10 +720,8 @@ class ReagentPrices(View) :
             JOIN item i ON rea.item_id = i.item_id
             JOIN item_class_hierarchy ich ON i.item_class_hierarchy_id = ich.item_class_hierarchy_id
             JOIN item_data id ON i.classic_item_data_id = id.item_data_id
-            LEFT JOIN auction_summary a ON i.item_id = a.item_id 
+            LEFT JOIN auction_summary_latest a ON i.item_id = a.item_id 
             	AND a.auction_house_id = %s
-            	AND a.update_date = %s 
-            	AND a.update_hour = %s
             WHERE 
             	p.name = %s
             	AND e.is_classic
@@ -708,12 +732,14 @@ class ReagentPrices(View) :
             	id.level,
             	i.item_id;             
         '''
-        params = ['{}_{}'.format(realm_id, faction_id), date, hour, profession]
+        params = ['{}_{}'.format(query_params['realm_id'], 
+            query_params['faction_id']), profession]
         res = qm.query(sql, params)
 
         # format data
         d = {
-            'update_time': '{}T{}:00:00+00:00'.format(date, str(hour).zfill(2)),
+            'update_time': '{}T{}:00:00+00:00'.format(
+                res[0]['update_date'], str(res[0]['update_hour']).zfill(2)),
             'data': {}
         }
         for class_name in {(x['class_name']) for x in res}:
@@ -858,33 +884,15 @@ class AllFreeLunches(View) :
         realm = params['realm']
         faction = params['faction']
         date = params['date']
-        
-        # get latest update_data if required
-        if date == 'latest':
-            sql = '''
-				SELECT 
-				    r.realm_id,
-				    ah.faction_id,
-				    DATE(MAX(update_time)) AS update_date, 
-                    HOUR(MAX(update_time)) AS update_hour
-				FROM auction_summary a
-				JOIN auction_house ah ON a.auction_house_id = ah.auction_house_id
-				JOIN realm_connection rc ON ah.connected_realm_id = rc.connected_realm_id
-				JOIN realm r ON rc.realm_id = r.realm_id
-				WHERE 
-					r.name = %s
-					AND ah.faction = %s;
-            '''
-            params = [realm, faction]
-            res = qm.query(sql, params)
-            realm_id = res[0]['realm_id']
-            faction_id = res[0]['faction_id']
-            date = res[0]['update_date']
-            hour = res[0]['update_hour']
-        
+
+        # get query params
+        query_params = get_auction_summary_params(realm, faction)
+
         # query data
         sql = '''
             SELECT
+                i.update_date,
+                i.update_hour,
                 i.profession,
             	-- crafted item
             	i.name,
@@ -913,7 +921,9 @@ class AllFreeLunches(View) :
             		-- auctions
                     IF(rid.is_vendor_item, rid.purchase_price, a.min_price) AS min_price,
                     COUNT(IF(rid.is_vendor_item, ri.item_id, a.item_id))
-                        OVER (PARTITION BY ci.item_id) AS num_prices
+                        OVER (PARTITION BY ci.item_id) AS num_prices,
+            	    MAX(a.update_date) OVER () AS update_date,
+            	    MAX(a.update_hour) OVER () AS update_hour
             	FROM profession p
             	JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             	JOIN expansion e ON pst.expansion_id = e.expansion_id
@@ -926,16 +936,14 @@ class AllFreeLunches(View) :
             	JOIN item ri ON rea.item_id = ri.item_id
             	JOIN item_data rid ON ri.classic_item_data_id = rid.item_data_id
             	-- auctions
-            	LEFT JOIN auction_summary a ON ri.item_id = a.item_id
-	            	AND a.auction_house_id = %s
-                	AND a.update_date = %s 
-                	AND a.update_hour = %s
+            	LEFT JOIN auction_summary_latest a ON ri.item_id = a.item_id
+                	AND a.auction_house_id = %s
             	WHERE 
             		p.is_crafting
             		AND e.is_classic
             ) i
             WHERE i.num_reagents = i.num_prices 
-            GROUP BY 1, 2, 3, 4, 5, 6, 7
+            GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
             HAVING 
             	i.vendor_price > SUM(i.reagent_quantity * i.min_price)
             ORDER BY
@@ -943,12 +951,14 @@ class AllFreeLunches(View) :
             	i.level,
             	i.item_id;
         '''
-        params = ['{}_{}'.format(realm_id, faction_id), date, hour]
+        params = ['{}_{}'.format(query_params['realm_id'], 
+            query_params['faction_id'])]
         res = qm.query(sql, params)
 
         # format data
         d = {
-            'update_time': '{}T{}:00:00+00:00'.format(date, str(hour).zfill(2)),
+            'update_time': '{}T{}:00:00+00:00'.format(
+                res[0]['update_date'], str(res[0]['update_hour']).zfill(2)),
             'data': {}
         }
         for profession in CraftingProfession:

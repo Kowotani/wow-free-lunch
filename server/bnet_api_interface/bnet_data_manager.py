@@ -2,10 +2,10 @@ from .bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 import csv
 from dataclasses import dataclass
+import datetime as dt
 from django.apps import apps
 from django.db.models import Q
 from django.utils import timezone
-import datetime as dt
 from enum import Enum
 import sys
 from urllib.parse import urlparse

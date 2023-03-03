@@ -1,3 +1,5 @@
+import datetime as dt
+
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.views import View
@@ -662,6 +664,30 @@ def get_auction_summary_params(realm, faction):
         'realm_id': res[0]['realm_id'],
         'faction_id': res[0]['faction_id']
     }
+
+
+'''
+DESC
+    Clean the update_date and update_hour for views
+    Return the default values if either is None
+    - default date = 1 week ago
+    - default hour = 12 AM
+    
+INPUT
+    - update date
+    - update hour
+    
+RETURN
+    Tuple of (update_date, update_hour)
+'''
+def get_clean_update_date_and_hour(date, hour):
+    
+    ts = dt.datetime.now() - dt.timedelta(days=7)
+    
+    update_date = date or ts.strftime('%Y-%m-%d')
+    update_hour = str(hour).zfill(2) or '00'
+    
+    return update_date, update_hour
     
     
 '''
@@ -710,8 +736,8 @@ class ReagentPrices(View) :
             	id.media_url,
             	CAST(COALESCE(a.min_quantity, 0)  AS UNSIGNED) AS quantity,
             	CAST(COALESCE(IF(id.is_vendor_item, id.purchase_price, a.min_price), 0) AS UNSIGNED) AS min_price,
-            	a.update_date,
-            	a.update_hour
+            	MAX(a.update_date) OVER () AS update_date,
+            	MAX(a.update_hour) OVER () AS update_hour
             FROM profession p
             JOIN profession_skill_tier pst ON p.profession_id = pst.profession_id
             JOIN expansion e ON pst.expansion_id = e.expansion_id 
@@ -736,10 +762,13 @@ class ReagentPrices(View) :
             query_params['faction_id']), profession]
         res = qm.query(sql, params)
 
+        # set update date and hour variables
+        update_date, update_hour = get_clean_update_date_and_hour(
+            res[0]['update_date'], res[0]['update_hour'])
+
         # format data
         d = {
-            'update_time': '{}T{}:00:00+00:00'.format(
-                res[0]['update_date'], str(res[0]['update_hour']).zfill(2)),
+            'update_time': '{}T{}:00:00+00:00'.format(update_date, update_hour),
             'data': {}
         }
         for class_name in {(x['class_name']) for x in res}:
@@ -955,10 +984,13 @@ class AllFreeLunches(View) :
             query_params['faction_id'])]
         res = qm.query(sql, params)
 
+        # set update date and hour variables
+        update_date, update_hour = get_clean_update_date_and_hour(
+            res[0]['update_date'], res[0]['update_hour'])
+
         # format data
         d = {
-            'update_time': '{}T{}:00:00+00:00'.format(
-                res[0]['update_date'], str(res[0]['update_hour']).zfill(2)),
+            'update_time': '{}T{}:00:00+00:00'.format(update_date, update_hour),
             'data': {}
         }
         for profession in CraftingProfession:

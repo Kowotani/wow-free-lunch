@@ -33,6 +33,7 @@ import '../styles.css';
 // =========
 
 // ProfessionBar
+const PROFESSION_BAR_ONE_HEIGHT = 44  // 1 line display height
 const PROFESSION_BAR_TWO_BREAKPOINT = 845   // 2 line display
 const PROFESSION_BAR_TWO_HEIGHT = 88  // 2 line display height
 const PROFESSION_BAR_THREE_BREAKPOINT = 450   // 3 line display
@@ -331,6 +332,9 @@ const ProfessionBarManager = () => {
     } else if (width < PROFESSION_BAR_TWO_BREAKPOINT) {
       nodeRef.current?.style?.setProperty(
         '--h', PROFESSION_BAR_TWO_HEIGHT + 'px');
+    } else {
+      nodeRef.current?.style?.setProperty(
+        '--h', PROFESSION_BAR_ONE_HEIGHT + 'px');
     }
   }, [nodeRef, nav, width])
 

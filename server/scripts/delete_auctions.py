@@ -30,8 +30,7 @@ def main():
     '''
     params = [date]
     res = qm.query(sql, params, row_count=True)
-    for r in res:
-        print('Deleted {} rows'.format(res))
+    print('Deleted {} rows'.format(res))
     
     # OPTIMIZE table to reclaim space
     

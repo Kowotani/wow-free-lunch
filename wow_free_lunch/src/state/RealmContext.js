@@ -21,7 +21,7 @@ export const RealmContext = createContext({});
 export const RealmProvider = ({children}) => {
   
   const [realm, setRealm] = useState({  
-    name: 'Skyfury',
+    name: 'Whitemane',
     isSelectorTransitioning: false,
   });
   

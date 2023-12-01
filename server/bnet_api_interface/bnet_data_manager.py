@@ -1418,6 +1418,7 @@ class RealmDataManager:
         realm_categories = {
             'Brazil': RealmCategory.BRAZIL,
             'Classic': RealmCategory.CLASSIC,
+            'Classic': RealmCategory.CLASSIC_ERA,
             'Hardcore': RealmCategory.HARDCORE,
             'Latin America': RealmCategory.LATIN_AMERICA,
             'Oceanic': RealmCategory.OCEANIC,

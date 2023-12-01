@@ -149,6 +149,7 @@ This enum represents the realm categories
 class RealmCategory(Enum):
     BRAZIL = 'BRAZIL'
     CLASSIC = 'CLASSIC'
+    CLASSIC_ERA = 'CLASSIC_ERA'
     HARDCORE = 'HARDCORE'
     LATIN_AMERICA = 'LATIN_AMERICA'
     OCEANIC = 'OCEANIC'

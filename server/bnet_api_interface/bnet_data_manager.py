@@ -1503,7 +1503,7 @@ class RealmDataManager:
         if realm_type not in realm_types.keys():
             raise Exception('Unknown realm_type={}'.format(realm_type))
             
-        return realm_types[realm_type].value
+        return realm_types[realm_type]
  
     
     '''

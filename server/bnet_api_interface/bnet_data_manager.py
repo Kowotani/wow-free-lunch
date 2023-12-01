@@ -1,4 +1,4 @@
-from bnet_api_utils import BNetAPIUtil, GameVersion
+from .bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 import csv
 from dataclasses import dataclass
@@ -1613,6 +1613,9 @@ class RealmDataManager:
     '''    
     def load_connected_realm_and_realm_connection(self, game_version):
         
+        # these return 404 errors from the API
+        excluded_connected_realms = [5098, 5821]
+        
         # call the /connected-realmn/index endpoint
         index_r = self._bnet_api_util.get_connected_realm_index(game_version)
         
@@ -1625,6 +1628,10 @@ class RealmDataManager:
             # parse connected_realm_id from URL
             parse = urlparse(connected_realm['href'])
             connected_realm_id = int(parse.path.split('/')[-1])
+            
+            # exclude unsupported connected realms
+            if connected_realm_id in excluded_connected_realms:
+                continue
             
             # call the /connected-realm/{connectedRealmId} endpoint
             rid_r = self._bnet_api_util.get_connected_realm_metadata(

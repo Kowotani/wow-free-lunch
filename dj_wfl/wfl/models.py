@@ -377,8 +377,8 @@ class ItemClassHierarchy(CommonData):
 DESC
     Dim table for ItemData - to be used in conjuction with Item
     Mostly maps to /item/{itemId} endpoint
-    This model will store the actual data associated with the Item for both
-    CLASSIC and RETAIL versions of the game
+    This model will store the actual data associated with the Item for 
+    CLASSIC, ERA, HARDCORE, and RETAIL versions of the game
 '''
 
 class ItemData(CommonData, MediaData):    

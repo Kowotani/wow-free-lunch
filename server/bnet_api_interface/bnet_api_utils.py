@@ -218,10 +218,12 @@ class BNetAPIUtil:
         namespaces = {
             NamespaceType.DYNAMIC: {
                     GameVersion.CLASSIC: 'dynamic-classic-us',
+                    GameVersion.ERA: 'dynamic-classic1x-us',
                     GameVersion.RETAIL: 'dynamic-us'
                 }, 
             NamespaceType.STATIC: {
                     GameVersion.CLASSIC: 'static-classic-us',
+                    GameVersion.ERA: 'static-classic1x-us',
                     GameVersion.RETAIL: 'static-us'
                 }
             }

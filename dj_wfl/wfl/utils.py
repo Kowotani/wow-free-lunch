@@ -87,10 +87,11 @@ class Faction(Enum):
 
 
 '''
-This enum represents the CLASSIC and RETAIL versions of WoW
+This enum represents the CLASSIC, ERA and RETAIL versions of WoW
 '''
 class GameVersion(Enum):
     CLASSIC = 'CLASSIC'
+    ERA = 'ERA'
     RETAIL = 'RETAIL'
     
     @classmethod
@@ -148,8 +149,10 @@ This enum represents the realm categories
 class RealmCategory(Enum):
     BRAZIL = 'BRAZIL'
     CLASSIC = 'CLASSIC'
+    HARDCORE = 'HARDCORE'
     LATIN_AMERICA = 'LATIN_AMERICA'
     OCEANIC = 'OCEANIC'
+    SEASONAL = 'SEASONAL'
     UNITED_STATES = 'UNITED_STATES'
     US_EAST = 'US_EAST'
     US_WEST = 'US_WEST'

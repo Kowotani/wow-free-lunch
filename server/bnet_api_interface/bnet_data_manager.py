@@ -1830,7 +1830,7 @@ class AuctionDataManager:
                 ],
             params=[game_version.value]
             )
-        for connected_realm in connected_realms:
+        for connected_realm in set(connected_realms):
         
             # call the /connected-realm/{connectedRealmId}/auctions/index endpoint
             index_r = self._bnet_api_util.get_auction_house_index(game_version, 

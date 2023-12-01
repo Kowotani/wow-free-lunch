@@ -1,4 +1,4 @@
-from .bnet_api_utils import BNetAPIUtil, GameVersion
+from bnet_api_utils import BNetAPIUtil, GameVersion
 from collections import defaultdict
 import csv
 from dataclasses import dataclass
@@ -1418,7 +1418,7 @@ class RealmDataManager:
         realm_categories = {
             'Brazil': RealmCategory.BRAZIL,
             'Classic': RealmCategory.CLASSIC,
-            'Classic': RealmCategory.CLASSIC_ERA,
+            'Classic Era': RealmCategory.CLASSIC_ERA,
             'Hardcore': RealmCategory.HARDCORE,
             'Latin America': RealmCategory.LATIN_AMERICA,
             'Oceanic': RealmCategory.OCEANIC,

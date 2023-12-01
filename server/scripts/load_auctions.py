@@ -8,7 +8,7 @@ import datetime as dt
 from wfl.utils import GameVersion
 # add '/home/ec2-user/environment/wow-free-lunch/server' to PYTHONPATH
 from bnet_api_interface.bnet_data_manager import AuctionDataManager
-from scripts.utils import AuctionFaction, AuctionRealm 
+from scripts.utils import AuctionFaction, ClassicAuctionRealm, EraAuctionRealm
 
 
 def main():
@@ -21,13 +21,20 @@ def main():
     
     # load auction data for the realms and factions
     adm = AuctionDataManager()
-    for realm in AuctionRealm:
+    
+    # CLASSIC auctions
+    for realm in ClassicAuctionRealm:
         for faction in AuctionFaction:
-            print('Loading auctions for: {}({})_{}({})'.format(
-                realm.name, realm.value, 
-                faction.name, faction.value))
-            adm.load_auction(GameVersion.CLASSIC, 
-                realm.value, faction.value)
+            print('Loading CLASSIC auctions for: {}({})_{}({})'.format(
+                realm.name, realm.value, faction.name, faction.value))
+            adm.load_auction(GameVersion.CLASSIC, realm.value, faction.value)
+    
+    # ERA auctions
+    for realm in EraAuctionRealm:
+        for faction in AuctionFaction:
+            print('Loading ERA auctions for: {}({})_{}({})'.format(
+                realm.name, realm.value, faction.name, faction.value))
+            adm.load_auction(GameVersion.ERA, realm.value, faction.value)    
     
     # load auction_summary
     print('Updating auction_summary for {}_{}'.format(

@@ -2,14 +2,13 @@ import { useState, createContext } from 'react';
 
 // Realm enum
 export const SupportedRealm = {
-    ARUGAL: 'Arugal',
     BENEDICTION: 'Benediction',
+    CHAOS_BOLT: 'Chaos Bolt',
+    CRUSADER_STRIKE: 'Crusader Strike',
     FAERLINA: 'Faerlina',
     GROBBULUS: 'Grobbulus',
-    MANKRIK: 'Mankrik',
-    PAGLE: 'Pagle',
-    SKYFURY: 'Skyfury',
-    WHITEMANE: 'Whitemane',
+    LONE_WOLF: 'Lone Wolf',
+    WILD_GROWTH: 'Wild Growth'
 }
 
 
@@ -21,7 +20,7 @@ export const RealmContext = createContext({});
 export const RealmProvider = ({children}) => {
   
   const [realm, setRealm] = useState({  
-    name: 'Whitemane',
+    name: 'Lone Wolf',
     isSelectorTransitioning: false,
   });
   

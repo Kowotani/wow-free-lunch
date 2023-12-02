@@ -41,7 +41,7 @@ const PROFESSION_BAR_THREE_HEIGHT = 132  // 3 line display height
 const PROFESSION_BAR_TRANSITION_TIME = 500  // transition delay
 
 // RealmSelector
-const REALM_SELECTOR_BREAKPOINT = 525   // Top or bottom display
+const REALM_SELECTOR_BREAKPOINT = 580   // Top or bottom display
 const REALM_SELECTOR_TRANSITION_TIME = 500   // transition delay
 
 

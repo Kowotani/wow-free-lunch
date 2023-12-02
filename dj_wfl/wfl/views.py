@@ -22,6 +22,7 @@ from wfl.serializers import (AuctionSerializer, AuctionHouseSerializer,
 from wfl.utils import CraftingProfession, QueryManager
 
 import json
+import urllib
 
 
 '''
@@ -32,7 +33,7 @@ Helper Functions
 
 '''
     DESC
-        Parses a query param string and returns a dict
+        Parses and decodes a query param string and returns a dict
         
     INPUT
         Query string to parse
@@ -42,7 +43,10 @@ Helper Functions
         Returns a dictionary of query params mapped to values
 '''
 def parse_query_params(params):
-    return {x.split('=')[0]: x.split('=')[1] for x in params.split('&')}
+    return {
+        urllib.parse.unquote_plus(x.split('=')[0]): 
+        urllib.parse.unquote_plus(x.split('=')[1]) 
+    for x in params.split('&')}
 
 
 '''
